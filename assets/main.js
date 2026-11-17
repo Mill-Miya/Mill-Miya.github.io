@@ -13,6 +13,10 @@
       card.hidden = !visible;
       if (visible) total += 1;
     }
+    const featuredLabel = document.querySelector("#featured-group-label");
+    const archiveLabel = document.querySelector("#archive-group-label");
+    if (featuredLabel) featuredLabel.hidden = !cards.some(card => card.classList.contains("featured") && !card.hidden);
+    if (archiveLabel) archiveLabel.hidden = !cards.some(card => !card.classList.contains("featured") && !card.hidden);
     for (const button of buttons) {
       const active = button.dataset.filter === filter;
       button.classList.toggle("active", active);
