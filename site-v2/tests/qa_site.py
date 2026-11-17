@@ -8,6 +8,7 @@ import sys
 BASE=Path(__file__).resolve().parents[1]
 ROOT=BASE if (BASE/'index.html').is_file() else BASE/'site-v2'
 OUT=BASE/'qa'
+OUT.mkdir(parents=True,exist_ok=True)
 WIDTHS=[320,360,375,390,430,540,630,768,820,1024,1280,1440]
 links=[
 'https://mill-miya.github.io/SkyShare/',
