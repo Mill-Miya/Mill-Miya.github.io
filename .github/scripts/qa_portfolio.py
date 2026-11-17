@@ -31,6 +31,13 @@ with sync_playwright() as p:
         page.on("pageerror", lambda err: errors.append(str(err)))
         page.goto(INDEX, wait_until="load", timeout=50000)
         page.wait_for_timeout(200)
+        # Lazy screenshots below the fold load when they enter a viewport.
+        for shot in page.locator(".project-card img").all():
+            shot.scroll_into_view_if_needed(timeout=10000)
+            shot.evaluate("(img) => { img.loading = 'eager'; }")
+            shot.evaluate("(img) => img.decode()")
+        page.evaluate("window.scrollTo(0, 0)")
+        page.wait_for_timeout(180)
         metrics = page.evaluate("""() => {
           const r = n => { const x=n.getBoundingClientRect();return {
             x:x.x,y:x.y,w:x.width,h:x.height,l:x.left,t:x.top,r:x.right,b:x.bottom
