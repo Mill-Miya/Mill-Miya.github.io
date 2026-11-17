@@ -74,3 +74,25 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .project-info p,.section-lead,.hero-description{color:#495650}
 .tag-row span{color:#45534b;border-color:#aeb7ae}
 @media(max-width:640px){.hero-flag{font-size:10px;line-height:1.5}}
+
+
+/* Private registry: approved L2 overview and name-only L1 visuals. */
+.project-card.is-overview{grid-column:span 6;min-width:0;border-bottom:1px solid var(--line)}
+.project-card.is-overview .project-info{min-height:0;height:auto;border:0;padding:24px 2px 32px}
+.project-card.is-overview .project-info h3{margin:0 0 15px;font-size:clamp(27px,2.4vw,38px)}
+.project-card.is-overview .project-info p{margin:0 0 18px;max-width:54ch}
+.project-card.is-overview .project-art{aspect-ratio:1.55/1}
+.project-card.is-locked{grid-column:1/-1;border-bottom:1px solid var(--line);min-height:0;padding:0}
+.project-card.is-locked .lock-row{display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:80px;padding:12px 3px}
+.project-card.is-locked .lock-title{font-size:clamp(20px,2.25vw,29px);line-height:1.25;letter-spacing:-.025em;font-weight:650}
+.project-card.is-locked .lock-row svg{flex:none;color:#53625b}
+.art-typographic{background:#172128;color:#f5f6f2;display:flex;flex-direction:column;justify-content:space-between;padding:24px}
+.art-typographic .art-type-index{font:10px var(--font-mono);letter-spacing:.12em;opacity:.7}
+.art-typographic strong{font-size:clamp(30px,4vw,62px);line-height:1.03;letter-spacing:-.055em;overflow-wrap:anywhere}
+.portfolio-empty{grid-column:1/-1;color:var(--muted);padding:36px 0 84px}
+@media(max-width:640px){
+  .project-card.is-overview{grid-column:1/-1}
+  .project-card.is-overview .project-info{min-height:0;height:auto;padding:19px 2px 28px}
+  .project-card.is-locked .lock-row{min-height:72px}
+  .project-card.is-locked .lock-title{font-size:20px}
+}
