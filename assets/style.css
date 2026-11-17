@@ -175,3 +175,14 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
  .footer-links{gap:14px}
  .footer-links a{font-size:10px}
 }
+
+
+/* Keep small-screen metadata and category filters on a single designed row. */
+@media(max-width:400px){
+  .hero-flag{font-size:9px;gap:7px}
+  .hero-flag>span:first-child,.hero-flag-index{white-space:nowrap}
+  .works-toolbar{align-items:stretch}
+  .filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%;gap:0}
+  .filter{min-width:0;white-space:nowrap;padding:10px 2px;font-size:10px;text-align:center}
+  .filter span{font-size:9px}
+}
