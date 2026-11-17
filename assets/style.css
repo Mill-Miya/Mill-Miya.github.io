@@ -96,3 +96,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   .project-card.is-locked .lock-row{min-height:72px}
   .project-card.is-locked .lock-title{font-size:20px}
 }
+
+/* Portfolio shots: pixels captured from actual running applications. */
+.project-art.real-shot{background:#e7eae7;border:1px solid #d3d8d6;isolation:auto;overflow:hidden;display:block}
+.project-art.real-shot>img{display:block;width:100%;height:100%;object-fit:contain;object-position:center}
