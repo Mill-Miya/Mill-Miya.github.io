@@ -1,0 +1,58 @@
+name: Import verified actual app screenshot evidence
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/import-proof-images.yml"
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  import:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: portfolio-real-screenshot-evidence
+          run-id: 44129103315
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: screenshots-raw
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Convert verified screenshot pixels to lightweight WebP
+        run: |
+          python -m pip install "Pillow>=10,<13"
+          python - <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          src=Path("screenshots-raw")
+          dst=Path("assets/projects");dst.mkdir(parents=True,exist_ok=True)
+          crops={
+            "wallpipe-ar":(180,70,1220,800),
+            "nova":(300,140,1130,780),
+            "assignment-checker":(355,25,1105,650),
+            "suwa-messe-2026":(155,0,1300,830),
+          }
+          for name in ["sorava","wallpipe-ar","nova","assignment-checker","suwa-messe-2026","wallpipe-landing"]:
+            image=Image.open(src/(name+".png")).convert("RGB")
+            if name in crops:image=image.crop(crops[name])
+            if image.width<200 or image.height<180:raise RuntimeError("Invalid real screenshot")
+            image.save(dst/(name+".webp"),"WEBP",quality=86,method=6)
+            print("REAL_SCREEN_IMPORTED",name,image.size)
+          # Qt pixels were rendered by the real PySide6 SettingsDialog and framed on a neutral canvas.
+          img=Image.open(src/"university-ai-framed.png").convert("RGB")
+          img.save(dst/"university-ai.webp","WEBP",quality=88,method=6)
+          print("REAL_QT_UI_IMPORTED",img.size)
+          PY
+      - name: Commit evidence only into review branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/projects/*.webp
+          git commit -m "Add original project UI screenshots"
+          git push --force origin HEAD:refs/heads/assets/real-project-screens-20261118
