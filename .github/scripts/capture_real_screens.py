@@ -25,6 +25,16 @@ SITES = [
 
 def save_webp(original, dest):
     image = Image.open(original).convert("RGB")
+    # Frame the actual UI pixels, never fabricate or redraw application content.
+    crop_boxes = {
+        "wallpipe-ar": (180, 70, 1220, 800),
+        "nova": (300, 140, 1130, 780),
+        "assignment-checker": (355, 25, 1105, 650),
+        "suwa-messe-2026": (155, 0, 1300, 830),
+    }
+    box = crop_boxes.get(dest.stem)
+    if box:
+        image = image.crop(box)
     if image.width < 250 or image.height < 180:
         raise RuntimeError("Real screenshot too small; refusing to publish")
     image.save(dest, "WEBP", quality=86, method=6)
@@ -48,7 +58,10 @@ with sync_playwright() as p:
                 page.wait_for_load_state("networkidle",timeout=12000)
             except Exception:
                 pass  # Live astronomy/AR apps can maintain connections indefinitely.
-            page.wait_for_timeout(2400 if slug!="wallpipe-ar" else 6200)
+            page.wait_for_timeout(5300 if slug=="sorava" else (6200 if slug=="wallpipe-ar" else 2400))
+            if slug == "sorava":
+                # The real React app intentionally displays a ~3.9s splash.
+                page.wait_for_selector(".splash-shell", state="detached", timeout=16000)
             body=page.locator("body").inner_text(timeout=8000)
             if not body.strip() or len(body.strip())<12:
                 raise RuntimeError("Empty real application screen: "+slug)
@@ -90,6 +103,8 @@ if Image.open(native).width<300:
     raise RuntimeError("Native Qt capture too small")
 # Place actual Qt window pixels on a quiet flat canvas; no simulated application UI.
 native_img=Image.open(native).convert("RGB")
+# Crop only unused blank area; upscale the authentic Qt widgets proportionally.
+native_img=native_img.crop((0,0,580,235)).resize((1160,470),Image.Resampling.LANCZOS)
 canvas=Image.new("RGB",(1440,900),(235,237,235))
 left=(canvas.width-native_img.width)//2
 top=(canvas.height-native_img.height)//2
