@@ -16,7 +16,9 @@
     const featuredLabel = document.querySelector("#featured-group-label");
     const archiveLabel = document.querySelector("#archive-group-label");
     if (featuredLabel) featuredLabel.hidden = !cards.some(card => card.classList.contains("featured") && !card.hidden);
-    if (archiveLabel) archiveLabel.hidden = !cards.some(card => !card.classList.contains("featured") && !card.hidden);
+    if (archiveLabel) archiveLabel.hidden = !cards.some(card => !card.classList.contains("featured") && !card.classList.contains("is-locked") && !card.hidden);
+    const lockedLabel = document.querySelector("#locked-group-label");
+    if (lockedLabel) lockedLabel.hidden = !cards.some(card => card.classList.contains("is-locked") && !card.hidden);
     for (const button of buttons) {
       const active = button.dataset.filter === filter;
       button.classList.toggle("active", active);
@@ -27,6 +29,7 @@
   for (const button of buttons) {
     button.addEventListener("click", () => applyFilter(button.dataset.filter || "all"));
   }
+  applyFilter("all");
   const year = document.querySelector("#footer-year");
   if (year) year.textContent = String(new Date().getFullYear());
 })();
