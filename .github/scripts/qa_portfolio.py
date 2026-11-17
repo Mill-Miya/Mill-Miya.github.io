@@ -11,9 +11,9 @@ OUT = ROOT / "qa-evidence"
 OUT.mkdir(exist_ok=True)
 INDEX = (ROOT / "index.html").resolve().as_uri()
 WIDTHS = [320, 360, 375, 390, 430, 480, 560, 640, 768, 820, 821, 900, 1024, 1280, 1440]
-IMAGE_NAMES = {
-    "sorava", "wallpipe-ar", "nova", "university-ai",
-    "assignment-checker", "suwa-messe-2026",
+VISUALS = {
+    "art-sorava", "art-wallpipe", "art-nova", "art-university",
+    "art-assignment", "art-messe",
 }
 
 def fail(msg, width):
@@ -31,12 +31,6 @@ with sync_playwright() as p:
         page.on("pageerror", lambda err: errors.append(str(err)))
         page.goto(INDEX, wait_until="load", timeout=50000)
         page.wait_for_timeout(200)
-        # Lazy screenshots below the fold load when they enter a viewport.
-        for shot in page.locator(".project-card img").all():
-            shot.scroll_into_view_if_needed(timeout=10000)
-            shot.evaluate("(img) => { img.loading = 'eager'; }")
-            shot.evaluate("(img) => img.decode()")
-        page.evaluate("window.scrollTo(0, 0)")
         page.wait_for_timeout(180)
         metrics = page.evaluate("""() => {
           const r = n => { const x=n.getBoundingClientRect();return {
@@ -44,7 +38,7 @@ with sync_playwright() as p:
           }};
           const elements = [...document.querySelectorAll('.project-card')];
           const sections = [...document.querySelectorAll('main section')];
-          const images = [...document.querySelectorAll('.project-card img')];
+          const visuals = [...document.querySelectorAll('.project-card .project-art')];
           const groups = [...document.querySelectorAll('.project-group-label')];
           const brand=document.querySelector('.site-header .brand');
           const navigation=document.querySelector('.site-header .site-nav');
@@ -58,7 +52,7 @@ with sync_playwright() as p:
             cards:elements.map(n=>({box:r(n),hidden:n.hidden})),
             groups:groups.map(n=>({box:r(n),hidden:n.hidden})),
             sections:sections.map(n=>({box:r(n),id:n.id || n.className})),
-            images:images.map(n=>({src:n.getAttribute('src'),naturalWidth:n.naturalWidth,naturalHeight:n.naturalHeight,complete:n.complete})),
+            visuals:visuals.map(n=>({classes:[...n.classList],box:r(n),hasChild:n.children.length>0})),
             logoOverlap:r(brand).r > r(navigation).l + 1,
             h1Rect:r(head),
             hasJPOutside:/[\u3040-\u30ff\u3400-\u9fff]/.test(outside),
@@ -76,14 +70,17 @@ with sync_playwright() as p:
         if metrics["hasJPOutside"]: fail("unwanted Japanese text outside work cards", width)
         if metrics["sourceLinks"]: fail("source-code link was reintroduced", width)
         if metrics["emptyAnchors"]: fail("broken internal anchors: "+repr(metrics["emptyAnchors"]), width)
-        if len(metrics["cards"]) != 6 or len(metrics["images"]) != 6:
-            fail("lost project card or authentic image", width)
-        slugs=set()
-        for img in metrics["images"]:
-            slugs.add(Path(img["src"]).stem)
-            if not img["complete"] or img["naturalWidth"] <= 200 or img["naturalHeight"] <= 180:
-                fail("unloaded actual screenshot "+str(img), width)
-        if slugs != IMAGE_NAMES: fail("unexpected screenshot files: "+repr(slugs), width)
+        if len(metrics["cards"]) != 6 or len(metrics["visuals"]) != 6:
+            fail("lost project card or concept artwork", width)
+        visual_classes=set()
+        for visual in metrics["visuals"]:
+            if not visual["hasChild"] or visual["box"]["w"] < 100 or visual["box"]["h"] < 100:
+                fail("missing or empty concept artwork: "+str(visual), width)
+            if "real-shot" in visual["classes"]:
+                fail("actual screenshot visual unexpectedly restored", width)
+            visual_classes.update(visual["classes"])
+        if not VISUALS.issubset(visual_classes):
+            fail("unexpected artwork classes: "+repr(visual_classes), width)
         boxes=[c["box"] for c in metrics["cards"]]
         for i, a in enumerate(boxes):
             for j, b in enumerate(boxes):
@@ -116,4 +113,4 @@ with sync_playwright() as p:
         page.close()
     browser.close()
 
-print("QA_COMPLETED",len(WIDTHS),"viewport widths, authentic images and filters")
+print("QA_COMPLETED",len(WIDTHS),"viewport widths, concept visuals and filters")
