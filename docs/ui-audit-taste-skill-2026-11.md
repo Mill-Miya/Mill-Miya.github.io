@@ -22,7 +22,7 @@
 ## Functional boundaries
 
 - All six public projects, their live/source links, and the exact R-logo SVG assets remain unchanged.
-- The private AI Debate Chamber repository is not linked.
+- Projects excluded by the private publication registry must never appear in generated public HTML.
 - Category filtering remains client-side only; archive/featured headings update to match visible projects.
 - No PHP, server, database, analytics, new runtime dependency or external font introduced.
 
