@@ -208,13 +208,21 @@ with sync_playwright() as p:
             if wallpipe.locator(".wp-pipe-effects "+water).count()!=1:
                 fail("The animated water is missing from its live rendering group: "+water, width)
         for name,clip in (("left","wp-part-left-clip"),
-                          ("center","wp-part-center-clip"),
                           ("right","wp-part-right-clip")):
             part=wallpipe.locator(".wp-part-"+name)
             if part.count()!=1 or part.get_attribute("clip-path")!="url(#"+clip+")":
                 fail("Rigid assembled pipe section is missing: "+name, width)
             if part.locator("use").get_attribute("href")!="#wp-pipe-template":
                 fail("All rigid pipe parts must reuse the same accurate geometry", width)
+        # The steel hidden by the handwheel is a continuous inlet/outlet,
+        # never a third piece that moves with the valve.
+        if wallpipe.locator(".wp-part-center, #wp-part-center-clip").count():
+            fail("Pipe beneath the wheel must not arrive together with the valve", width)
+        left_rect=wallpipe.locator("#wp-part-left-clip rect")
+        right_rect=wallpipe.locator("#wp-part-right-clip rect")
+        if (left_rect.get_attribute("x")!="55" or left_rect.get_attribute("width")!="309" or
+                right_rect.get_attribute("x")!="364" or right_rect.get_attribute("width")!="219"):
+            fail("Left and right steel modules must meet under the valve hub", width)
         if wallpipe.locator(".wp-coupler-locks .wp-lock-left").count()!=1 or \
                 wallpipe.locator(".wp-coupler-locks .wp-lock-right").count()!=1:
             fail("Subtle fixed joint collars are missing", width)
@@ -406,10 +414,10 @@ with sync_playwright() as p:
             # Validate translations and joints rather than just opacity:
             # components must be fully built and physically fixed after seating.
             modules=pipe_sheet.evaluate("""art=>{
-              const selectors=['.wp-part-left','.wp-part-center','.wp-valve',
-                               '.wp-part-right','.wp-lock-left','.wp-lock-right'];
-              const names=['wp-dock-left','wp-dock-center','wp-dock-center',
-                           'wp-dock-right','wp-coupler-left','wp-coupler-right'];
+              const selectors=['.wp-part-left','.wp-valve','.wp-part-right',
+                               '.wp-lock-left','.wp-lock-right'];
+              const names=['wp-dock-left','wp-dock-center','wp-dock-right',
+                           'wp-coupler-left','wp-coupler-right'];
               const els=selectors.map(sel=>art.querySelector(sel));
               const anims=els.map((el,i)=>
                 el?.getAnimations().find(a=>a.animationName===names[i]));
@@ -429,27 +437,27 @@ with sync_playwright() as p:
             if not modules:
                 fail("Missing rigid inlet, valve, outlet and coupler animation tracks", width)
             m=modules
-            if (m["start"][0]["opacity"]>.05 or m["start"][2]["opacity"]>.05 or
-                    m["start"][3]["opacity"]>.05):
+            if (m["start"][0]["opacity"]>.05 or m["start"][1]["opacity"]>.05 or
+                    m["start"][2]["opacity"]>.05):
                 fail("Pipe modules must enter separately, not pop in together: "+str(m), width)
             if not -36<m["inletMove"][0]["x"]<-5:
                 fail("Finished inlet should slide a small rigid distance: "+str(m), width)
             if (abs(m["inletDone"][0]["x"])>.1 or m["inletDone"][0]["opacity"]<.99 or
-                    m["inletDone"][3]["opacity"]>.05):
+                    m["inletDone"][2]["opacity"]>.05):
                 fail("Left inlet must seat before the right pipe enters: "+str(m), width)
-            if not -18<m["valveMove"][2]["y"]<-1:
+            if not -18<m["valveMove"][1]["y"]<-1:
                 fail("Valve should dock with a restrained axial translation: "+str(m), width)
-            if (abs(m["valveDone"][2]["y"])>.1 or m["valveDone"][2]["opacity"]<.99 or
-                    m["valveDone"][3]["opacity"]>.05):
+            if (abs(m["valveDone"][1]["y"])>.1 or m["valveDone"][1]["opacity"]<.99 or
+                    m["valveDone"][2]["opacity"]>.05):
                 fail("The valve must seat before the right pipe enters: "+str(m), width)
-            if not 8<m["outletMove"][3]["x"]<42:
+            if not 8<m["outletMove"][2]["x"]<42:
                 fail("Finished outlet should slide into its fitting, not grow: "+str(m), width)
-            if (abs(m["outletDone"][0]["x"])>.1 or abs(m["outletDone"][2]["y"])>.1 or
-                    abs(m["outletDone"][3]["x"])>.1):
+            if (abs(m["outletDone"][0]["x"])>.1 or abs(m["outletDone"][1]["y"])>.1 or
+                    abs(m["outletDone"][2]["x"])>.1):
                 fail("All rigid parts must remain perfectly stationary after docking: "+str(m), width)
-            if (m["start"][4]["opacity"]>.01 or m["start"][5]["opacity"]>.01 or
-                    m["outletMove"][4]["opacity"]<.7 or
-                    m["outletDone"][5]["opacity"]<.7):
+            if (m["start"][3]["opacity"]>.01 or m["start"][4]["opacity"]>.01 or
+                    m["outletMove"][3]["opacity"]<.7 or
+                    m["outletDone"][4]["opacity"]<.7):
                 fail("Mechanical locks must close at their respective insertion events: "+str(m), width)
             # Upstream water is physically in motion before the valve opens,
             # but must remain invisible until the front metal becomes translucent.
