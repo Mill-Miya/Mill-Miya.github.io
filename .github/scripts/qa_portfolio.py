@@ -158,6 +158,88 @@ with sync_playwright() as p:
             fail("expected three public live site links", width)
         if page.locator("a[href*='assignment-checker/'], a[href*='suwa-messe-2026/']").count()!=0:
             fail("locked public demo URLs leaked into the page", width)
+        # WallPipe AR illustration: 2 elbow turns, one round four-spoke wheel,
+        # concealed internal water and a semi-transparent front cover.
+        wallpipe = page.locator('.project-card[data-project="02"] .pipe-drawing')
+        if wallpipe.count()!=1:
+            fail("WallPipe AR illustration missing", width)
+        route="M98 290H205V173H523"
+        if wallpipe.locator(f'path.wp-pipe-outline[d="{route}"]').count()!=1:
+            fail("WallPipe must have exactly two 90-degree pipe elbows", width)
+        if any(wallpipe.locator(cls).count()!=1 for cls in
+               (".wp-pipe-back", ".wp-pipe-bore", ".wp-water-core", ".wp-water-stream",
+                ".wp-pipe-front", ".wp-wheel-spin", ".wp-status-open", ".wp-status-closed")):
+            fail("WallPipe cutaway/flow/handwheel layers missing", width)
+        if wallpipe.locator('.wp-wheel-spin path[d="M0-40V40M-40 0H40"]').count()!=2:
+            fail("WallPipe handwheel must have four radial spokes", width)
+        if wallpipe.locator(".wp-pipe-front").evaluate(
+                "(el) => parseFloat(getComputedStyle(el).opacity)")>.45:
+            fail("WallPipe static artwork must reveal the flow on small cards", width)
+        if wallpipe.locator(".wp-water-core").evaluate(
+                "(el) => parseFloat(getComputedStyle(el).opacity)")<.9:
+            fail("WallPipe static water flow must be visible", width)
+        if width in (390,1440):
+            page.emulate_media(reduced_motion="no-preference")
+            pipe_media=page.locator('.project-card[data-project="02"] .project-media')
+            pipe_art=pipe_media.locator(".art-wallpipe")
+            pipe_media.hover()
+            if "is-hovering" not in (pipe_art.get_attribute("class") or ""):
+                fail("WallPipe listing did not start playback on hover", width)
+            if pipe_art.locator(".wp-wheel-spin").evaluate(
+                    "(el) => getComputedStyle(el).animationName")!="wp-wheel-open":
+                fail("WallPipe handwheel did not animate on hover", width)
+            preview_seconds=pipe_art.locator(".wp-wheel-spin").evaluate(
+                "(el) => parseFloat(getComputedStyle(el).animationDuration)")
+            if abs(preview_seconds-4.5)>.02:
+                fail("WallPipe hover must run exactly 1.6x (4.5s)", width)
+            page.mouse.move(0,0)
+            if "is-hovering" in (pipe_art.get_attribute("class") or ""):
+                fail("WallPipe hover did not reset", width)
+            page.locator('.project-card[data-project="02"] .project-title-button').click()
+            pipe_sheet=page.locator("#sheet-visual .art-wallpipe")
+            page.wait_for_function("""() =>
+                document.querySelector('#sheet-visual .art-wallpipe')?.classList.contains('is-playing')
+            """,timeout=1500)
+            if not page.locator(".sheet-motion-play").is_visible():
+                fail("WallPipe replay control missing in detail sheet", width)
+            duration=pipe_sheet.locator(".wp-wheel-spin").evaluate(
+                "(el) => parseFloat(getComputedStyle(el).animationDuration)")
+            if abs(duration-7.2)>.02:
+                fail("WallPipe sheet must play at normal 7.2s", width)
+            phases=pipe_sheet.evaluate("""art => {
+              const find=sel=>art.querySelector(sel);
+              const els=['.wp-pipe-assembly','.wp-wheel-spin','.wp-pipe-front',
+                         '.wp-water-core','.wp-water-stream','.wp-status-open',
+                         '.wp-status-closed'].map(find);
+              const animations=els.map(el=>el.getAnimations().find(a=>a.animationName));
+              const frame=t=>{
+                animations.forEach(a=>{if(a)a.currentTime=t});
+                return {
+                  assembly:parseFloat(getComputedStyle(els[0]).opacity),
+                  wheel:getComputedStyle(els[1]).transform,
+                  front:parseFloat(getComputedStyle(els[2]).opacity),
+                  water:parseFloat(getComputedStyle(els[3]).opacity),
+                  stream:parseFloat(getComputedStyle(els[4]).opacity),
+                  open:parseFloat(getComputedStyle(els[5]).opacity),
+                  closed:parseFloat(getComputedStyle(els[6]).opacity)
+                };
+              };
+              return {begin:frame(0),closed:frame(2800),ending:frame(7200)};
+            }""")
+            if phases["begin"]["assembly"]>.1 or phases["begin"]["water"]>.05:
+                fail("WallPipe must begin with an unplaced, dry pipe: "+str(phases), width)
+            if phases["closed"]["closed"]<.95 or phases["closed"]["front"]<.9:
+                fail("WallPipe must keep pipe opaque before valve opens: "+str(phases), width)
+            if (phases["ending"]["water"]<.9 or phases["ending"]["stream"]<.9 or
+                    phases["ending"]["front"]>.4 or phases["ending"]["open"]<.95 or
+                    phases["ending"]["closed"]>.05):
+                fail("WallPipe final cutaway must reveal water inside after valve opens: "+str(phases), width)
+            page.locator(".sheet-motion-play").click()
+            if "is-playing" not in (pipe_sheet.get_attribute("class") or ""):
+                fail("WallPipe replay did not restart", width)
+            page.locator("#sheet-close").click()
+            page.emulate_media(reduced_motion="reduce")
+
         # Corrected sparse four-stage SVG replaces the former dense mechanical poster.
         concept = page.locator('.project-card[data-project="07"] .eqmount-drawing')
         if concept.count()!=1:
