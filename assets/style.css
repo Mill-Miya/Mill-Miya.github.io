@@ -86,7 +86,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 
 /* WallPipe AR: two 90-degree elbows, hand-free four-spoke valve and see-through near wall.
    Static/reduced-motion content shows the final state; a hover or sheet replay
-   continuously replays the 7.2-second operation without moving the scene. */
+   ends after one 7.2-second cycle, holding the completed state. */
 .art-wallpipe{--wp-motion-duration:7.2s}
 .project-card .art-wallpipe.is-hovering{--wp-motion-duration:4.5s}
 .art-wallpipe .pipe-drawing{display:block}
@@ -100,6 +100,8 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .wp-pipe-highlight{opacity:.48}
 .wp-water-core{opacity:.95}
 .wp-water-stream{opacity:1}
+.wp-reveal-left{stroke-dasharray:380 1000}
+.wp-reveal-right{stroke-dasharray:170 1000}
 .wp-flow-cutaway{opacity:.55}
 .wp-flow-trace{opacity:1}
 .wp-status-closed{opacity:0}
@@ -113,37 +115,43 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .art-wallpipe.is-complete .wp-status-open{opacity:1}
 @media(prefers-reduced-motion:no-preference){
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-pipe-assembly{
-    animation:wp-pipe-appear var(--wp-motion-duration) ease-out infinite both;
+    animation:wp-pipe-appear var(--wp-motion-duration) ease-out 1 both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-wheel-spin{
-    animation:wp-wheel-open var(--wp-motion-duration) ease-in-out infinite both;
+    animation:wp-wheel-open var(--wp-motion-duration) ease-in-out 1 both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-pipe-front{
-    animation:wp-front-cutaway var(--wp-motion-duration) ease-in-out infinite both;
+    animation:wp-front-cutaway var(--wp-motion-duration) ease-in-out 1 both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-pipe-highlight{
-    animation:wp-highlight-fade var(--wp-motion-duration) ease-in-out infinite both;
+    animation:wp-highlight-fade var(--wp-motion-duration) ease-in-out 1 both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-water-core{
-    animation:wp-water-appear var(--wp-motion-duration) ease-in infinite both;
+    animation:wp-water-appear var(--wp-motion-duration) ease-in 1 both;
+  }
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-reveal-left{
+    animation:wp-propagate-left var(--wp-motion-duration) linear 1 both;
+  }
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-reveal-right{
+    animation:wp-propagate-right var(--wp-motion-duration) linear 1 both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-water-stream{
-    animation:wp-water-move var(--wp-motion-duration) linear infinite both,wp-water-bars-appear var(--wp-motion-duration) ease-in infinite both;
+    animation:wp-water-move var(--wp-motion-duration) linear 1 both,wp-water-bars-appear var(--wp-motion-duration) ease-in 1 both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-flow-cutaway{
-    animation:wp-flow-channel-appear var(--wp-motion-duration) ease-in infinite both;
+    animation:wp-flow-channel-appear var(--wp-motion-duration) ease-in 1 both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-flow-trace{
-    animation:wp-water-move var(--wp-motion-duration) linear infinite both,wp-water-bars-appear var(--wp-motion-duration) ease-in infinite both;
+    animation:wp-water-move var(--wp-motion-duration) linear 1 both,wp-water-bars-appear var(--wp-motion-duration) ease-in 1 both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-tracking-frame{
-    animation:wp-tracking-lock var(--wp-motion-duration) ease-out infinite both;
+    animation:wp-tracking-lock var(--wp-motion-duration) ease-out 1 both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-status-closed{
-    animation:wp-closed-status var(--wp-motion-duration) linear infinite both;
+    animation:wp-closed-status var(--wp-motion-duration) linear 1 both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-status-open{
-    animation:wp-open-status var(--wp-motion-duration) linear infinite both;
+    animation:wp-open-status var(--wp-motion-duration) linear 1 both;
   }
 }
 @keyframes wp-pipe-appear{
@@ -165,6 +173,19 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 @keyframes wp-water-appear{
   0%,39%{opacity:0}
   62%,100%{opacity:.95}
+}
+@keyframes wp-propagate-left{
+  0%,42%{stroke-dasharray:0 1000}
+  58%{stroke-dasharray:48 1000}
+  77%{stroke-dasharray:200 1000}
+  92%{stroke-dasharray:345 1000}
+  100%{stroke-dasharray:380 1000}
+}
+@keyframes wp-propagate-right{
+  0%,42%{stroke-dasharray:0 1000}
+  58%{stroke-dasharray:34 1000}
+  78%{stroke-dasharray:119 1000}
+  92%,100%{stroke-dasharray:170 1000}
 }
 @keyframes wp-water-move{
   0%,39%{stroke-dashoffset:0}
