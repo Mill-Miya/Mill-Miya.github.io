@@ -672,18 +672,15 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   .hero-visual { width:min(100%,max(280px,calc(100svh - 170px))); }
 }
 
-/* Locked cards: A rotational sway, B horizontal damped shake.
-   Each is independent from the 1.6x project showcase previews. */
+/* Locked previews: one normal-speed damped rotational sway.
+   A applies to both private cards; no 1.6x preview multiplier. */
 .project-media--locked .project-lock-mark svg{
   transform-box:fill-box;
   transform-origin:50% 15%;
 }
-@media (hover:hover) and (prefers-reduced-motion:no-preference) {
-  .project-media--locked[data-lock-motion="swing"]:hover .project-lock-mark svg{
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference) {
+  .project-media--locked:hover .project-lock-mark svg{
     animation:mm-lock-damped-swing 1.9s linear 1 both;
-  }
-  .project-media--locked[data-lock-motion="shake"]:hover .project-lock-mark svg{
-    animation:mm-lock-damped-shake 1.35s linear 1 both;
   }
 }
 @keyframes mm-lock-damped-swing {
@@ -696,17 +693,5 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   79%{transform:rotate(-.8deg)}
   91%{transform:rotate(.23deg)}
   100%{transform:rotate(0deg)}
-}
-@keyframes mm-lock-damped-shake {
-  0%{transform:translateX(0)}
-  9%{transform:translateX(12px)}
-  20%{transform:translateX(-9.5px)}
-  32%{transform:translateX(7px)}
-  44%{transform:translateX(-5px)}
-  56%{transform:translateX(3.25px)}
-  68%{transform:translateX(-1.8px)}
-  80%{transform:translateX(.8px)}
-  91%{transform:translateX(-.225px)}
-  100%{transform:translateX(0)}
 }
 #lock-preview-a,#lock-preview-b{scroll-margin-top:110px}
