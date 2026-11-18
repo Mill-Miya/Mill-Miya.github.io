@@ -69,7 +69,7 @@
         window.clearTimeout(motionTimer);
         motionTimer = null;
       }
-      sheetVisual.querySelector(".art-eqmount")?.classList.remove("is-playing", "is-hovering");
+      sheetVisual.querySelector(".art-eqmount")?.classList.remove("is-playing", "is-hovering", "is-complete");
     }
     function playSheetMotion() {
       const art = sheetVisual.querySelector(".art-eqmount");
@@ -79,16 +79,35 @@
       void art.getBoundingClientRect().width;
       art.classList.add("is-playing");
       motionTimer = window.setTimeout(() => {
+        // Keep the acquired target in the reticle instead of jumping back.
+        art.classList.add("is-complete");
         art.classList.remove("is-playing");
         motionTimer = null;
       }, motionDuration);
     }
     motionButton.addEventListener("click", playSheetMotion);
+    // The listing's transparent open-sheet button sits above the art. Listen
+    // on the media parent so the card animates even when the pointer hits it.
+    const listingMedia = document.querySelector('.project-card[data-sheet-id="diy-equatorial-mount"] .project-media');
+    const listingArt = listingMedia?.querySelector(".art-eqmount");
+    if (listingMedia && listingArt) {
+      listingMedia.addEventListener("pointerenter", event => {
+        if (event.pointerType === "mouse" && motionAllowed() &&
+            window.matchMedia("(hover:hover) and (pointer:fine)").matches) {
+          listingArt.classList.remove("is-complete");
+          listingArt.classList.add("is-hovering");
+        }
+      });
+      listingMedia.addEventListener("pointerleave", () => {
+        listingArt.classList.remove("is-hovering", "is-complete");
+      });
+    }
     const eligible = () => cards.filter(card => !card.hidden && card.querySelector("[data-open-sheet]"));
 
     function openSheet(card, trigger) {
       if (!card || !card.querySelector("[data-open-sheet]")) return;
       resetSheetMotion();
+      listingArt?.classList.remove("is-hovering", "is-complete");
       if (!dialog.open && trigger instanceof HTMLElement) lastOpener = trigger;
       const selection = eligible();
       const current = selection.indexOf(card);
@@ -114,10 +133,11 @@
           art.addEventListener("pointerenter", event => {
             if (event.pointerType !== "touch" && motionAllowed() &&
                 window.matchMedia("(hover:hover) and (pointer:fine)").matches) {
+              art.classList.remove("is-complete");
               art.classList.add("is-hovering");
             }
           });
-          art.addEventListener("pointerleave", () => art.classList.remove("is-hovering"));
+          art.addEventListener("pointerleave", () => resetSheetMotion());
           art.addEventListener("pointerup", event => {
             if (event.pointerType === "touch") playSheetMotion();
           });
