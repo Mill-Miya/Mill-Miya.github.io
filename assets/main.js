@@ -145,17 +145,8 @@
               finishSheetMotion(art);
             }
           });
-          art.addEventListener("pointerenter", event => {
-            if (event.pointerType !== "touch" && motionAllowed() &&
-                window.matchMedia("(hover:hover) and (pointer:fine)").matches) {
-              art.classList.remove("is-complete");
-              art.classList.add("is-hovering");
-            }
-          });
-          art.addEventListener("pointerleave", () => resetSheetMotion());
-          art.addEventListener("pointerup", event => {
-            if (event.pointerType === "touch") playSheetMotion();
-          });
+          // The sheet animation belongs to the sheet lifecycle, not pointer
+          // position. It autoplays once on open; only REPLAY restarts it.
         }
         // SVG identifiers must be unique when the original art remains in the listing.
         for (const node of art.querySelectorAll("[id]")) {
