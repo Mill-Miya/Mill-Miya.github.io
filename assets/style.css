@@ -350,20 +350,20 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
    Every motor turn ends at the original orientation (5:1 ratio). */
 .eq-small-rotor,.eq-belt-teeth{opacity:0}
 .sheet-motion-play{
-  position:absolute;z-index:12;left:50%;top:50%;transform:translate(-50%,-50%);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
-  min-width:82px;min-height:82px;padding:14px;border:1px solid #e9fff0b2;border-radius:50%;
-  background:#091d2fc9;box-shadow:0 6px 24px #07142355;
-  color:#f0fff8;font:600 10px var(--font-mono);letter-spacing:.1em;
-  cursor:pointer;transition:background .2s,opacity .2s;white-space:nowrap;
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:30px;padding:7px 10px;
+  border:1px solid currentColor;border-radius:2px;
+  background:transparent;color:inherit;
+  font:inherit;letter-spacing:inherit;white-space:nowrap;
+  cursor:pointer;transition:background .2s,color .2s;
 }
-.sheet-motion-play::before{content:"▶";font:21px/1 var(--font-ui);padding-left:4px}
 .sheet-motion-play:hover,.sheet-motion-play:focus-visible{
-  background:#1b4959f2;outline-offset:4px;
+  background:#ffffff77;color:#214d5c;outline-offset:3px;
 }
 .sheet-motion-play[hidden]{display:none!important}
-.sheet-visual:has(.art-eqmount.is-playing) .sheet-motion-play:not(:focus-visible){opacity:0;pointer-events:none}
-@media(max-width:760px){.sheet-motion-play{min-height:62px;min-width:62px;padding:9px;font-size:8px}.sheet-motion-play::before{font-size:17px}}
+@media(max-width:760px){
+  .sheet-motion-play{min-height:27px;padding:5px 8px}
+}
 .sheet-visual .art-eqmount{cursor:default}
 @media(hover:hover) and (pointer:fine){
   .sheet-visual .art-eqmount{cursor:crosshair}
