@@ -163,9 +163,29 @@ with sync_playwright() as p:
         wallpipe = page.locator('.project-card[data-project="02"] .pipe-drawing')
         if wallpipe.count()!=1:
             fail("WallPipe AR illustration missing", width)
-        route="M98 290H205V173H523"
+        route="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523"
         if wallpipe.locator(f'path.wp-pipe-outline[d="{route}"]').count()!=1:
-            fail("WallPipe must have exactly two 90-degree pipe elbows", width)
+            fail("WallPipe pipe must have two constant-radius 35px quarter-circle elbows", width)
+        for cls in (".wp-pipe-back", ".wp-pipe-bore", ".wp-water-core", ".wp-water-stream",
+                    ".wp-pipe-front", ".wp-flow-cutaway", ".wp-flow-trace"):
+            if wallpipe.locator(cls).get_attribute("d")!=route:
+                fail("WallPipe water and metal layers must follow identical rounded pipe centerline: "+cls, width)
+        for side, x, y in (("in", 98, 290), ("out", 523, 173)):
+            mouth=wallpipe.locator(".wp-pipe-mouth-"+side)
+            if mouth.count()!=1 or mouth.locator("ellipse").count()!=2:
+                fail("Hollow annular pipe mouth missing: "+side, width)
+            outer,inner=mouth.locator("ellipse").all()
+            for el in (outer,inner):
+                if el.get_attribute("cx")!=str(x) or el.get_attribute("cy")!=str(y):
+                    fail("Pipe opening is not concentric with the horizontal tube: "+side, width)
+            if outer.get_attribute("rx")<=inner.get_attribute("rx") or outer.get_attribute("ry")<=inner.get_attribute("ry"):
+                fail("Pipe opening lacks annular wall thickness: "+side, width)
+        if wallpipe.locator(".wp-valve-housing").count()!=1:
+            fail("Cast mechanical valve housing is missing", width)
+        if wallpipe.locator('.wp-valve rect[x="329"][width="65"]').count():
+            fail("Obsolete square valve box remains", width)
+        if wallpipe.locator('.wp-wheel-spin > circle:first-child').get_attribute("fill")!="none":
+            fail("The four-spoke wheel must have open spaces, not a solid disk", width)
         if any(wallpipe.locator(cls).count()!=1 for cls in
                (".wp-pipe-back", ".wp-pipe-bore", ".wp-water-core", ".wp-water-stream",
                 ".wp-pipe-front", ".wp-flow-cutaway", ".wp-flow-trace", ".wp-wheel-spin", ".wp-status-open", ".wp-status-closed")):
@@ -178,6 +198,9 @@ with sync_playwright() as p:
         if wallpipe.locator(".wp-water-core").evaluate(
                 "(el) => parseFloat(getComputedStyle(el).opacity)")<.9:
             fail("WallPipe static water flow must be visible", width)
+        if wallpipe.locator(".wp-pipe-mouth-in").evaluate(
+                "(el) => getComputedStyle(el).visibility")!="visible":
+            fail("Hollow pipe opening must remain visible without motion", width)
         if width in (390,1440):
             page.emulate_media(reduced_motion="no-preference")
             pipe_media=page.locator('.project-card[data-project="02"] .project-media')
