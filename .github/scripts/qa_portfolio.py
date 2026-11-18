@@ -171,10 +171,14 @@ with sync_playwright() as p:
             fail("duplicated outdated art labels remain", width)
         if concept.locator('path[d="M192 178L214 191L236 190"][fill="none"]').count()!=1:
             fail("smartphone star path lost no-fill correction", width)
-        if concept.locator('path.eq-belt-upper-run[d="M447.01 277.98L479.18 201.16"]').count()!=1:
-            fail("upper belt does not meet the common pulley radius", width)
-        if concept.locator('path.eq-belt-lower-run[d="M465.52 294.25L537.57 252.47"]').count()!=1:
-            fail("lower belt does not meet the common pulley radius", width)
+        if concept.locator("path.eq-belt-loop").count()!=1 or concept.locator("path.eq-belt-flow").count()!=1:
+            fail("the closed pulley belt or its continuous travelling teeth are missing", width)
+        if concept.locator('circle[r="53"][opacity=".42"]').count()!=1:
+            fail("the pulley-back belt attenuation layer is missing", width)
+        if concept.locator('.eq-large-rotor path[d*="M510 172L517 163L524 172"]').count()!=0:
+            fail("rotation arrowheads should be removed, leaving straight indicator lines", width)
+        if concept.locator('path[d="M281 223V233"]').count()!=0:
+            fail("stray dashed Wi-Fi tail remains", width)
         if concept.locator('path[d="M551 217H570"]').count()!=0:
             fail("stray dashed stroke still protrudes right of pulley", width)
         if concept.locator(".eq-target-object").count()!=1:
@@ -203,26 +207,35 @@ with sync_playwright() as p:
             fail("target field does not include all five stars", width)
         if concept.locator(".eq-target-ring").evaluate("(el) => !!el.closest('.eq-target-field')"):
             fail("target reticle must remain stationary", width)
-        # Both contact points must be on the same 41-unit pitch circle, with
-        # the line normal perpendicular to each run (external tangents).
-        tangent_error = concept.evaluate("""svg => {
-          const c1 = {x:459,y:283,r:13}, c2 = {x:517,y:217,r:41};
-          const paths = [
-            svg.querySelector('.eq-belt-upper-run'),
-            svg.querySelector('.eq-belt-lower-run')
+        # Check the closed belt's two straight tangents, correct external contact
+        # radii, both wrap arcs, and synchronized teeth on the same path.
+        belt_geometry = concept.evaluate("""svg => {
+          const belt=svg.querySelector('.eq-belt-loop');
+          const flow=svg.querySelector('.eq-belt-flow');
+          const d=belt?.getAttribute('d') || '';
+          const m=d.match(/^M([\d.]+) ([\d.]+)L([\d.]+) ([\d.]+)A41 41 0 1 1 ([\d.]+) ([\d.]+)L([\d.]+) ([\d.]+)A13 13 0 0 1 ([\d.]+) ([\d.]+)Z$/);
+          if(!m || !flow || flow.getAttribute('d')!==d) return {valid:false,error:Infinity};
+          const n=m.slice(1).map(Number);
+          const [suX,suY,buX,buY,blX,blY,slX,slY,endX,endY]=n;
+          const c1={x:459,y:283,r:13}, c2={x:517,y:217,r:41};
+          const runs=[
+            [[suX,suY],[buX,buY]],
+            [[slX,slY],[blX,blY]]
           ];
-          return paths.map(p => {
-            const v = p.getAttribute('d').match(/[-+]?[0-9]*\\.?[0-9]+/g).map(Number);
-            const [x1,y1,x2,y2] = v;
-            const rad1 = Math.hypot(x1-c1.x,y1-c1.y);
-            const rad2 = Math.hypot(x2-c2.x,y2-c2.y);
-            const dot = ((x2-x1)*(x2-c2.x)+(y2-y1)*(y2-c2.y)) /
-              (Math.hypot(x2-x1,y2-y1)*rad2);
-            return Math.max(Math.abs(rad1-c1.r),Math.abs(rad2-c2.r),Math.abs(dot));
-          });
+          const errors=[];
+          for(const [small,large] of runs){
+            const [sx,sy]=small,[lx,ly]=large;
+            const rs=Math.hypot(sx-c1.x,sy-c1.y);
+            const rl=Math.hypot(lx-c2.x,ly-c2.y);
+            const vx=lx-sx,vy=ly-sy,rx=lx-c2.x,ry=ly-c2.y;
+            const dot=Math.abs((vx*rx+vy*ry)/(Math.hypot(vx,vy)*rl));
+            errors.push(Math.abs(rs-c1.r),Math.abs(rl-c2.r),dot);
+          }
+          errors.push(Math.hypot(endX-suX,endY-suY));
+          return {valid:true,error:Math.max(...errors)};
         }""")
-        if any(v > 0.015 for v in tangent_error):
-            fail("belt tangent geometry is inconsistent: "+str(tangent_error), width)
+        if not belt_geometry["valid"] or belt_geometry["error"] > 0.015:
+            fail("belt tangent or closed-wrap geometry is inconsistent: "+str(belt_geometry), width)
         if concept.evaluate("(el) => getComputedStyle(el).filter")!="none":
             fail("old artwork drop shadow remains", width)
         if width in (390, 1440):
@@ -444,13 +457,13 @@ with sync_playwright() as p:
                     fail("replay control not at bottom-right under fixed image: "+str(replay_position), width)
                 if not play_button.is_visible():
                     fail("equatorial motion replay control not visible", width)
-                if art.locator(".eq-large-rotor").count()!=1 or art.locator(".eq-belt-teeth").count()!=2:
+                if art.locator(".eq-large-rotor").count()!=1 or art.locator(".eq-belt-teeth").count()!=1:
                     fail("rotor or belt travel elements missing", width)
                 eq_sheet_seconds=art.locator(".eq-large-rotor").evaluate(
                     "(el) => parseFloat(getComputedStyle(el).animationDuration)")
                 if abs(eq_sheet_seconds - 6.4) > .02:
                     fail("equatorial detail sheet must keep normal 6.4s playback", width)
-                if page.locator('.project-card[data-project="07"] .eq-belt-teeth').count()!=2:
+                if page.locator('.project-card[data-project="07"] .eq-belt-teeth').count()!=1:
                     fail("listing lost its static SVG artwork", width)
                 if page.locator('.project-card[data-project="07"] .eq-small-rotor').evaluate(
                     "(el) => getComputedStyle(el).opacity")!="0":
@@ -480,7 +493,7 @@ with sync_playwright() as p:
                 play_button.click()
                 if "is-playing" not in (art.get_attribute("class") or ""):
                     fail("touch replay button did not start animation", width)
-                if "eq-belt-forward" not in art.locator(".eq-belt-upper").evaluate(
+                if "eq-belt-travel" not in art.locator(".eq-belt-flow").evaluate(
                     "(el) => getComputedStyle(el).animationName"):
                     fail("belt-motion animation not active on replay", width)
                 # Record an early state without allowing a screenshot to complete the cycle.
@@ -640,8 +653,8 @@ with sync_playwright() as p:
                     fail("Host reticle should appear only after M42 selection; guest stays blank: "+str(phases), width)
                 if phases["transfer"][3]<.8 or phases["transfer"][1]>.05:
                     fail("Sorava Wi-Fi phase is not between host and guest: "+str(phases), width)
-                if phases["transfer"][6]<.95 or phases["transfer"][5]>.05:
-                    fail("Guest must see directional arrow instead of reticle while pointing: "+str(phases), width)
+                if phases["transfer"][6]<.95 or phases["transfer"][5]<.95:
+                    fail("Guest reticle and directional arrow must appear together during guidance: "+str(phases), width)
                 if phases["guest"][1]<.95 or phases["guest"][2]>.05:
                     fail("Sorava guest did not receive M42: "+str(phases), width)
                 if phases["end"][1]<.95 or phases["end"][2]>.05:
