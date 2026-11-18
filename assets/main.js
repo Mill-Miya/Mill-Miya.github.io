@@ -43,6 +43,15 @@
     const sheetKind = document.getElementById("sheet-kind");
     const sheetTags = document.getElementById("sheet-tags");
     const sheetVisual = document.getElementById("sheet-visual");
+    const sheetVisualBottom = document.querySelector(".sheet-visual-bottom");
+    const sheetVisualBrand = sheetVisualBottom?.lastElementChild;
+    const motionButton = document.createElement("button");
+    motionButton.type = "button";
+    motionButton.className = "sheet-motion-play";
+    motionButton.textContent = "PLAY MOTION ↻";
+    motionButton.setAttribute("aria-label", "自動赤道儀の動作アニメーションを再生");
+    motionButton.hidden = true;
+    sheetVisualBottom?.appendChild(motionButton);
     const sheetActions = document.getElementById("sheet-actions");
     const sheetCounter = document.getElementById("sheet-counter");
     const sheetPosition = document.getElementById("sheet-position");
@@ -52,10 +61,34 @@
     const nextButton = document.getElementById("sheet-next");
     let activeCard = null;
     let lastOpener = null;
+    let motionTimer = null;
+    const motionDuration = 6400;
+    const motionAllowed = () => !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function resetSheetMotion() {
+      if (motionTimer !== null) {
+        window.clearTimeout(motionTimer);
+        motionTimer = null;
+      }
+      sheetVisual.querySelector(".art-eqmount")?.classList.remove("is-playing", "is-hovering");
+    }
+    function playSheetMotion() {
+      const art = sheetVisual.querySelector(".art-eqmount");
+      if (!dialog.open || !art || !motionAllowed()) return;
+      resetSheetMotion();
+      // Restart a previously completed cycle, including while the pointer stays over the sheet.
+      void art.getBoundingClientRect().width;
+      art.classList.add("is-playing");
+      motionTimer = window.setTimeout(() => {
+        art.classList.remove("is-playing");
+        motionTimer = null;
+      }, motionDuration);
+    }
+    motionButton.addEventListener("click", playSheetMotion);
     const eligible = () => cards.filter(card => !card.hidden && card.querySelector("[data-open-sheet]"));
 
     function openSheet(card, trigger) {
       if (!card || !card.querySelector("[data-open-sheet]")) return;
+      resetSheetMotion();
       if (!dialog.open && trigger instanceof HTMLElement) lastOpener = trigger;
       const selection = eligible();
       const current = selection.indexOf(card);
@@ -77,6 +110,18 @@
       sheetVisualIndex.textContent = position;
       const art = card.querySelector(".project-art")?.cloneNode(true);
       if (art) {
+        if (card.dataset.sheetId === "diy-equatorial-mount") {
+          art.addEventListener("pointerenter", event => {
+            if (event.pointerType !== "touch" && motionAllowed() &&
+                window.matchMedia("(hover:hover) and (pointer:fine)").matches) {
+              art.classList.add("is-hovering");
+            }
+          });
+          art.addEventListener("pointerleave", () => art.classList.remove("is-hovering"));
+          art.addEventListener("pointerup", event => {
+            if (event.pointerType === "touch") playSheetMotion();
+          });
+        }
         // SVG identifiers must be unique when the original art remains in the listing.
         for (const node of art.querySelectorAll("[id]")) {
           const original = node.id;
@@ -94,6 +139,9 @@
       } else {
         sheetVisual.replaceChildren();
       }
+      const showMotion = card.dataset.sheetId === "diy-equatorial-mount" && motionAllowed();
+      motionButton.hidden = !showMotion;
+      if (sheetVisualBrand) sheetVisualBrand.hidden = showMotion;
       sheetTags.replaceChildren(...[...card.querySelectorAll(".tag-row span")].map(tag => tag.cloneNode(true)));
       const live = card.querySelector(".project-links a[href]");
       sheetActions.replaceChildren();
@@ -128,6 +176,7 @@
       if (event.target === dialog) dialog.close();
     });
     dialog.addEventListener("close", () => {
+      resetSheetMotion();
       activeCard = null;
       if (lastOpener?.isConnected && !lastOpener.closest("[hidden]")) lastOpener.focus();
       lastOpener = null;
