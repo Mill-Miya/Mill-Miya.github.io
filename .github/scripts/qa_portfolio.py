@@ -609,6 +609,9 @@ with sync_playwright() as p:
                     fail("Sorava did not finish showing both M42 screens: "+str(phases), width)
                 if width in (390,1440):
                     sorava_sheet.screenshot(path=str(OUT/f"sorava_two_phones_{width}.png"),animations="disabled")
+                # Screenshot testing may finish/cancel finite animations. Explicitly
+                # restart the motion before measuring intermediate CSS frames.
+                replay.click()
                 # At the start the guest points elsewhere (its target is
                 # away from the fixed reticle); it aligns only after Wi-Fi sync.
                 # Sample the actual rendered SVG coordinates, not just keyframes.
