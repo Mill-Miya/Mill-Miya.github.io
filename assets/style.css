@@ -106,7 +106,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .wp-upstream-stream{opacity:1}
 .wp-upstream-water{opacity:1}
 .wp-reveal-right{stroke-dasharray:170 1000}
-.wp-flow-cutaway{opacity:.55}
+.wp-flow-cutaway{opacity:.9}
 .wp-flow-trace{opacity:1}
 .wp-status-closed{opacity:0}
 .wp-status-open{opacity:1}
@@ -190,21 +190,21 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   0%{stroke-dashoffset:0}
   100%{stroke-dashoffset:-248}
 }
+/* The right-hand fill front and moving stripes advance together at 34.44 SVG units/s.
+   170 units of downstream pipe take 4.9355 seconds; start at 31.45% of 7.2s. */
 @keyframes wp-propagate-right{
-  0%,42%{stroke-dasharray:0 1000}
-  58%{stroke-dasharray:34 1000}
-  78%{stroke-dasharray:119 1000}
-  92%,100%{stroke-dasharray:170 1000}
+  0%,31.45%{stroke-dasharray:0 1000}
+  100%{stroke-dasharray:170 1000}
 }
-/* Both banks move at 34.44 SVG units/sec while visible:
-   upstream 248/7.2s; downstream 144/(7.2s*58%). */
+/* 170 / (7.2s * (1 - .3145)) = 34.44 units/s: exactly the upstream flow speed.
+   Both downstream stripe layers share these same frames and offset. */
 @keyframes wp-water-move{
-  0%,42%{stroke-dashoffset:0}
-  100%{stroke-dashoffset:-144}
+  0%,31.45%{stroke-dashoffset:0}
+  100%{stroke-dashoffset:-170}
 }
 @keyframes wp-flow-channel-appear{
   0%,40%{opacity:0}
-  62%,100%{opacity:.55}
+  62%,100%{opacity:.9}
 }
 @keyframes wp-water-bars-appear{
   0%,40%{opacity:0}
