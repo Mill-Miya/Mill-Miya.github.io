@@ -478,8 +478,13 @@ with sync_playwright() as p:
                     fail("belt-motion animation not active on replay", width)
                 # Record an early state without allowing a screenshot to complete the cycle.
                 page.locator("#sheet-next").click()
-                if page.locator("#sheet-visual .art-eqmount").count()!=0 or play_button.is_visible():
+                if page.locator("#sheet-visual .art-eqmount").count()!=0:
                     fail("sheet switching did not clear equatorial motion", width)
+                page.wait_for_function("""() =>
+                  document.querySelector('#sheet-visual .art-sorava')?.classList.contains('is-playing')
+                """, timeout=1500)
+                if not play_button.is_visible() or "Sorava" not in (play_button.get_attribute("aria-label") or ""):
+                    fail("NEXT did not switch the replay control to Sorava", width)
                 page.locator("#sheet-prev").click()
                 page.wait_for_function("""() => document.querySelector('#sheet-visual .art-eqmount')?.classList.contains('is-playing')""", timeout=1500)
                 # Old animation is discarded on navigation; reopening starts
