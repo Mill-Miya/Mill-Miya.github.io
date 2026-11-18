@@ -43,15 +43,16 @@
     const sheetKind = document.getElementById("sheet-kind");
     const sheetTags = document.getElementById("sheet-tags");
     const sheetVisual = document.getElementById("sheet-visual");
-    const sheetVisualBottom = document.querySelector(".sheet-visual-bottom");
-    const sheetVisualBrand = sheetVisualBottom?.lastElementChild;
     const motionButton = document.createElement("button");
     motionButton.type = "button";
     motionButton.className = "sheet-motion-play";
-    motionButton.textContent = "PLAY MOTION ↻";
+    motionButton.textContent = "REPLAY";
     motionButton.setAttribute("aria-label", "自動赤道儀の動作アニメーションを再生");
     motionButton.hidden = true;
-    sheetVisualBottom?.appendChild(motionButton);
+    // A compact replay control stays centered inside the visual frame,
+    // never in the footer or the scrolling text column.
+    sheetVisual.appendChild(motionButton);
+    const sheetCopySide = dialog.querySelector(".sheet-copy-side");
     const sheetActions = document.getElementById("sheet-actions");
     const sheetCounter = document.getElementById("sheet-counter");
     const sheetPosition = document.getElementById("sheet-position");
@@ -168,13 +169,14 @@
           }
           node.id = replacement;
         }
-        sheetVisual.replaceChildren(art);
+        sheetVisual.replaceChildren(art, motionButton);
       } else {
-        sheetVisual.replaceChildren();
+        sheetVisual.replaceChildren(motionButton);
       }
       const showMotion = card.dataset.sheetId === "diy-equatorial-mount" && motionAllowed();
       motionButton.hidden = !showMotion;
-      if (sheetVisualBrand) sheetVisualBrand.hidden = showMotion;
+      // Each sheet starts at the beginning of its own right-side content.
+      if (sheetCopySide) sheetCopySide.scrollTop = 0;
       sheetTags.replaceChildren(...[...card.querySelectorAll(".tag-row span")].map(tag => tag.cloneNode(true)));
       const live = card.querySelector(".project-links a[href]");
       sheetActions.replaceChildren();
@@ -187,6 +189,13 @@
       nextButton.disabled = selection.length < 2;
       if (!dialog.open) dialog.showModal();
       closeButton.focus();
+      // Play exactly once when an animated sheet opens, including navigation
+      // from another sheet. Static artwork stays static; reduced-motion is honored.
+      if (showMotion) {
+        requestAnimationFrame(() => {
+          if (dialog.open && activeCard === card) playSheetMotion();
+        });
+      }
     }
 
     function moveSheet(direction) {
