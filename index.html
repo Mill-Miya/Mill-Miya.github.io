@@ -18,8 +18,8 @@
   <link rel="icon" href="assets/favicon-48.png?v=3" sizes="48x48" type="image/png">
   <link rel="icon" href="assets/favicon.svg?v=3" type="image/svg+xml" sizes="any">
   <link rel="apple-touch-icon" href="assets/icon-180.png?v=3">
-  <link rel="stylesheet" href="assets/style.css?v=39">
-  <script src="assets/main.js?v=14" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=40">
+  <script src="assets/main.js?v=15" defer></script>
   <title>Mill-Miya — Selected Works</title>
 </head>
 <body>
@@ -180,6 +180,11 @@
                 <linearGradient id="wp-metal" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f1f8f2"/><stop offset=".23" stop-color="#c2d8d1"/><stop offset=".53" stop-color="#7faaa0"/><stop offset=".85" stop-color="#477a72"/><stop offset="1" stop-color="#31554f"/></linearGradient>
                 <linearGradient id="wp-bore" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#0b444b"/><stop offset=".5" stop-color="#125d67"/><stop offset="1" stop-color="#082f37"/></linearGradient>
                 <linearGradient id="wp-valve" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c3d9ce"/><stop offset=".4" stop-color="#61877b"/><stop offset="1" stop-color="#284e48"/></linearGradient>
+                <mask id="wp-flow-reveal" x="57" y="119" width="525" height="240" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
+                  <!-- Flow reaches the valve first, then extends independently toward both open ends. -->
+                  <path class="wp-reveal-left" d="M364 173H240A35 35 0 0 0 205 208V255A35 35 0 0 1 170 290H98" fill="none" stroke="#fff" stroke-width="37" stroke-linecap="butt"/>
+                  <path class="wp-reveal-right" d="M364 173H523" fill="none" stroke="#fff" stroke-width="37" stroke-linecap="butt"/>
+                </mask>
               </defs>
               <!-- A simplified wall plane provides depth cues, not actual pipe detection. -->
               <path class="wp-wall-plane" d="M56 70L539 45L574 360L80 388Z" fill="url(#wp-wall)" opacity=".9"/>
@@ -196,13 +201,13 @@
                   <path class="wp-pipe-outline" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="#234841" stroke-width="52"/>
                   <path class="wp-pipe-back" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="#72998d" stroke-width="45"/>
                   <path class="wp-pipe-bore" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="url(#wp-bore)" stroke-width="31"/>
-                  <path class="wp-water-core" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="#58d6f2" stroke-width="13" opacity=".96"/>
-                  <path class="wp-water-stream" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="#e4fdff" stroke-width="5" stroke-dasharray="11 18"/>
+                  <path class="wp-water-core" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" mask="url(#wp-flow-reveal)" stroke="#58d6f2" stroke-width="13" opacity=".96"/>
+                  <path class="wp-water-stream" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" mask="url(#wp-flow-reveal)" stroke="#e4fdff" stroke-width="5" stroke-dasharray="11 18"/>
                   <!-- The metallic near wall initially hides the water, then becomes translucent. -->
                   <path class="wp-pipe-front" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="url(#wp-metal)" stroke-width="40"/>
                   <!-- A narrow cutaway window reveals water in the pipe core, not on the metal surface. -->
-                  <path class="wp-flow-cutaway" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="#0e5868" stroke-width="16"/>
-                  <path class="wp-flow-trace" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="#9eefff" stroke-width="6" stroke-dasharray="18 14"/>
+                  <path class="wp-flow-cutaway" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" mask="url(#wp-flow-reveal)" stroke="#0e5868" stroke-width="16"/>
+                  <path class="wp-flow-trace" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" mask="url(#wp-flow-reveal)" stroke="#9eefff" stroke-width="6" stroke-dasharray="18 14"/>
                   <path class="wp-pipe-highlight" d="M109 274H170A19 19 0 0 0 189 255V208A51 51 0 0 1 240 157H510" stroke="#f4fff7" stroke-width="3" opacity=".66"/>
                   <g class="wp-pipe-collars" stroke="#cce5d8" stroke-width="3" fill="#315f55">
                     <path d="M117 267V313M133 267V313M489 149V197M505 149V197" opacity=".85"/>
@@ -212,15 +217,16 @@
                   <!-- The end lips widen only the final short stretches of tubing;
                        neither opening is covered by a disc or closed with an ellipse. -->
                   <g class="wp-mouth-flares" stroke-linejoin="round">
+                    <!-- Straight, squared-off lip sections transition smoothly into the nominal pipe width. -->
                     <g class="wp-mouth-in">
-                      <path d="M98 251Q118 260 143 264L143 269Q118 265 98 267Z" fill="#91b7a9" stroke="#cce8da" stroke-width="1.8"/>
-                      <path d="M98 329Q118 320 143 316L143 311Q118 315 98 313Z" fill="#416b60" stroke="#8eb7a9" stroke-width="1.8"/>
-                      <path d="M98 251Q118 259 143 264M98 329Q118 321 143 316" fill="none" stroke="#e0f4e7" stroke-width="2.5"/>
+                      <path d="M98 250H110Q115 250 121 256L143 264V269L118 263H98Z" fill="#91b7a9" stroke="#cce8da" stroke-width="1.8"/>
+                      <path d="M98 330H110Q115 330 121 324L143 316V311L118 317H98Z" fill="#416b60" stroke="#8eb7a9" stroke-width="1.8"/>
+                      <path d="M98 250H110Q115 250 121 256L143 264M98 330H110Q115 330 121 324L143 316" fill="none" stroke="#e0f4e7" stroke-width="2.5"/>
                     </g>
                     <g class="wp-mouth-out">
-                      <path d="M478 147Q501 145 523 134L523 151Q501 152 478 154Z" fill="#91b7a9" stroke="#cce8da" stroke-width="1.8"/>
-                      <path d="M478 199Q501 201 523 212L523 195Q501 194 478 192Z" fill="#416b60" stroke="#8eb7a9" stroke-width="1.8"/>
-                      <path d="M478 147Q501 145 523 134M478 199Q501 201 523 212" fill="none" stroke="#e0f4e7" stroke-width="2.5"/>
+                      <path d="M478 147L499 143Q509 137 513 134H523V150H515L496 153L478 154Z" fill="#91b7a9" stroke="#cce8da" stroke-width="1.8"/>
+                      <path d="M478 199L499 203Q509 209 513 212H523V196H515L496 193L478 192Z" fill="#416b60" stroke="#8eb7a9" stroke-width="1.8"/>
+                      <path d="M478 147L499 143Q509 137 513 134H523M478 199L499 203Q509 209 513 212H523" fill="none" stroke="#e0f4e7" stroke-width="2.5"/>
                     </g>
                   </g>
                   <g class="wp-valve">
