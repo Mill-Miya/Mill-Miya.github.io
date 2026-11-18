@@ -18,8 +18,8 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="assets/favicon-48.png" sizes="48x48" type="image/png">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/style.css?v=11">
-  <script src="assets/main.js?v=5" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=12">
+  <script src="assets/main.js?v=6" defer></script>
   <title>Mill-Miya — Selected Works</title>
 </head>
 <body>
@@ -121,7 +121,7 @@
   <!-- The observing goal, reduced to a target marker instead of a second device. -->
   <g stroke-linecap="round" stroke-linejoin="round">
     <circle cx="87" cy="219" r="44" fill="#1c3b49" stroke="#a3d1cc" stroke-width="2.2"/>
-    <circle cx="87" cy="219" r="25" fill="none" stroke="#bce5df" stroke-width="2"/>
+    <circle class="eq-target-ring" cx="87" cy="219" r="25" fill="none" stroke="#bce5df" stroke-width="2"/>
     <circle cx="87" cy="219" r="5.5" fill="#a4f0d4"/>
     <path d="M87 164V184M87 254V274M32 219H52M122 219H142" stroke="#a3d9d2" stroke-width="2"/>
     <g fill="#b9e0dc" opacity=".78">
@@ -143,18 +143,18 @@
       <circle cx="188" cy="254" r="1.4"/>
     </g>
     <path d="M192 178L214 191L236 190" fill="none" stroke="#83b8be" opacity=".55" stroke-width="1.1"/>
-    <circle cx="212" cy="219" r="21" fill="none" stroke="#c2e9e3" stroke-width="1.9"/>
+    <circle class="eq-phone-target" cx="212" cy="219" r="21" fill="none" stroke="#c2e9e3" stroke-width="1.9"/>
     <circle cx="212" cy="219" r="4.5" fill="#a0ead0"/>
     <path d="M212 190V199M212 239V248M183 219H192M232 219H241" stroke="#bce7dc" stroke-width="1.8"/>
     <path d="M188 263H233" stroke="#8bbec0" stroke-width="1.3" opacity=".45"/>
   </g>
   <!-- Wi-Fi bridge, not an additional hardware box. -->
   <g fill="none" stroke="#9bd8d1" stroke-width="2" stroke-linecap="round">
-    <path d="M269 208Q281 196 293 208" opacity=".73"/>
-    <path d="M274 215Q281 208 288 215"/>
+    <path class="eq-wifi-outer" d="M269 208Q281 196 293 208" opacity=".73"/>
+    <path class="eq-wifi-inner" d="M274 215Q281 208 288 215"/>
     <path d="M281 223V233" stroke-dasharray="3 4"/>
   </g>
-  <circle cx="281" cy="221" r="2.5" fill="#a4f0d4"/>
+  <circle class="eq-wifi-dot" cx="281" cy="221" r="2.5" fill="#a4f0d4"/>
   <!-- ESP32 as a single chip — no driver boards / wiring inventory. -->
   <g stroke-linecap="round" stroke-linejoin="round">
     <rect x="308" y="175" width="85" height="105" rx="9" fill="#1b404b" stroke="#a9d3cd" stroke-width="2.1"/>
@@ -164,26 +164,32 @@
       <path d="M300 195H308M300 214H308M300 233H308M300 252H308"/>
       <path d="M393 195H401M393 214H401M393 233H401M393 252H401"/>
     </g>
-    <circle cx="352" cy="247" r="2.9" fill="#a0e9d4"/>
+    <circle class="eq-esp-led" cx="352" cy="247" r="2.9" fill="#a0e9d4"/>
     <text x="350.5" y="271" font-family="Arial, sans-serif" font-size="9.5" letter-spacing="1" text-anchor="middle" fill="#c8e7df">ESP32</text>
   </g>
   <!-- One controlled move direction. -->
-  <path d="M407 222H433" stroke="#a6e3d5" stroke-width="2.5" stroke-linecap="round"/>
+  <path class="eq-command-path" d="M407 222H433" stroke="#a6e3d5" stroke-width="2.5" stroke-linecap="round"/>
   <path d="M427 216L434 222L427 228" fill="none" stroke="#a6e3d5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
   <!-- Abstract physical drive icon: one small motor driving a larger pulley. -->
   <g stroke-linecap="round" stroke-linejoin="round">
     <rect x="436" y="259" width="51" height="48" rx="6" fill="#254a55" stroke="#a9d1cb" stroke-width="2"/>
     <path d="M445 268H479M445 298H479" stroke="#94c4c0" stroke-width="1.7" opacity=".65"/>
     <circle cx="459" cy="283" r="13" fill="#15343f" stroke="#c0e5d9" stroke-width="2"/>
+    <g class="eq-small-rotor" stroke="#d7f9ec" stroke-width="2"><path d="M459 274V279M459 287V292M450 283H455M463 283H468"/></g>
     <!-- Upper run remains as drawn; lower run terminates tangentially on the large pulley. -->
     <path d="M458 271L488 172" fill="none" stroke="#9ddfd2" stroke-width="5" opacity=".68"/>
     <path d="M463.3 295.3L535.6 269.8" fill="none" stroke="#9ddfd2" stroke-width="5" opacity=".68"/>
+    <!-- Belt travel accents are animated only in the expanded project sheet. -->
+    <path class="eq-belt-teeth eq-belt-upper" d="M458 271L488 172" fill="none" stroke="#d5fff0" stroke-width="2" stroke-dasharray="5 7"/>
+    <path class="eq-belt-teeth eq-belt-lower" d="M463.3 295.3L535.6 269.8" fill="none" stroke="#d5fff0" stroke-width="2" stroke-dasharray="5 7"/>
     <circle cx="517" cy="217" r="56" fill="#1e434e" stroke="#b2ddcf" stroke-width="5"/>
     <circle cx="517" cy="217" r="41" fill="none" stroke="#80aeb9" stroke-width="2.2" opacity=".8"/>
     <circle cx="517" cy="217" r="17" fill="#102e3a" stroke="#c0e9dc" stroke-width="2.7"/>
     <circle cx="517" cy="217" r="4.8" fill="#a5ecd3"/>
-    <path d="M517 184V164M517 249V270" stroke="#d2f0e7" stroke-width="2"/>
-    <path d="M510 172L517 163L524 172M510 262L517 271L524 262" stroke="#d2f0e7" stroke-width="2" fill="none"/>
+    <g class="eq-large-rotor">
+      <path d="M517 184V164M517 249V270" stroke="#d2f0e7" stroke-width="2"/>
+      <path d="M510 172L517 163L524 172M510 262L517 271L524 262" stroke="#d2f0e7" stroke-width="2" fill="none"/>
+    </g>
     <path d="M551 217H570" stroke="#9ccbd2" stroke-width="2" stroke-dasharray="3 6"/>
   </g>
   <!-- Matching four-stage labels. -->
