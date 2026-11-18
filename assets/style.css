@@ -84,9 +84,9 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .project-sheet[data-theme="sorava"] .sheet-visual .project-art{aspect-ratio:620 / 430}
 .art-wallpipe{background:#e4e9e6;color:#1e292c;aspect-ratio:620 / 430}.art-wallpipe::before{content:none}.art-wallpipe .pipe-drawing{position:absolute;inset:0;width:100%;height:100%;display:block;filter:none}
 
-/* WallPipe AR: two 90-degree elbows, hand-free four-spoke valve and see-through near wall.
+/* WallPipe AR: fixed piping and valve body, animated four-spoke wheel and cutaway flow.
    Static/reduced-motion content shows the final state; a hover or sheet replay
-   ends after one 7.2-second cycle, holding the completed state. */
+   ends after one 7.2-second cycle, holding the opened state. */
 .art-wallpipe{--wp-motion-duration:7.2s}
 .project-card .art-wallpipe.is-hovering{--wp-motion-duration:4.5s}
 .art-wallpipe .pipe-drawing{display:block}
@@ -95,7 +95,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .wp-pipe-assembly{opacity:1}
 .wp-part-left,.wp-part-right,.wp-valve{opacity:1;transform:translate(0,0)}
 .wp-lock-left,.wp-lock-right{opacity:.78}
-/* Rim and spokes are exactly symmetric about the stationary SVG hub. */
+/* Rim and spokes rotate about a stationary hub; the pipe and valve body stay assembled. */
 .wp-wheel-spin{transform-box:fill-box;transform-origin:50% 50%;transform:rotate(900deg)}
 .wp-wheel-hub{transform:none}
 .wp-pipe-front{opacity:.27}
@@ -120,22 +120,8 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .art-wallpipe.is-complete .wp-status-closed{opacity:0}
 .art-wallpipe.is-complete .wp-status-open{opacity:1}
 @media(prefers-reduced-motion:no-preference){
-  /* Readable, still restrained docking: 18–42 SVG units and no bounce. */
-  .art-wallpipe:is(.is-hovering,.is-playing) .wp-part-left{
-    animation:wp-dock-left var(--wp-motion-duration) linear 1 both;
-  }
-  .art-wallpipe:is(.is-hovering,.is-playing) .wp-valve{
-    animation:wp-dock-center var(--wp-motion-duration) linear 1 both;
-  }
-  .art-wallpipe:is(.is-hovering,.is-playing) .wp-part-right{
-    animation:wp-dock-right var(--wp-motion-duration) linear 1 both;
-  }
-  .art-wallpipe:is(.is-hovering,.is-playing) .wp-lock-left{
-    animation:wp-coupler-left var(--wp-motion-duration) steps(1,end) 1 both;
-  }
-  .art-wallpipe:is(.is-hovering,.is-playing) .wp-lock-right{
-    animation:wp-coupler-right var(--wp-motion-duration) steps(1,end) 1 both;
-  }
+  /* The assembled pipes, valve body and couplers stay fixed throughout playback.
+     Only the wheel and flow visualization animate. */
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-wheel-spin{
     animation:wp-wheel-open var(--wp-motion-duration) ease-in-out 1 both;
   }
@@ -148,7 +134,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-water-core{
     animation:wp-water-appear var(--wp-motion-duration) ease-in 1 both;
   }
-  /* Only reveal the moving inlet when the metal pipe is turning translucent. */
+  /* The inlet remains physically full, but the flow becomes visible as the metal turns translucent. */
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-upstream-water{
     animation:wp-upstream-reveal var(--wp-motion-duration) linear 1 both;
   }
@@ -177,38 +163,9 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
     animation:wp-open-status var(--wp-motion-duration) linear 1 both;
   }
 }
-/* Rigid parts arrive in the first 2.05s of the 7.2s one-shot:
-   inlet 0–0.7s, valve 0.7–1.35s, outlet 1.35–2.05s.
-   Each holds perfectly still after its seating click. */
-@keyframes wp-dock-left{
-  0%,1%{visibility:hidden;opacity:0;transform:translateX(-38px)}
-  1.01%{visibility:visible;opacity:1;transform:translateX(-38px)}
-  7.7%{visibility:visible;opacity:1;transform:translateX(-9px)}
-  9.72%,100%{visibility:visible;opacity:1;transform:translateX(0)}
-}
-@keyframes wp-dock-center{
-  0%,9.72%{visibility:hidden;opacity:0;transform:translateY(-18px)}
-  10.4%{visibility:visible;opacity:1;transform:translateY(-18px)}
-  16.7%{visibility:visible;opacity:1;transform:translateY(-6px)}
-  18.75%,100%{visibility:visible;opacity:1;transform:translateY(0)}
-}
-@keyframes wp-dock-right{
-  0%,18.75%{visibility:hidden;opacity:0;transform:translateX(42px)}
-  19.4%{visibility:visible;opacity:1;transform:translateX(42px)}
-  26.2%{visibility:visible;opacity:1;transform:translateX(10px)}
-  28.47%,100%{visibility:visible;opacity:1;transform:translateX(0)}
-}
-@keyframes wp-coupler-left{
-  0%,18.75%{opacity:0}
-  18.76%,100%{opacity:.78}
-}
-@keyframes wp-coupler-right{
-  0%,28.47%{opacity:0}
-  28.48%,100%{opacity:.78}
-}
 @keyframes wp-wheel-open{
-  0%,32%{transform:rotate(0deg)}
-  63%,100%{transform:rotate(900deg)}
+  0%{transform:rotate(0deg)}
+  40%,100%{transform:rotate(900deg)}
 }
 @keyframes wp-front-cutaway{
   0%,40%{opacity:.98}
@@ -254,8 +211,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   0%{opacity:.18}14%{opacity:1}28%,100%{opacity:.68}
 }
 @keyframes wp-closed-status{
-  0%,9.72%{opacity:0}
-  18.75%,42%{opacity:1}
+  0%,38%{opacity:1}
   60%,100%{opacity:0}
 }
 @keyframes wp-open-status{

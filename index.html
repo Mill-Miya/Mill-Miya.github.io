@@ -18,7 +18,7 @@
   <link rel="icon" href="assets/favicon-48.png?v=3" sizes="48x48" type="image/png">
   <link rel="icon" href="assets/favicon.svg?v=3" type="image/svg+xml" sizes="any">
   <link rel="apple-touch-icon" href="assets/icon-180.png?v=3">
-  <link rel="stylesheet" href="assets/style.css?v=56">
+  <link rel="stylesheet" href="assets/style.css?v=57">
   <script src="assets/main.js?v=15" defer></script>
   <title>Mill-Miya — Selected Works</title>
 </head>
@@ -172,7 +172,7 @@
   </svg>
   <div class="art-bottom"><span>SORAVA / SKYSHARE</span><span>FIND · POINT · SHARE</span></div>
 </div><button type="button" class="project-media-hit" data-open-sheet aria-label="Sorava / SkyShare の紹介シートを開く"></button></div><div class="project-info"><div class="project-topline"><span class="project-number">PROJECT / 001</span><span class="project-year">WEB APP</span></div><h3><button type="button" class="project-title-button" data-open-sheet>Sorava / SkyShare</button></h3><p>天体の位置計算、観望対象の案内、ホストとゲスト間のリアルタイム共有をまとめた観望会支援アプリ。</p><div class="tag-row"><span>TypeScript</span><span>React</span><span>Astronomy</span></div><div class="project-links"><button type="button" class="sheet-link" data-open-sheet>View sheet ↗</button><a href="https://mill-miya.github.io/SkyShare/" target="_blank" rel="noopener noreferrer">Live site ↗</a></div></div><template class="project-sheet-detail"><section class="sheet-detail-section" aria-label="Project concept"><div class="sheet-detail-heading">01 / CONCEPT</div><p class="sheet-purpose">観望会で、今見ている天体や場所を参加者同士でリアルタイムに共有できるWebアプリ。</p></section><section class="sheet-detail-section" aria-label="Key features"><div class="sheet-detail-heading">02 / KEY FEATURES</div><div class="sheet-feature-list"><div class="sheet-feature"><span class="sheet-feature-index">01</span><div><h3>観測情報の共有</h3><p>見ている天体や場所・方向を共有</p></div></div><div class="sheet-feature"><span class="sheet-feature-index">02</span><div><h3>天体案内</h3><p>月や惑星の位置を計算して表示</p></div></div><div class="sheet-feature"><span class="sheet-feature-index">03</span><div><h3>ホスト・ゲスト連携</h3><p>観望会の案内役と参加者をつなぐ</p></div></div></div></section><section class="sheet-note" aria-label="Development notes"><div class="sheet-detail-heading">DEVELOPMENT NOTES</div><p>開発中。リアルタイム共有には別途サーバーを使用。</p></section></template></article>
-        <article class="project-card featured" data-tags="web engineering" data-project="02" data-sheet-id="wallpipe-ar"><div class="project-media"><div class="project-art art-wallpipe" aria-label="壁面に2か所の曲がりを持つ仮想金属配管が現れ、4本スポークの丸ハンドルが回ると配管内部の水流が見えるWallPipe ARの概念アニメーション">
+        <article class="project-card featured" data-tags="web engineering" data-project="02" data-sheet-id="wallpipe-ar"><div class="project-media"><div class="project-art art-wallpipe" aria-label="2か所の曲がりを持つ固定された仮想金属配管で、4本スポークのバルブハンドルを回すと配管内部の水流が見えるWallPipe ARの概念アニメーション">
             <svg class="pipe-drawing" aria-hidden="true" viewBox="0 0 620 430" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect width="620" height="430" fill="#E4E9E6"/>
               <path d="M0 68H620M0 365H620" stroke="#82949A" stroke-opacity=".46"/>
@@ -231,8 +231,8 @@
               <!-- Flat engineering backdrop, no perspective grid or tracking decorations. -->
               <g class="wp-scene">
                 <g class="wp-pipe-assembly" stroke-linecap="butt" stroke-linejoin="round">
-                  <!-- Assembled steel parts translate only a short distance, then stop.
-                       No scale spring, camera shake, flashes, or growing tube geometry. -->
+                  <!-- The pipe and valve are fully assembled from the first frame.
+                       Their positions remain fixed while the wheel and internal water move. -->
                   <g class="wp-part-left" clip-path="url(#wp-part-left-clip)">
                     <use href="#wp-pipe-template"/>
                   </g>
