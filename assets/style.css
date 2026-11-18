@@ -101,6 +101,9 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .wp-water-core{opacity:.95}
 .wp-water-stream{opacity:1}
 .wp-reveal-left{stroke-dasharray:380 1000}
+.wp-upstream-window{opacity:.9}
+.wp-upstream-core{opacity:.85}
+.wp-upstream-stream{opacity:1}
 .wp-reveal-right{stroke-dasharray:170 1000}
 .wp-flow-cutaway{opacity:.55}
 .wp-flow-trace{opacity:1}
@@ -129,8 +132,8 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-water-core{
     animation:wp-water-appear var(--wp-motion-duration) ease-in 1 both;
   }
-  .art-wallpipe:is(.is-hovering,.is-playing) .wp-reveal-left{
-    animation:wp-propagate-left var(--wp-motion-duration) linear 1 both;
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-upstream-stream{
+    animation:wp-upstream-travel var(--wp-motion-duration) linear 1 both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-reveal-right{
     animation:wp-propagate-right var(--wp-motion-duration) linear 1 both;
@@ -174,12 +177,9 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   0%,39%{opacity:0}
   62%,100%{opacity:.95}
 }
-@keyframes wp-propagate-left{
-  0%,42%{stroke-dasharray:0 1000}
-  58%{stroke-dasharray:48 1000}
-  77%{stroke-dasharray:200 1000}
-  92%{stroke-dasharray:345 1000}
-  100%{stroke-dasharray:380 1000}
+@keyframes wp-upstream-travel{
+  0%{stroke-dashoffset:0}
+  100%{stroke-dashoffset:-248}
 }
 @keyframes wp-propagate-right{
   0%,42%{stroke-dasharray:0 1000}
