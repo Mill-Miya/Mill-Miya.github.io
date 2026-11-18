@@ -63,7 +63,8 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 @keyframes sorava-host-pick{0%,10%{opacity:0}22%,100%{opacity:1}}
 @keyframes sorava-host-reticle-reveal{0%,10%{opacity:0}22%,100%{opacity:1}}
 @keyframes sorava-guest-arrow-guidance{0%,32%{opacity:0}43%,69%{opacity:1}78%,100%{opacity:0}}
-@keyframes sorava-guest-reticle-acquired{0%,73%{opacity:0}85%,100%{opacity:1}}
+/* Guest reticle and guidance arrow now emerge together on receiving the target. */
+@keyframes sorava-guest-reticle-acquired{0%,32%{opacity:0}43%,100%{opacity:1}}
 /* The Wi-Fi symbol ITSELF blinks three times; no wandering signal dot. */
 @keyframes sorava-wifi-blink{
   0%,25%{opacity:.28}
@@ -482,6 +483,12 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   }
   .art-eqmount:is(.is-hovering,.is-playing) .eq-belt-lower{
     animation:eq-belt-return var(--eq-motion-duration) linear 1 both,eq-drive-visibility var(--eq-motion-duration) linear 1 both;
+  }
+  .art-eqmount:is(.is-hovering,.is-playing) .eq-belt-wrap{
+    animation:eq-belt-forward var(--eq-motion-duration) linear 1 both,eq-drive-visibility var(--eq-motion-duration) linear 1 both;
+  }
+  .art-eqmount:is(.is-hovering,.is-playing) .eq-belt-small-wrap{
+    animation:eq-belt-forward var(--eq-motion-duration) linear 1 both,eq-drive-visibility var(--eq-motion-duration) linear 1 both;
   }
 }
 @keyframes eq-target-acquire{
