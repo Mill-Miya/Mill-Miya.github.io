@@ -82,7 +82,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 @keyframes sorava-guest-wait{0%,62%{opacity:1}79%,100%{opacity:0}}
 @keyframes sorava-guest-receive{0%,62%{opacity:0}80%,100%{opacity:1}}
 .project-sheet[data-theme="sorava"] .sheet-visual .project-art{aspect-ratio:620 / 430}
-.art-wallpipe{background:radial-gradient(circle at 62% 44%,#34614b,#152a22 47%,#071613 100%);color:#e9f9ee}.art-wallpipe::before{content:"";position:absolute;inset:0;opacity:.22;background-image:linear-gradient(#b0d8b41f 1px,transparent 1px),linear-gradient(90deg,#b0d8b41f 1px,transparent 1px);background-size:31px 31px}.pipe-drawing{position:absolute;width:94%;height:90%;left:3%;top:7%;filter:drop-shadow(11px 13px 17px #000b)}.wallpipe-callout{position:absolute;z-index:4;bottom:15%;left:6%;display:flex;gap:9px;align-items:center;padding:11px 15px;background:#112c24cd;border:1px solid #54826c91;color:#bbebd0;font:10px var(--font-mono);letter-spacing:.05em}.callout-indicator{width:7px;height:7px;background:#9ee3b6;border-radius:50%;box-shadow:0 0 14px #abf8c6}
+.art-wallpipe{background:#e4e9e6;color:#1e292c}.art-wallpipe::before{content:none}.pipe-drawing{position:absolute;width:94%;height:90%;left:3%;top:7%;filter:drop-shadow(5px 7px 9px rgba(29,45,47,.16))}.wallpipe-callout{position:absolute;z-index:4;bottom:15%;left:6%;display:flex;gap:9px;align-items:center;padding:11px 15px;background:#f5f8f6ed;border:1px solid #b7c6c2;color:#334a53;font:10px var(--font-mono);letter-spacing:.05em}.callout-indicator{width:7px;height:7px;background:#088fc9;border-radius:50%;box-shadow:0 0 0 3px #088fc91f}
 
 /* WallPipe AR: two 90-degree elbows, hand-free four-spoke valve and see-through near wall.
    Static/reduced-motion content shows the final state; a hover or sheet replay
@@ -90,7 +90,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .art-wallpipe{--wp-motion-duration:7.2s}
 .project-card .art-wallpipe.is-hovering{--wp-motion-duration:4.5s}
 .art-wallpipe .pipe-drawing{display:block}
-.art-wallpipe .art-bottom{color:#ddf2e5b5}
+.art-wallpipe .art-cap,.art-wallpipe .art-bottom{color:#50646b}
 .wp-scene{transform:none}
 .wp-pipe-assembly{opacity:1}
 .wp-part-left,.wp-part-right,.wp-valve{opacity:1;transform:translate(0,0)}
@@ -480,7 +480,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .sheet-navigation button:not(:disabled):hover{border-color:var(--ink);background:var(--ink);color:#fff}
 .sheet-navigation button:disabled{opacity:.35;cursor:not-allowed}
 .project-sheet[data-theme="sorava"]{--sheet-accent:#076b93;--sheet-panel:#eef2f1;--sheet-muted:#56727d}
-.project-sheet[data-theme="wallpipe-ar"]{--sheet-accent:#27674d;--sheet-panel:#e0eae2;--sheet-muted:#4d705c}
+.project-sheet[data-theme="wallpipe-ar"]{--sheet-accent:#076b93;--sheet-panel:#e9eeec;--sheet-muted:#56727d}
 .project-sheet[data-theme="nova"]{--sheet-accent:#237d91;--sheet-panel:#dce7e9;--sheet-muted:#48747d}
 .project-sheet[data-theme="university-ai"]{--sheet-accent:#3e6678;--sheet-panel:#e4e9eb;--sheet-muted:#61777f}
 .project-sheet[data-theme="assignment-checker"]{--sheet-accent:#485d50;--sheet-panel:#e6e7e1;--sheet-muted:#667269}
