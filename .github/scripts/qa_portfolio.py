@@ -467,8 +467,9 @@ with sync_playwright() as p:
                 if page.locator("#sheet-visual .art-eqmount").count()!=0 or play_button.is_visible():
                     fail("sheet switching did not clear equatorial motion", width)
                 page.locator("#sheet-prev").click()
-                if page.locator("#sheet-visual .art-eqmount.is-playing").count()!=0:
-                    fail("animation was not reset when reopening sheet", width)
+                page.wait_for_function("""() => document.querySelector('#sheet-visual .art-eqmount')?.classList.contains('is-playing')""", timeout=1500)
+                # Old animation is discarded on navigation; reopening starts
+                # a fresh, single autoplay cycle rather than staying paused.
                 page.emulate_media(reduced_motion="reduce")
                 if art.locator(".eq-large-rotor").count()!=1:
                     # After re-opening, the previous locator should still resolve to this clone.
