@@ -688,3 +688,13 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   100%{transform:rotate(0deg)}
 }
 #lock-preview-a,#lock-preview-b{scroll-margin-top:110px}
+
+/* Muted, near-monochrome Sorava and ESP32 equatorial-mount concept art.
+   Keep enough blue/teal to read the signal flow; leave all motion unchanged.
+   Scope both listing previews and full project sheets; do not affect other artwork. */
+.project-card[data-sheet-id="sorava"] .project-art,
+.project-card[data-sheet-id="diy-equatorial-mount"] .project-art,
+.project-sheet[data-theme="sorava"] .sheet-visual .project-art,
+.project-sheet[data-theme="diy-equatorial-mount"] .sheet-visual .project-art{
+  filter:grayscale(.40) saturate(.72) brightness(1.07) contrast(.95);
+}
