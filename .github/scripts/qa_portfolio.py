@@ -200,6 +200,9 @@ with sync_playwright() as p:
                 fail("Every water or water-window layer must use the flow-front mask: "+cls, width)
         if wallpipe.locator(".wp-upstream-water").count()!=1:
             fail("Continuously flowing upstream section is missing", width)
+        if wallpipe.locator(".wp-upstream-stream").get_attribute("stroke-dasharray")!= \
+                wallpipe.locator(".wp-flow-trace").get_attribute("stroke-dasharray"):
+            fail("Moving water dashes should have matching cadence on both sides", width)
         for cls in (".wp-upstream-window", ".wp-upstream-core", ".wp-upstream-stream"):
             if wallpipe.locator(cls).count()!=1:
                 fail("Upstream flow layer is missing: "+cls, width)
@@ -324,42 +327,62 @@ with sync_playwright() as p:
             page.wait_for_function("""() =>
                 document.querySelector('#sheet-visual .art-wallpipe')?.classList.contains('is-playing')
             """, timeout=1500)
-            # The left-side inlet is already supplied with moving water while
-            # the wheel is still closed; only the right outlet fills after opening.
+            # Upstream water is physically in motion before the valve opens,
+            # but must remain invisible until the front metal becomes translucent.
+            # The downstream moving dashes then travel at the same physical SVG
+            # speed (not the same total dash offset) as the upstream dashes.
             front=pipe_sheet.evaluate("""art => {
               const l=art.querySelector('.wp-reveal-left');
               const r=art.querySelector('.wp-reveal-right');
+              const upstream=art.querySelector('.wp-upstream-water');
               const u=art.querySelector('.wp-upstream-stream');
+              const downstream=art.querySelector('.wp-flow-trace');
               const ra=r.getAnimations().find(a=>a.animationName==='wp-propagate-right');
+              const ga=upstream.getAnimations().find(a=>a.animationName==='wp-upstream-reveal');
               const ua=u.getAnimations().find(a=>a.animationName==='wp-upstream-travel');
-              if(!ra || !ua) return null;
+              const da=downstream.getAnimations().find(a=>a.animationName==='wp-water-move');
+              if(!ra || !ga || !ua || !da) return null;
               const snap=t=>{
-                ra.currentTime=t; ua.currentTime=t;
-                return [
-                  parseFloat(getComputedStyle(l).strokeDasharray),
-                  parseFloat(getComputedStyle(r).strokeDasharray),
-                  parseFloat(getComputedStyle(u).strokeDashoffset),
-                  parseFloat(getComputedStyle(u).opacity)
-                ];
+                for(const a of [ra,ga,ua,da]) a.currentTime=t;
+                return {
+                  upstreamLength:parseFloat(getComputedStyle(l).strokeDasharray),
+                  rightLength:parseFloat(getComputedStyle(r).strokeDasharray),
+                  upOffset:parseFloat(getComputedStyle(u).strokeDashoffset),
+                  upGroupOpacity:parseFloat(getComputedStyle(upstream).opacity),
+                  downOffset:parseFloat(getComputedStyle(downstream).strokeDashoffset)
+                };
               };
-              return {initial:snap(0),closed:snap(2800),opening:snap(3450),
-                      halfway:snap(4200),finished:snap(7050)};
+              return {initial:snap(0),closed:snap(2800),transition:snap(3600),
+                      opening:snap(3450),halfway:snap(4200),
+                      speedStart:snap(4500),speedEnd:snap(6000),
+                      finished:snap(7050)};
             }""")
             if not front:
-                fail("Upstream motion or downstream arrival animation is missing", width)
-            if any(frame[0]<340 or frame[3]<.95 for frame in front.values()):
-                fail("Left inlet must be continuously supplied and visible: "+str(front), width)
-            if front["initial"][1]>1 or front["closed"][1]>1:
-                fail("Right outlet must remain dry while the valve is closed: "+str(front), width)
-            if abs(front["closed"][2]-front["initial"][2])<30:
-                fail("Left-side water must visibly move before the valve opens: "+str(front), width)
-            if (not 0<front["opening"][1]<70 or front["halfway"][1]>=100):
-                fail("Downstream water is reaching the right end too early: "+str(front), width)
-            if front["finished"][1]<160:
-                fail("Downstream water must reach the right end by the final state: "+str(front), width)
+                fail("Upstream visibility gating or either flow animation is missing", width)
+            if any(frame["upstreamLength"]<340 for frame in front.values()):
+                fail("The upstream supply must be present along the entire left pipe: "+str(front), width)
+            if front["initial"]["upGroupOpacity"]>.02 or front["closed"]["upGroupOpacity"]>.02:
+                fail("The left water must be concealed by the opaque pipe wall: "+str(front), width)
+            if not .2<front["transition"]["upGroupOpacity"]<.8:
+                fail("Left-side water must appear only as the near wall becomes translucent: "+str(front), width)
+            if front["finished"]["upGroupOpacity"]<.98:
+                fail("The left water must be visible when the near wall is translucent: "+str(front), width)
+            if front["initial"]["rightLength"]>1 or front["closed"]["rightLength"]>1:
+                fail("The outlet must remain dry while the valve is closed: "+str(front), width)
+            if abs(front["closed"]["upOffset"]-front["initial"]["upOffset"])<30:
+                fail("The concealed upstream supply must continue moving before opening: "+str(front), width)
+            if (not 0<front["opening"]["rightLength"]<70 or
+                    front["halfway"]["rightLength"]>=100):
+                fail("Water must reach the right outlet progressively, not immediately: "+str(front), width)
+            if front["finished"]["rightLength"]<160:
+                fail("The downstream water must reach the right opening before the video ends: "+str(front), width)
+            upstream_advance=abs(front["speedEnd"]["upOffset"]-front["speedStart"]["upOffset"])
+            downstream_advance=abs(front["speedEnd"]["downOffset"]-front["speedStart"]["downOffset"])
+            if abs(upstream_advance-downstream_advance)>1.0:
+                fail("Left and right moving water have unequal speed: "+str(front), width)
             if pipe_sheet.locator(".wp-upstream-stream").evaluate(
                     "(el) => getComputedStyle(el).animationIterationCount")!="1":
-                fail("Upstream animation must stop after the single playback", width)
+                fail("The video must stop after its single cycle", width)
             page.locator(".sheet-motion-play").click()
             if "is-playing" not in (pipe_sheet.get_attribute("class") or ""):
                 fail("WallPipe replay did not restart", width)
