@@ -18,7 +18,7 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="assets/favicon-48.png" sizes="48x48" type="image/png">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/style.css?v=22">
+  <link rel="stylesheet" href="assets/style.css?v=23">
   <script src="assets/main.js?v=13" defer></script>
   <title>Mill-Miya — Selected Works</title>
 </head>
@@ -144,13 +144,14 @@
         </g>
         <!-- Real SkyShare uses directional guidance before acquisition: with
              the guest pointing right/up of the target, guide towards upper-right. -->
-        <g class="sorava-guest-direction" stroke="#d1f7ed" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="74" cy="91" r="25" fill="#153d47" fill-opacity=".9" stroke="#86d7c9" stroke-width="1.3"/>
+        <!-- Bottom-center of the star chart, just above the LOCAL VIEW caption. -->
+        <g class="sorava-guest-direction" transform="translate(0 55)" stroke="#d1f7ed" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="74" cy="91" r="22" fill="#153d47" fill-opacity=".93" stroke="#86d7c9" stroke-width="1.3"/>
           <path d="M60 105L89 76M75 76H89V90" fill="none"/>
-          <text x="74" y="139" text-anchor="middle" class="sorava-direction-label" stroke="none">POINT ↗</text>
         </g>
       </svg>
       <text x="87" y="250" text-anchor="middle" class="sorava-map-label sorava-guest-local-label">LOCAL VIEW</text>
+      <text x="87" y="250" text-anchor="middle" class="sorava-map-label sorava-guest-guiding-label">FOLLOW ↗</text>
       <text x="87" y="250" text-anchor="middle" class="sorava-map-label sorava-guest-synced-label">SYNCED VIEW</text>
       
       <g class="sorava-guest-waiting">
