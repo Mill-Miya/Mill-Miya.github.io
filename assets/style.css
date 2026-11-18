@@ -82,7 +82,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 @keyframes sorava-guest-wait{0%,62%{opacity:1}79%,100%{opacity:0}}
 @keyframes sorava-guest-receive{0%,62%{opacity:0}80%,100%{opacity:1}}
 .project-sheet[data-theme="sorava"] .sheet-visual .project-art{aspect-ratio:620 / 430}
-.art-wallpipe{background:#e4e9e6;color:#1e292c}.art-wallpipe::before{content:none}.pipe-drawing{position:absolute;width:94%;height:90%;left:3%;top:7%;filter:none}
+.art-wallpipe{background:#e4e9e6;color:#1e292c;aspect-ratio:620 / 430}.art-wallpipe::before{content:none}.art-wallpipe .pipe-drawing{position:absolute;inset:0;width:100%;height:100%;display:block;filter:none}
 
 /* WallPipe AR: two 90-degree elbows, hand-free four-spoke valve and see-through near wall.
    Static/reduced-motion content shows the final state; a hover or sheet replay
@@ -90,7 +90,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .art-wallpipe{--wp-motion-duration:7.2s}
 .project-card .art-wallpipe.is-hovering{--wp-motion-duration:4.5s}
 .art-wallpipe .pipe-drawing{display:block}
-.art-wallpipe .art-cap,.art-wallpipe .art-bottom{color:#52656a}
+/* WallPipe matches the equatorial-mount drawing: captions live inside the SVG. */
 .wp-scene{transform:none}
 .wp-pipe-assembly{opacity:1}
 .wp-part-left,.wp-part-right,.wp-valve{opacity:1;transform:translate(0,0)}
