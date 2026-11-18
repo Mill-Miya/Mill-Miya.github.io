@@ -71,6 +71,17 @@
       }
       sheetVisual.querySelector(".art-eqmount")?.classList.remove("is-playing", "is-hovering", "is-complete");
     }
+    function finishSheetMotion(art) {
+      if (!art?.classList.contains("is-playing")) return;
+      // The CSS animationend event is authoritative: the motor arrows have
+      // completed all whole turns at the exact instant the target is centered.
+      art.classList.add("is-complete");
+      art.classList.remove("is-playing");
+      if (motionTimer !== null) {
+        window.clearTimeout(motionTimer);
+        motionTimer = null;
+      }
+    }
     function playSheetMotion() {
       const art = sheetVisual.querySelector(".art-eqmount");
       if (!dialog.open || !art || !motionAllowed()) return;
@@ -78,12 +89,8 @@
       // Restart a previously completed cycle, including while the pointer stays over the sheet.
       void art.getBoundingClientRect().width;
       art.classList.add("is-playing");
-      motionTimer = window.setTimeout(() => {
-        // Keep the acquired target in the reticle instead of jumping back.
-        art.classList.add("is-complete");
-        art.classList.remove("is-playing");
-        motionTimer = null;
-      }, motionDuration);
+      // Safety fallback if the browser suppresses animationend (e.g. a hidden tab).
+      motionTimer = window.setTimeout(() => finishSheetMotion(art), motionDuration + 250);
     }
     motionButton.addEventListener("click", playSheetMotion);
     // The listing's transparent open-sheet button sits above the art. Listen
@@ -130,6 +137,12 @@
       const art = card.querySelector(".project-art")?.cloneNode(true);
       if (art) {
         if (card.dataset.sheetId === "diy-equatorial-mount") {
+          art.addEventListener("animationend", event => {
+            if (event.animationName === "eq-target-acquire" &&
+                event.target.classList.contains("eq-target-field")) {
+              finishSheetMotion(art);
+            }
+          });
           art.addEventListener("pointerenter", event => {
             if (event.pointerType !== "touch" && motionAllowed() &&
                 window.matchMedia("(hover:hover) and (pointer:fine)").matches) {
