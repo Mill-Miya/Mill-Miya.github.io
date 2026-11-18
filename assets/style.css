@@ -83,6 +83,104 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 @keyframes sorava-guest-receive{0%,62%{opacity:0}80%,100%{opacity:1}}
 .project-sheet[data-theme="sorava"] .sheet-visual .project-art{aspect-ratio:620 / 430}
 .art-wallpipe{background:radial-gradient(circle at 62% 44%,#34614b,#152a22 47%,#071613 100%);color:#e9f9ee}.art-wallpipe::before{content:"";position:absolute;inset:0;opacity:.22;background-image:linear-gradient(#b0d8b41f 1px,transparent 1px),linear-gradient(90deg,#b0d8b41f 1px,transparent 1px);background-size:31px 31px}.pipe-drawing{position:absolute;width:94%;height:90%;left:3%;top:7%;filter:drop-shadow(11px 13px 17px #000b)}.wallpipe-callout{position:absolute;z-index:4;bottom:15%;left:6%;display:flex;gap:9px;align-items:center;padding:11px 15px;background:#112c24cd;border:1px solid #54826c91;color:#bbebd0;font:10px var(--font-mono);letter-spacing:.05em}.callout-indicator{width:7px;height:7px;background:#9ee3b6;border-radius:50%;box-shadow:0 0 14px #abf8c6}
+
+/* WallPipe AR: two 90-degree elbows, hand-free four-spoke valve and see-through near wall.
+   Static/reduced-motion content shows the final state; a hover or sheet replay
+   resets the scene and tells the 7.2-second story once. */
+.art-wallpipe{--wp-motion-duration:7.2s}
+.project-card .art-wallpipe.is-hovering{--wp-motion-duration:4.5s}
+.art-wallpipe .pipe-drawing{display:block}
+.art-wallpipe .art-bottom{color:#ddf2e5b5}
+.wp-scene{transform:translate(7px,-3px) skewX(-3deg);transform-origin:50% 50%}
+.wp-pipe-assembly{opacity:1}
+.wp-wheel-spin{transform-box:fill-box;transform-origin:center;transform:rotate(900deg)}
+.wp-pipe-front{opacity:.27}
+.wp-pipe-highlight{opacity:.48}
+.wp-water-core{opacity:.95}
+.wp-water-stream{opacity:1}
+.wp-status-closed{opacity:0}
+.wp-status-open{opacity:1}
+.wp-tracking-frame{opacity:.68}
+.art-wallpipe.is-complete .wp-pipe-front{opacity:.27}
+.art-wallpipe.is-complete .wp-water-core{opacity:.95}
+.art-wallpipe.is-complete .wp-water-stream{opacity:1}
+.art-wallpipe.is-complete .wp-wheel-spin{transform:rotate(900deg)}
+.art-wallpipe.is-complete .wp-status-closed{opacity:0}
+.art-wallpipe.is-complete .wp-status-open{opacity:1}
+@media(prefers-reduced-motion:no-preference){
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-scene{
+    animation:wp-perspective var(--wp-motion-duration) ease-in-out 1 both;
+  }
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-pipe-assembly{
+    animation:wp-pipe-appear var(--wp-motion-duration) ease-out 1 both;
+  }
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-wheel-spin{
+    animation:wp-wheel-open var(--wp-motion-duration) ease-in-out 1 both;
+  }
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-pipe-front{
+    animation:wp-front-cutaway var(--wp-motion-duration) ease-in-out 1 both;
+  }
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-pipe-highlight{
+    animation:wp-highlight-fade var(--wp-motion-duration) ease-in-out 1 both;
+  }
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-water-core{
+    animation:wp-water-appear var(--wp-motion-duration) ease-in 1 both;
+  }
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-water-stream{
+    animation:wp-water-move var(--wp-motion-duration) linear 1 both,wp-water-bars-appear var(--wp-motion-duration) ease-in 1 both;
+  }
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-tracking-frame{
+    animation:wp-tracking-lock var(--wp-motion-duration) ease-out 1 both;
+  }
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-status-closed{
+    animation:wp-closed-status var(--wp-motion-duration) linear 1 both;
+  }
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-status-open{
+    animation:wp-open-status var(--wp-motion-duration) linear 1 both;
+  }
+}
+@keyframes wp-pipe-appear{
+  0%,13%{opacity:0;transform:translateY(10px)}
+  34%,100%{opacity:1;transform:translateY(0)}
+}
+@keyframes wp-perspective{
+  0%,77%{transform:translate(0,0) skewX(0deg)}
+  100%{transform:translate(7px,-3px) skewX(-3deg)}
+}
+@keyframes wp-wheel-open{
+  0%,37%{transform:rotate(0deg)}
+  73%,100%{transform:rotate(900deg)}
+}
+@keyframes wp-front-cutaway{
+  0%,48%{opacity:.98}
+  73%,100%{opacity:.27}
+}
+@keyframes wp-highlight-fade{
+  0%,48%{opacity:.66}
+  73%,100%{opacity:.28}
+}
+@keyframes wp-water-appear{
+  0%,49%{opacity:0}
+  73%,100%{opacity:.95}
+}
+@keyframes wp-water-move{
+  0%,49%{stroke-dashoffset:0}
+  100%{stroke-dashoffset:-215}
+}
+@keyframes wp-water-bars-appear{
+  0%,53%{opacity:0}
+  73%,100%{opacity:1}
+}
+@keyframes wp-tracking-lock{
+  0%{opacity:.18}14%{opacity:1}28%,100%{opacity:.68}
+}
+@keyframes wp-closed-status{
+  0%,48%{opacity:1}65%,100%{opacity:0}
+}
+@keyframes wp-open-status{
+  0%,48%{opacity:0}65%,100%{opacity:1}
+}
+
 .art-nova{background:radial-gradient(circle at 50% 45%,#102b35,#040d14 67%,#02060b);color:#d1faff}.art-nova::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#87b8b411 1px,transparent 1px),linear-gradient(#87b8b411 1px,transparent 1px);background-size:40px 40px;mask-image:linear-gradient(90deg,transparent,#000 40%,transparent)}.nova-orbits{position:absolute;left:50%;top:43%;height:220px;width:220px;transform:translate(-50%,-50%);border:1px solid #8eddf04d;border-radius:50%;box-shadow:0 0 70px #4de8fa22,inset 0 0 45px #38cfec15}.nova-orbits::before,.nova-orbits::after{content:"";position:absolute;border-radius:50%;inset:21px;border:1px solid #8fd7ec75}.nova-orbits::after{inset:47px;border-color:#d4fbff90;box-shadow:0 0 24px #7de4ff55}.nova-core{position:absolute;inset:75px;border-radius:50%;background:radial-gradient(circle at 32% 33%,#d8fdff,#77dce2 25%,#225d76 53%,#061627 74%);box-shadow:0 0 20px #60d8f6,0 0 70px #0ec3ff77;z-index:1}.nova-dot{position:absolute;right:8px;top:60px;width:9px;height:9px;background:#ecc78c;border-radius:50%;box-shadow:0 0 19px #f9c16a}.nova-ui-caption{position:absolute;z-index:3;bottom:18%;left:8%;display:grid;gap:5px}.nova-ui-caption span{font:9px var(--font-mono);letter-spacing:.09em;color:#83a8b7}.nova-ui-caption strong{font-size:30px;font-weight:620;letter-spacing:.2em}
 .art-university{background:linear-gradient(145deg,#222d36,#101920);color:#f4f7f6}.art-university::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 65% 40%,#30718a24,transparent 70%)}.university-panel{position:absolute;top:23%;left:11%;right:11%;background:#172630;border:1px solid #54738077;border-radius:9px;overflow:hidden;transform:rotate(-4deg);box-shadow:18px 24px 28px #0006}.up-top{display:flex;align-items:center;gap:10px;padding:16px 18px;color:#bfd6dd;font:11px var(--font-mono);border-bottom:1px solid #3b5d6977}.up-top i{margin-left:auto;background:#7ed4a9;width:7px;height:7px;border-radius:50%}.up-icon{width:29px;height:29px;border:1px solid #729ba6;border-radius:6px;display:grid;place-items:center;font:14px var(--font-ui)}.up-icon span{color:#57e4d6}.up-content{padding:13px 17px 18px}.up-line{display:flex;align-items:center;gap:9px;padding:10px 0;font:11px var(--font-mono);color:#d1e0e3;border-bottom:1px solid #31505b66}.up-line:last-child{border:0}.up-line em{margin-left:auto;color:#8bbaab;font-style:normal;font-size:9px}.up-bullet{width:7px;height:7px;border-radius:2px;background:#689af2}.up-bullet.green{background:#7dc8a5}.up-bullet.orange{background:#ddc18b}
 .art-assignment{background:#ebeae6;color:#1b2422}.art-assignment .art-cap,.art-assignment .art-bottom{color:#53605a}.check-panel{position:absolute;top:22%;left:12%;right:12%;background:#fff;border:1px solid #d6d7d1;box-shadow:13px 16px 0 #cdd1cb}.check-top{display:flex;justify-content:space-between;padding:18px 17px;border-bottom:1px solid #e4e7e2;font-size:20px;font-weight:760;letter-spacing:-.06em}.check-top span{font:10px var(--font-mono);color:#89948d;letter-spacing:0}.check-item{display:flex;align-items:center;gap:11px;padding:12px 17px;border-bottom:1px solid #edf0eb;font-size:12px;font-weight:600}.check-item:last-child{border:0}.check-box{width:22px;height:22px;flex-shrink:0;border:1px solid #bac2bc;border-radius:4px;display:grid;place-items:center;font-size:13px}.check-box.checked{background:#283c35;border-color:#283c35;color:#fff}.check-label{margin-left:auto;color:#2c7c61;font:9px var(--font-mono)}.check-label.muted{color:#a1a9a1}
