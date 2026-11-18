@@ -18,8 +18,8 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="assets/favicon-48.png" sizes="48x48" type="image/png">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/style.css?v=19">
-  <script src="assets/main.js?v=12" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=20">
+  <script src="assets/main.js?v=13" defer></script>
   <title>Mill-Miya — Selected Works</title>
 </head>
 <body>
@@ -72,24 +72,83 @@
 
       <div class="project-grid" id="project-grid">
 <div class="project-group-label" id="featured-group-label"><span>FEATURED WORK / 02</span><span>Featured</span></div>
-        <article class="project-card featured" data-tags="web astronomy" data-project="01" data-sheet-id="sorava"><div class="project-media"><div class="project-art art-sorava" aria-label="星図をモチーフにしたSoravaのイメージビジュアル">
-            <div class="art-cap"><span>01 / ASTRONOMY</span><span>SOFTWARE</span></div>
-            <!-- The complete sky field pans; the observation reticle stays fixed. -->
-            <div class="sorava-skyfield" aria-hidden="true">
-              <div class="sky-grid"></div>
-              <div class="star s1"></div><div class="star s2"></div><div class="star s3"></div><div class="star s4"></div><div class="star s5"></div><div class="star s6"></div>
-              <div class="star sorava-target-star"></div>
-            </div>
-            <div class="sky-reticle" aria-hidden="true"><span></span><span></span><span></span></div>
-            <!-- Three small connected observers suggest position sharing after acquisition. -->
-            <svg class="sorava-share-symbol" viewBox="0 0 90 48" fill="none" aria-hidden="true">
-              <path d="M17 24L45 9L73 24L45 39Z" stroke="currentColor" stroke-width="1.5"/>
-              <circle cx="17" cy="24" r="4" fill="#b9dcef"/><circle cx="45" cy="9" r="4" fill="#b9dcef"/>
-              <circle cx="73" cy="24" r="4" fill="#b9dcef"/><circle cx="45" cy="39" r="4" fill="#b9dcef"/>
-            </svg>
-            <div class="sorava-art-caption"><small>OBSERVATION SUPPORT SYSTEM</small><strong>So<span>rava</span></strong><span>Find. Point. Share.</span></div>
-            <div class="art-bottom"><span>AZ / ALT / SKY</span><span>LIVE POSITION CALCULATION</span></div>
-          </div><button type="button" class="project-media-hit" data-open-sheet aria-label="Sorava / SkyShare の紹介シートを開く"></button></div><div class="project-info"><div class="project-topline"><span class="project-number">PROJECT / 001</span><span class="project-year">WEB APP</span></div><h3><button type="button" class="project-title-button" data-open-sheet>Sorava / SkyShare</button></h3><p>天体の位置計算、観望対象の案内、ホストとゲスト間のリアルタイム共有をまとめた観望会支援アプリ。</p><div class="tag-row"><span>TypeScript</span><span>React</span><span>Astronomy</span></div><div class="project-links"><button type="button" class="sheet-link" data-open-sheet>View sheet ↗</button><a href="https://mill-miya.github.io/SkyShare/" target="_blank" rel="noopener noreferrer">Live site ↗</a></div></div><template class="project-sheet-detail"><section class="sheet-detail-section" aria-label="Project concept"><div class="sheet-detail-heading">01 / CONCEPT</div><p class="sheet-purpose">観望会で、今見ている天体や場所を参加者同士でリアルタイムに共有できるWebアプリ。</p></section><section class="sheet-detail-section" aria-label="Key features"><div class="sheet-detail-heading">02 / KEY FEATURES</div><div class="sheet-feature-list"><div class="sheet-feature"><span class="sheet-feature-index">01</span><div><h3>観測情報の共有</h3><p>見ている天体や場所・方向を共有</p></div></div><div class="sheet-feature"><span class="sheet-feature-index">02</span><div><h3>天体案内</h3><p>月や惑星の位置を計算して表示</p></div></div><div class="sheet-feature"><span class="sheet-feature-index">03</span><div><h3>ホスト・ゲスト連携</h3><p>観望会の案内役と参加者をつなぐ</p></div></div></div></section><section class="sheet-note" aria-label="Development notes"><div class="sheet-detail-heading">DEVELOPMENT NOTES</div><p>開発中。リアルタイム共有には別途サーバーを使用。</p></section></template></article>
+        <article class="project-card featured" data-tags="web astronomy" data-project="01" data-sheet-id="sorava"><div class="project-media"><div class="project-art art-sorava" aria-label="Soravaのホストとゲストのスマートフォン間でM42の観測情報を共有する概念アニメーション">
+  <div class="art-cap"><span>01 / ASTRONOMY</span><span>SOFTWARE</span></div>
+  <svg class="sorava-sharing-drawing" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 430" fill="none" aria-hidden="true">
+    <!-- Both display panels dominate the image; very little phone bezel is wasted. -->
+    <g class="sorava-phone-host">
+      <rect x="50" y="47" width="220" height="324" rx="23" fill="#0a1b29" stroke="#88abc1" stroke-width="2.5"/>
+      <rect x="60" y="60" width="200" height="296" rx="12" fill="#102739"/>
+      <path d="M121 53H199" stroke="#547487" stroke-width="3.5" stroke-linecap="round"/>
+      <text x="77" y="87" class="sorava-brand">Sorava</text>
+      <text x="242" y="87" text-anchor="end" class="sorava-role">HOST</text>
+      <path d="M73 98H247" stroke="#60849b" stroke-opacity=".55"/>
+      <g class="sorava-sky-points" fill="#c2e5f4">
+        <circle cx="95" cy="127" r="2.5"/><circle cx="235" cy="127" r="1.6"/>
+        <circle cx="117" cy="179" r="1.8"/><circle cx="229" cy="197" r="2.2"/>
+        <circle cx="102" cy="244" r="1.5"/><circle cx="219" cy="256" r="2"/>
+        <circle cx="154" cy="113" r="1.5"/><circle cx="182" cy="248" r="1.5"/>
+      </g>
+      <path d="M95 127L117 179L173 183L229 197M173 183L219 256" stroke="#6896ad" stroke-width="1.2" stroke-opacity=".5"/>
+      <path d="M171 140V160M171 206V226M128 183H148M194 183H214" stroke="#b6d6e0" stroke-opacity=".7" stroke-width="1.3"/>
+      <g class="sorava-host-picked">
+        <circle cx="171" cy="183" r="26" stroke="#a1e9d2" stroke-width="2"/>
+        <circle cx="171" cy="183" r="5.4" fill="#befde7"/>
+        <circle cx="171" cy="183" r="34" stroke="#9ddecf" stroke-opacity=".38"/>
+        <rect x="74" y="273" width="172" height="65" rx="7" fill="#244b5a" stroke="#80c0c3" stroke-opacity=".55"/>
+        <text x="88" y="296" class="sorava-object-name">M42</text>
+        <text x="88" y="314" class="sorava-object-detail">ORION NEBULA</text>
+        <text x="88" y="329" class="sorava-object-data">TARGET SELECTED</text>
+        <circle cx="227" cy="288" r="4" fill="#a1ebd3"/>
+      </g>
+      <text x="74" y="344" class="sorava-footer-text">OBSERVATION HOST</text>
+    </g>
+    <!-- The communication link sits in the central gap and never overlaps a screen. -->
+    <g class="sorava-wifi-node" transform="translate(310 195)">
+      <path d="M-25 -11Q0 -35 25 -11" stroke="#a6e2e5" stroke-width="3" stroke-linecap="round"/>
+      <path d="M-17 -3Q0 -19 17 -3" stroke="#a6e2e5" stroke-width="3" stroke-linecap="round"/>
+      <path d="M-9 6Q0 -2 9 6" stroke="#a6e2e5" stroke-width="3" stroke-linecap="round"/>
+      <circle cy="15" r="3.5" fill="#c5faf2"/>
+    </g>
+    <circle class="sorava-data-packet" cx="275" cy="226" r="3.8" fill="#b9ffed"/>
+    <!-- The guest sees the same star chart, but not the selected target until sync. -->
+    <g class="sorava-phone-guest">
+      <rect x="350" y="47" width="220" height="324" rx="23" fill="#0a1b29" stroke="#88abc1" stroke-width="2.5"/>
+      <rect x="360" y="60" width="200" height="296" rx="12" fill="#102739"/>
+      <path d="M421 53H499" stroke="#547487" stroke-width="3.5" stroke-linecap="round"/>
+      <text x="377" y="87" class="sorava-brand">Sorava</text>
+      <text x="542" y="87" text-anchor="end" class="sorava-role">GUEST</text>
+      <path d="M373 98H547" stroke="#60849b" stroke-opacity=".55"/>
+      <g class="sorava-sky-points" fill="#c2e5f4">
+        <circle cx="395" cy="127" r="2.5"/><circle cx="535" cy="127" r="1.6"/>
+        <circle cx="417" cy="179" r="1.8"/><circle cx="529" cy="197" r="2.2"/>
+        <circle cx="402" cy="244" r="1.5"/><circle cx="519" cy="256" r="2"/>
+        <circle cx="454" cy="113" r="1.5"/><circle cx="482" cy="248" r="1.5"/>
+      </g>
+      <path d="M395 127L417 179L473 183L529 197M473 183L519 256" stroke="#6896ad" stroke-width="1.2" stroke-opacity=".5"/>
+      <path d="M471 140V160M471 206V226M428 183H448M494 183H514" stroke="#b6d6e0" stroke-opacity=".7" stroke-width="1.3"/>
+      <g class="sorava-guest-waiting">
+        <rect x="374" y="273" width="172" height="65" rx="7" fill="#1a3648" stroke="#54798e" stroke-opacity=".7"/>
+        <text x="460" y="297" text-anchor="middle" class="sorava-waiting-label">AWAITING TARGET</text>
+        <path d="M410 316H510" stroke="#6d9cb5" stroke-width="2" stroke-dasharray="3 5" opacity=".65"/>
+        <text x="374" y="344" class="sorava-footer-text">OBSERVATION GUEST</text>
+      </g>
+      <g class="sorava-guest-received">
+        <circle cx="471" cy="183" r="26" stroke="#a1e9d2" stroke-width="2"/>
+        <circle cx="471" cy="183" r="5.4" fill="#befde7"/>
+        <circle cx="471" cy="183" r="34" stroke="#9ddecf" stroke-opacity=".38"/>
+        <rect x="374" y="273" width="172" height="65" rx="7" fill="#244b5a" stroke="#80c0c3" stroke-opacity=".55"/>
+        <text x="388" y="296" class="sorava-object-name">M42</text>
+        <text x="388" y="314" class="sorava-object-detail">ORION NEBULA</text>
+        <text x="388" y="329" class="sorava-object-data">TARGET RECEIVED</text>
+        <circle cx="527" cy="288" r="4" fill="#a1ebd3"/>
+      </g>
+    </g>
+    <text x="160" y="392" text-anchor="middle" class="sorava-device-label">HOST</text>
+    <text x="460" y="392" text-anchor="middle" class="sorava-device-label">GUEST</text>
+  </svg>
+  <div class="art-bottom"><span>SORAVA / SKYSHARE</span><span>FIND · POINT · SHARE</span></div>
+</div><button type="button" class="project-media-hit" data-open-sheet aria-label="Sorava / SkyShare の紹介シートを開く"></button></div><div class="project-info"><div class="project-topline"><span class="project-number">PROJECT / 001</span><span class="project-year">WEB APP</span></div><h3><button type="button" class="project-title-button" data-open-sheet>Sorava / SkyShare</button></h3><p>天体の位置計算、観望対象の案内、ホストとゲスト間のリアルタイム共有をまとめた観望会支援アプリ。</p><div class="tag-row"><span>TypeScript</span><span>React</span><span>Astronomy</span></div><div class="project-links"><button type="button" class="sheet-link" data-open-sheet>View sheet ↗</button><a href="https://mill-miya.github.io/SkyShare/" target="_blank" rel="noopener noreferrer">Live site ↗</a></div></div><template class="project-sheet-detail"><section class="sheet-detail-section" aria-label="Project concept"><div class="sheet-detail-heading">01 / CONCEPT</div><p class="sheet-purpose">観望会で、今見ている天体や場所を参加者同士でリアルタイムに共有できるWebアプリ。</p></section><section class="sheet-detail-section" aria-label="Key features"><div class="sheet-detail-heading">02 / KEY FEATURES</div><div class="sheet-feature-list"><div class="sheet-feature"><span class="sheet-feature-index">01</span><div><h3>観測情報の共有</h3><p>見ている天体や場所・方向を共有</p></div></div><div class="sheet-feature"><span class="sheet-feature-index">02</span><div><h3>天体案内</h3><p>月や惑星の位置を計算して表示</p></div></div><div class="sheet-feature"><span class="sheet-feature-index">03</span><div><h3>ホスト・ゲスト連携</h3><p>観望会の案内役と参加者をつなぐ</p></div></div></div></section><section class="sheet-note" aria-label="Development notes"><div class="sheet-detail-heading">DEVELOPMENT NOTES</div><p>開発中。リアルタイム共有には別途サーバーを使用。</p></section></template></article>
         <article class="project-card featured" data-tags="web engineering" data-project="02" data-sheet-id="wallpipe-ar"><div class="project-media"><div class="project-art art-wallpipe" aria-label="配管とバルブをモチーフにしたWallPipe ARのイメージビジュアル">
             <div class="art-cap"><span>02 / AUGMENTED REALITY</span><span>EXPERIMENT</span></div>
             <svg class="pipe-drawing" aria-hidden="true" viewBox="0 0 620 430" fill="none" xmlns="http://www.w3.org/2000/svg">
