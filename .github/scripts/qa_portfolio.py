@@ -158,6 +158,26 @@ with sync_playwright() as p:
             fail("expected three public live site links", width)
         if page.locator("a[href*='assignment-checker/'], a[href*='suwa-messe-2026/']").count()!=0:
             fail("locked public demo URLs leaked into the page", width)
+        # Corrected sparse four-stage SVG replaces the former dense mechanical poster.
+        concept = page.locator('.project-card[data-project="07"] .eqmount-drawing')
+        if concept.count()!=1:
+            fail("concept SVG absent from seventh card", width)
+        labels = concept.locator("text").all_text_contents()
+        for value in ("TARGET", "SKYSAFARI", "CONTROL", "MOTION"):
+            if value not in labels:
+                fail("concept stage missing: "+value, width)
+        if page.locator('.project-card[data-project="07"] .eqmount-mode, .project-card[data-project="07"] .art-cap, .project-card[data-project="07"] .art-bottom').count():
+            fail("duplicated outdated art labels remain", width)
+        if concept.locator('path[d="M192 178L214 191L236 190"][fill="none"]').count()!=1:
+            fail("smartphone star path lost no-fill correction", width)
+        if concept.locator('path[d="M463.3 295.3L535.6 269.8"][fill="none"]').count()!=1:
+            fail("tangent-aligned bottom belt path missing", width)
+        if concept.evaluate("(el) => getComputedStyle(el).filter")!="none":
+            fail("old artwork drop shadow remains", width)
+        if width in (390, 1440):
+            page.locator('.project-card[data-project="07"] .project-art').screenshot(
+                path=str(OUT/f"eqmount_concept_card_{width}.png"), animations="disabled"
+            )
         # Five eligible projects open sheets; the physical project has no live demo.
         if width in (320, 390, 820, 1440):
             trigger = page.locator('.project-card[data-project="01"] .project-media-hit')
