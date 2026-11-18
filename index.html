@@ -18,7 +18,7 @@
   <link rel="icon" href="assets/favicon-48.png?v=3" sizes="48x48" type="image/png">
   <link rel="icon" href="assets/favicon.svg?v=3" type="image/svg+xml" sizes="any">
   <link rel="apple-touch-icon" href="assets/icon-180.png?v=3">
-  <link rel="stylesheet" href="assets/style.css?v=51">
+  <link rel="stylesheet" href="assets/style.css?v=52">
   <script src="assets/main.js?v=15" defer></script>
   <title>Mill-Miya — Selected Works</title>
 </head>
@@ -197,20 +197,12 @@
                   <path class="wp-pipe-outline" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="#234841" stroke-width="52"/>
                   <path class="wp-pipe-back" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="#72998d" stroke-width="45"/>
                   <path class="wp-pipe-bore" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="url(#wp-bore)" stroke-width="31"/>
-                  <path class="wp-water-stream" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" mask="url(#wp-flow-reveal)" stroke="#b3f1ff" stroke-width="5" stroke-dasharray="14 17"/>
                   <!-- The metallic near wall initially hides the water, then becomes translucent. -->
                   <path class="wp-pipe-front" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="url(#wp-metal)" stroke-width="40"/>
                   <!-- A narrow cutaway window reveals water in the pipe core, not on the metal surface. -->
-                  <path class="wp-flow-cutaway" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" mask="url(#wp-flow-reveal)" stroke="#0e5664" stroke-width="16"/>
                   <!-- The cyan core must paint over the translucent cutaway, matching the left-hand water. -->
-                  <path class="wp-water-core" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" mask="url(#wp-flow-reveal)" stroke="#5cc8e1" stroke-opacity=".65" stroke-width="9" opacity=".96"/>
-                  <path class="wp-flow-trace" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" mask="url(#wp-flow-reveal)" stroke="#b3f1ff" stroke-width="5" stroke-dasharray="14 17"/>
                   <!-- Upstream supply continues underneath the opaque near wall; revealed only when metal turns translucent. -->
-                  <g class="wp-upstream-water" stroke-linecap="butt" stroke-linejoin="round">
-                    <path class="wp-upstream-window" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H337" stroke="#0e5664" stroke-width="16"/>
-                    <path class="wp-upstream-core" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H337" stroke="#5cc8e1" stroke-opacity=".65" stroke-width="9"/>
-                    <path class="wp-upstream-stream" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H337" stroke="#b3f1ff" stroke-width="5" stroke-dasharray="14 17"/>
-                  </g>
+
                   <path class="wp-pipe-highlight" d="M109 274H170A19 19 0 0 0 189 255V208A51 51 0 0 1 240 157H510" stroke="#f4fff7" stroke-width="3" opacity=".66"/>
                   <g class="wp-pipe-collars" stroke="#cce5d8" stroke-width="3" fill="#315f55">
                     <path d="M117 267V313M133 267V313M489 149V197M505 149V197" opacity=".85"/>
@@ -255,6 +247,19 @@
                   </g>
                   <g class="wp-part-right" clip-path="url(#wp-part-right-clip)">
                     <use href="#wp-pipe-template"/>
+                  </g>
+                  <!-- Live water is deliberately not part of the rigid steel <use> copies.
+                       Otherwise cloned SVG content can show the final blue state during assembly. -->
+                  <g class="wp-pipe-effects" stroke-linecap="butt" stroke-linejoin="round">
+                    <path class="wp-water-stream" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" mask="url(#wp-flow-reveal)" stroke="#b3f1ff" stroke-width="5" stroke-dasharray="14 17"/>
+                    <path class="wp-flow-cutaway" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" mask="url(#wp-flow-reveal)" stroke="#0e5664" stroke-width="16"/>
+                    <path class="wp-water-core" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" mask="url(#wp-flow-reveal)" stroke="#5cc8e1" stroke-opacity=".65" stroke-width="9" opacity=".96"/>
+                    <path class="wp-flow-trace" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" mask="url(#wp-flow-reveal)" stroke="#b3f1ff" stroke-width="5" stroke-dasharray="14 17"/>
+                  <g class="wp-upstream-water" stroke-linecap="butt" stroke-linejoin="round">
+                    <path class="wp-upstream-window" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H337" stroke="#0e5664" stroke-width="16"/>
+                    <path class="wp-upstream-core" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H337" stroke="#5cc8e1" stroke-opacity=".65" stroke-width="9"/>
+                    <path class="wp-upstream-stream" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H337" stroke="#b3f1ff" stroke-width="5" stroke-dasharray="14 17"/>
+                  </g>
                   </g>
                   <g class="wp-coupler-locks" fill="none" stroke="#cce4d7" stroke-linecap="round">
                     <path class="wp-lock-left" d="M335 151V195" stroke-width="3" opacity=".78"/>
