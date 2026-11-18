@@ -476,14 +476,15 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .project-media--locked:focus-within .project-art{transform:none}
 .project-lock-veil{
   position:absolute;inset:0;z-index:11;display:grid;place-items:center;
-  background:linear-gradient(0deg,rgba(227,234,229,.27),rgba(218,226,221,.17));
+  /* Slightly lower the artwork behind the lock, without hiding it. */
+  background:rgba(27,37,33,.085);
   pointer-events:none;
 }
 .project-lock-mark{
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;
   min-width:min(55%,240px);min-height:144px;padding:22px 26px;
-  border:1px solid rgba(48,62,55,.27);border-radius:2px;
-  background:rgba(248,250,246,.94);box-shadow:0 14px 34px #182c262d;
+  border:1px solid #bcc5bf;border-radius:2px;
+  background:#fcfdfb;box-shadow:0 18px 38px rgba(18,30,26,.24),0 3px 8px rgba(18,30,26,.10);
   color:#34463d;font:650 11px/1.4 var(--font-mono);letter-spacing:.08em;
   text-align:center;
 }
