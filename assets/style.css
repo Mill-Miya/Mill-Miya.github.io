@@ -93,10 +93,8 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .art-wallpipe .art-bottom{color:#ddf2e5b5}
 .wp-scene{transform:none}
 .wp-pipe-assembly{opacity:1}
-.wp-build-left{stroke-dasharray:340 1000;stroke-dashoffset:0}
-.wp-build-middle{opacity:1}
-.wp-build-right{stroke-dasharray:150 1000;stroke-dashoffset:0}
-.wp-valve{opacity:1}
+.wp-part-left,.wp-part-center,.wp-part-right,.wp-valve{opacity:1;transform:translate(0,0)}
+.wp-lock-left,.wp-lock-right{opacity:.78}
 /* Rim and spokes are exactly symmetric about the stationary SVG hub. */
 .wp-wheel-spin{transform-box:fill-box;transform-origin:50% 50%;transform:rotate(900deg)}
 .wp-wheel-hub{transform:none}
@@ -122,19 +120,22 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .art-wallpipe.is-complete .wp-status-closed{opacity:0}
 .art-wallpipe.is-complete .wp-status-open{opacity:1}
 @media(prefers-reduced-motion:no-preference){
-  /* Full-size stroke reveal forms the actual metal pipe, shadow, and highlights.
-     SVG clips prevent the early inlet mask from leaking into the outlet. */
-  .art-wallpipe:is(.is-hovering,.is-playing) .wp-build-left{
-    animation:wp-build-left-stage var(--wp-motion-duration) ease-out 1 both;
+  /* Subtle completed-part docking: 20–22 SVG units, no elastic overshoot. */
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-part-left{
+    animation:wp-dock-left var(--wp-motion-duration) linear 1 both;
   }
-  .art-wallpipe:is(.is-hovering,.is-playing) .wp-build-middle{
-    animation:wp-build-valve-stage var(--wp-motion-duration) ease-in-out 1 both;
-  }
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-part-center,
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-valve{
-    animation:wp-build-valve-stage var(--wp-motion-duration) ease-in-out 1 both;
+    animation:wp-dock-center var(--wp-motion-duration) linear 1 both;
   }
-  .art-wallpipe:is(.is-hovering,.is-playing) .wp-build-right{
-    animation:wp-build-right-stage var(--wp-motion-duration) ease-out 1 both;
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-part-right{
+    animation:wp-dock-right var(--wp-motion-duration) linear 1 both;
+  }
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-lock-left{
+    animation:wp-coupler-left var(--wp-motion-duration) steps(1,end) 1 both;
+  }
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-lock-right{
+    animation:wp-coupler-right var(--wp-motion-duration) steps(1,end) 1 both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-wheel-spin{
     animation:wp-wheel-open var(--wp-motion-duration) ease-in-out 1 both;
@@ -177,19 +178,34 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
     animation:wp-open-status var(--wp-motion-duration) linear 1 both;
   }
 }
-/* First 2.1 seconds of the 7.2-second one-shot cycle:
-   0–0.8s inlet, 0.8–1.4s valve, 1.4–2.1s outlet. */
-@keyframes wp-build-left-stage{
-  0%{stroke-dashoffset:340}
-  11.11%,100%{stroke-dashoffset:0}
+/* Rigid parts arrive in the first 2.05s of the 7.2s one-shot:
+   inlet 0–0.7s, valve 0.7–1.35s, outlet 1.35–2.05s.
+   Each holds perfectly still after its seating click. */
+@keyframes wp-dock-left{
+  0%{opacity:0;transform:translateX(-20px)}
+  1%{opacity:1;transform:translateX(-18px)}
+  7.65%{opacity:1;transform:translateX(-3px)}
+  9.72%,100%{opacity:1;transform:translateX(0)}
 }
-@keyframes wp-build-valve-stage{
-  0%,11.11%{opacity:0}
-  19.44%,100%{opacity:1}
+@keyframes wp-dock-center{
+  0%,9.72%{opacity:0;transform:translateY(-11px)}
+  10.4%{opacity:1;transform:translateY(-10px)}
+  16.7%{opacity:1;transform:translateY(-2px)}
+  18.75%,100%{opacity:1;transform:translateY(0)}
 }
-@keyframes wp-build-right-stage{
-  0%,19.44%{stroke-dashoffset:150}
-  29.17%,100%{stroke-dashoffset:0}
+@keyframes wp-dock-right{
+  0%,18.75%{opacity:0;transform:translateX(22px)}
+  19.4%{opacity:1;transform:translateX(20px)}
+  26.2%{opacity:1;transform:translateX(3px)}
+  28.47%,100%{opacity:1;transform:translateX(0)}
+}
+@keyframes wp-coupler-left{
+  0%,18.75%{opacity:0}
+  18.76%,100%{opacity:.78}
+}
+@keyframes wp-coupler-right{
+  0%,28.47%{opacity:0}
+  28.48%,100%{opacity:.78}
 }
 @keyframes wp-wheel-open{
   0%,32%{transform:rotate(0deg)}
@@ -239,8 +255,8 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   0%{opacity:.18}14%{opacity:1}28%,100%{opacity:.68}
 }
 @keyframes wp-closed-status{
-  0%,11.11%{opacity:0}
-  19.44%,42%{opacity:1}
+  0%,9.72%{opacity:0}
+  18.75%,42%{opacity:1}
   60%,100%{opacity:0}
 }
 @keyframes wp-open-status{
