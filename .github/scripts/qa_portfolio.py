@@ -168,7 +168,7 @@ with sync_playwright() as p:
             fail("WallPipe must have exactly two 90-degree pipe elbows", width)
         if any(wallpipe.locator(cls).count()!=1 for cls in
                (".wp-pipe-back", ".wp-pipe-bore", ".wp-water-core", ".wp-water-stream",
-                ".wp-pipe-front", ".wp-wheel-spin", ".wp-status-open", ".wp-status-closed")):
+                ".wp-pipe-front", ".wp-flow-cutaway", ".wp-flow-trace", ".wp-wheel-spin", ".wp-status-open", ".wp-status-closed")):
             fail("WallPipe cutaway/flow/handwheel layers missing", width)
         if wallpipe.locator('.wp-wheel-spin path[d="M0-40V40M-40 0H40"]').count()!=2:
             fail("WallPipe handwheel must have four radial spokes", width)
@@ -190,6 +190,9 @@ with sync_playwright() as p:
                 fail("WallPipe handwheel did not animate on hover", width)
             preview_seconds=pipe_art.locator(".wp-wheel-spin").evaluate(
                 "(el) => parseFloat(getComputedStyle(el).animationDuration)")
+            if pipe_art.locator(".wp-wheel-spin").evaluate(
+                    "(el) => getComputedStyle(el).animationIterationCount")!="infinite":
+                fail("WallPipe hover wheel must loop while card is hovered", width)
             if abs(preview_seconds-4.5)>.02:
                 fail("WallPipe hover must run exactly 1.6x (4.5s)", width)
             page.mouse.move(0,0)
@@ -206,6 +209,14 @@ with sync_playwright() as p:
                 "(el) => parseFloat(getComputedStyle(el).animationDuration)")
             if abs(duration-7.2)>.02:
                 fail("WallPipe sheet must play at normal 7.2s", width)
+            if pipe_sheet.locator(".wp-wheel-spin").evaluate(
+                    "(el) => getComputedStyle(el).animationIterationCount")!="infinite":
+                fail("WallPipe sheet motion must keep looping", width)
+            if pipe_sheet.locator(".wp-flow-trace").evaluate(
+                    "(el) => getComputedStyle(el).animationIterationCount")!="infinite, infinite":
+                fail("WallPipe internal water travel must repeat", width)
+            if page.locator(".sheet-motion-play").inner_text().strip()!="RESTART":
+                fail("WallPipe looping replay button should be labelled RESTART", width)
             phases=pipe_sheet.evaluate("""art => {
               const find=sel=>art.querySelector(sel);
               const els=['.wp-pipe-assembly','.wp-wheel-spin','.wp-pipe-front',
@@ -224,7 +235,8 @@ with sync_playwright() as p:
                   closed:parseFloat(getComputedStyle(els[6]).opacity)
                 };
               };
-              return {begin:frame(0),closed:frame(2800),ending:frame(7200)};
+              return {begin:frame(0),closed:frame(2800),
+                      ending:frame(7050),repeated:frame(7550)};
             }""")
             if phases["begin"]["assembly"]>.1 or phases["begin"]["water"]>.05:
                 fail("WallPipe must begin with an unplaced, dry pipe: "+str(phases), width)
@@ -234,6 +246,8 @@ with sync_playwright() as p:
                     phases["ending"]["front"]>.4 or phases["ending"]["open"]<.95 or
                     phases["ending"]["closed"]>.05):
                 fail("WallPipe final cutaway must reveal water inside after valve opens: "+str(phases), width)
+            if phases["repeated"]["assembly"]>.1 or phases["repeated"]["water"]>.05:
+                fail("WallPipe must restart from the scan phase after 7.2s: "+str(phases), width)
             page.locator(".sheet-motion-play").click()
             if "is-playing" not in (pipe_sheet.get_attribute("class") or ""):
                 fail("WallPipe replay did not restart", width)
