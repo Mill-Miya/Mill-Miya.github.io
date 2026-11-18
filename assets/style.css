@@ -220,142 +220,133 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 
 .art-nova{background:radial-gradient(circle at 50% 45%,#102b35,#040d14 67%,#02060b);color:#d1faff}.art-nova::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#87b8b411 1px,transparent 1px),linear-gradient(#87b8b411 1px,transparent 1px);background-size:40px 40px;mask-image:linear-gradient(90deg,transparent,#000 40%,transparent)}.nova-orbits{position:absolute;left:50%;top:43%;height:220px;width:220px;transform:translate(-50%,-50%);border:1px solid #8eddf04d;border-radius:50%;box-shadow:0 0 70px #4de8fa22,inset 0 0 45px #38cfec15}.nova-orbits::before,.nova-orbits::after{content:"";position:absolute;border-radius:50%;inset:21px;border:1px solid #8fd7ec75}.nova-orbits::after{inset:47px;border-color:#d4fbff90;box-shadow:0 0 24px #7de4ff55}.nova-core{position:absolute;inset:75px;border-radius:50%;background:radial-gradient(circle at 32% 33%,#d8fdff,#77dce2 25%,#225d76 53%,#061627 74%);box-shadow:0 0 20px #60d8f6,0 0 70px #0ec3ff77;z-index:1}.nova-dot{position:absolute;right:8px;top:60px;width:9px;height:9px;background:#ecc78c;border-radius:50%;box-shadow:0 0 19px #f9c16a}.nova-ui-caption{position:absolute;z-index:3;bottom:18%;left:8%;display:grid;gap:5px}.nova-ui-caption span{font:9px var(--font-mono);letter-spacing:.09em;color:#83a8b7}.nova-ui-caption strong{font-size:30px;font-weight:620;letter-spacing:.2em}
 
-/* N.O.V.A. portfolio motion study: existing concentric signature,
-   three compact HUD cards and a single 6-second progression.
-   Everything defaults to the finished state (static / reduced-motion). */
-.art-nova{--nova-motion-duration:6s}
+/* N.O.V.A. compact presence study, based on the actual visual-playground:
+   minimal black-blue space, dark glass volume, fine broken concentric rings,
+   one amber index, and lightweight CORE / MEMORY / SYSTEM data panels.
+   Static/reduced-motion presentation is the completed Full HUD. */
+.art-nova{--nova-motion-duration:6s;container-type:inline-size;
+  background:radial-gradient(ellipse at 50% 45%,#09202b40,transparent 55%),#03080d;color:#b6dbe4}
 .project-card .art-nova.is-hovering{--nova-motion-duration:3.75s}
-.art-nova .nova-orbits{
-  width:clamp(104px,34%,186px);height:auto;aspect-ratio:1;
-  top:43%;transform:translate(-50%,-50%) scale(1);
-  border-color:#8eddf075;box-shadow:0 0 24px #4de8fa20,inset 0 0 16px #38cfec12;
-  z-index:2;
-}
-.art-nova .nova-orbits::before{inset:11%;opacity:1;border-color:#8fd7ec70}
-.art-nova .nova-orbits::after{inset:24%;opacity:1;border-color:#d4fbff85;box-shadow:0 0 11px #7de4ff30}
-.art-nova .nova-core{
-  inset:32%;transform:scale(1);filter:brightness(1);
-  box-shadow:0 0 12px #60d8f670,0 0 30px #0ec3ff35;
-}
-.art-nova .nova-dot{
-  inset:0;width:100%;height:100%;right:auto;top:auto;
-  background:none;border-radius:0;box-shadow:none;
-  transform:rotate(34deg);transform-origin:50% 50%;
-}
-.art-nova .nova-dot::before{
-  content:"";position:absolute;left:calc(50% - 3.5px);top:-4px;
-  width:7px;height:7px;border-radius:50%;background:#eabd72;
-  box-shadow:0 0 9px #eabd7266;
-}
-.art-nova .nova-hud{
-  position:absolute;inset:0;z-index:3;pointer-events:none;
-  font-family:var(--font-mono);font-variant-numeric:tabular-nums;
-}
-.art-nova .nova-panel{
-  position:absolute;box-sizing:border-box;width:24.5%;
-  min-height:45px;padding:8px 9px 7px;
-  border:1px solid #7baeb85e;border-radius:2px;
-  background:#071b25d9;color:#d3f0f1;
-  display:flex;flex-direction:column;gap:5px;
-  opacity:1;transform:translateX(0);
-}
-.art-nova .nova-panel span{
-  white-space:nowrap;letter-spacing:.07em;
-  color:#80abb9;font-size:clamp(6px,.72vw,9px);line-height:1.1;
-}
-.art-nova .nova-panel strong{
-  font-size:clamp(8px,.89vw,12px);
-  letter-spacing:.09em;font-weight:540;line-height:1.05;
-}
-.art-nova .nova-panel i{width:34%;height:1px;background:#74c8d6ad;display:block;margin-top:1px}
-.art-nova .nova-panel-core{left:5.5%;top:35%}
-.art-nova .nova-panel-system{right:5.5%;top:25%}
-.art-nova .nova-panel-memory{right:5.5%;top:51%}
-.art-nova .nova-wire{
-  position:absolute;height:1px;background:#85bcca8c;
-  opacity:1;transform:scaleX(1);
-}
-.art-nova .nova-wire-core{top:44%;left:30%;width:3.5%;transform-origin:right center}
-.art-nova .nova-wire-system{top:34%;right:30%;width:3.5%;transform-origin:left center}
-.art-nova .nova-wire-memory{top:60%;right:30%;width:3.5%;transform-origin:left center}
-@media(max-width:430px){
-  .art-nova .nova-panel{padding:6px 5px;min-height:37px;gap:4px}
-  .art-nova .nova-ui-caption strong{font-size:clamp(20px,6vw,30px)}
-}
+.art-nova::before{background-image:linear-gradient(#86dced10 1px,transparent 1px),
+  linear-gradient(90deg,#86dced10 1px,transparent 1px);
+  background-size:48px 48px;opacity:.29;mask-image:linear-gradient(90deg,transparent,#000 25%,#000 75%,transparent)}
+.art-nova .nova-orbits{position:absolute;left:50%;top:46%;z-index:2;
+  width:38%;height:auto;aspect-ratio:1;transform:translate(-50%,-50%) scale(1);
+  border:0;border-radius:50%;box-shadow:none}
+.art-nova .nova-orbits::before,.art-nova .nova-orbits::after{content:none}
+.art-nova .nova-signature{display:block;width:100%;height:100%;overflow:visible}
+.art-nova .nova-rings{opacity:1}
+.art-nova .nova-core{position:absolute;left:calc(50% - 2px);top:calc(50% - 2px);
+  right:auto;bottom:auto;inset:auto;width:4px;height:4px;
+  background:#eafaff;border-radius:50%;box-shadow:0 0 5px #d4f4ff99;
+  z-index:1;transform:scale(1)}
+.art-nova .nova-dot{position:absolute;inset:0;width:100%;height:100%;z-index:2;
+  background:none;box-shadow:none;border:0;border-radius:0;
+  transform:rotate(34deg);transform-origin:50% 50%}
+.art-nova .nova-dot::before{content:"";position:absolute;left:calc(50% - 3px);top:5%;
+  width:6px;height:6px;border-radius:50%;background:#eabd72;box-shadow:0 0 8px #eabd7270}
+.art-nova .nova-hud{position:absolute;inset:0;z-index:3;pointer-events:none;
+  color:#b6dbe4;font-family:Consolas,"Courier New",monospace}
+.art-nova .nova-panel{position:absolute;box-sizing:border-box;width:25%;
+  min-height:0;padding:8px 7px 6px 9px;display:block;
+  background:linear-gradient(110deg,#0b24302e,transparent 90%);
+  border:0;border-top:1px solid #42697592;border-bottom:1px solid #1a394585;border-radius:0;
+  color:#b6dbe4;opacity:1;clip-path:inset(0 0 0 0);transform:none}
+.art-nova .nova-panel::before{content:"";position:absolute;left:0;top:0;
+  bottom:12px;width:1px;background:#527b8594}
+.art-nova .nova-panel::after{content:"";position:absolute;right:0;top:0;
+  width:10px;height:10px;border-top:1px solid #426975a8;
+  transform:rotate(45deg);transform-origin:right top}
+.art-nova .nova-panel-core{left:5%;top:27%}
+.art-nova .nova-panel-memory{right:5%;top:27%}
+.art-nova .nova-panel-system{right:5%;top:57%}
+.art-nova .nova-panel-head{font-size:clamp(6px,1.6cqi,9px);letter-spacing:.1em;
+  line-height:1.1;color:#88adb9}
+.art-nova .nova-panel strong{display:block;margin-top:7px;color:#c4e9f0;
+  font-weight:330;font-size:clamp(7px,2.35cqi,12px);
+  line-height:1.1;letter-spacing:.055em;white-space:nowrap}
+.art-nova .nova-panel dl{margin:7px 0 0;display:grid;gap:5px}
+.art-nova .nova-panel dl div{display:flex;justify-content:space-between;
+  align-items:baseline;gap:3px;font-size:clamp(5.5px,1.42cqi,8.5px);
+  line-height:1.2;letter-spacing:0;white-space:nowrap}
+.art-nova .nova-panel dt{color:#648695}
+.art-nova .nova-panel dd{margin:0;color:#b5d9e2}
+.art-nova .nova-panel small{display:block;margin-top:8px;color:#476b79;
+  font-size:clamp(5px,1.23cqi,7px);white-space:nowrap;letter-spacing:.025em}
+.art-nova .nova-wire{position:absolute;z-index:1;height:1px;
+  background:#86dced72;opacity:1;transform:scaleX(1)}
+.art-nova .nova-wire::after{content:"";position:absolute;width:3px;height:3px;
+  right:-1px;top:-1px;border-radius:50%;background:#86dced99}
+.art-nova .nova-wire-core{top:35.5%;left:29.7%;width:7.7%;transform-origin:left center}
+.art-nova .nova-wire-memory{top:36%;right:29.7%;width:7.7%;transform-origin:right center}
+.art-nova .nova-wire-system{top:64%;right:29.7%;width:7.7%;transform-origin:right center}
+.art-nova .nova-ui-caption{position:absolute;z-index:4;top:13%;left:50%;bottom:auto;
+  transform:translateX(-50%);text-align:center;display:grid;gap:6px;
+  width:70%;pointer-events:none}
+.art-nova .nova-ui-caption span{font:clamp(5px,1.6cqi,8px) Consolas,monospace;
+  letter-spacing:.25em;color:#6f9ba9}
+.art-nova .nova-ui-caption strong{font-family:"Segoe UI",Arial,sans-serif;
+  font-size:clamp(16px,5.3cqi,30px);font-weight:250;
+  letter-spacing:.29em;line-height:1.05;color:#c5f0fa;
+  text-shadow:none;white-space:nowrap}
+.art-nova .nova-state-line{position:absolute;left:50%;bottom:20%;
+  transform:translateX(-50%);white-space:nowrap;
+  color:#86dced;font:clamp(7px,1.6cqi,10px) Consolas,monospace;
+  letter-spacing:.15em}
+.art-nova .nova-state-line::before{content:"";display:inline-block;
+  width:3px;height:3px;margin-right:9px;vertical-align:middle;
+  border-radius:50%;background:#86dced}
+.art-nova .nova-state-line b{font-weight:400;color:#476470}
+.art-nova .art-cap,.art-nova .art-bottom{color:#628593b8}
 @media(prefers-reduced-motion:no-preference){
   .art-nova:is(.is-hovering,.is-playing) .nova-orbits{
-    animation:nova-orbit-activate var(--nova-motion-duration) ease-in-out 1 both;
-  }
-  .art-nova:is(.is-hovering,.is-playing) .nova-orbits::before,
-  .art-nova:is(.is-hovering,.is-playing) .nova-orbits::after{
-    animation:nova-rings-open var(--nova-motion-duration) ease-out 1 both;
-  }
+    animation:nova-orbit-activate var(--nova-motion-duration) ease-in-out 1 both}
+  .art-nova:is(.is-hovering,.is-playing) .nova-rings{
+    animation:nova-rings-open var(--nova-motion-duration) ease-out 1 both}
   .art-nova:is(.is-hovering,.is-playing) .nova-core{
-    animation:nova-core-activate var(--nova-motion-duration) ease-in-out 1 both;
-  }
+    animation:nova-core-activate var(--nova-motion-duration) ease-in-out 1 both}
   .art-nova:is(.is-hovering,.is-playing) .nova-dot{
-    animation:nova-point-activate var(--nova-motion-duration) ease-in-out 1 both;
-  }
+    animation:nova-point-activate var(--nova-motion-duration) ease-in-out 1 both}
   .art-nova:is(.is-hovering,.is-playing) .nova-panel-core{
-    animation:nova-panel-core-in var(--nova-motion-duration) ease-out 1 both;
-  }
-  .art-nova:is(.is-hovering,.is-playing) .nova-panel-system{
-    animation:nova-panel-system-in var(--nova-motion-duration) ease-out 1 both;
-  }
+    animation:nova-panel-core-in var(--nova-motion-duration) ease-out 1 both}
   .art-nova:is(.is-hovering,.is-playing) .nova-panel-memory{
-    animation:nova-panel-memory-in var(--nova-motion-duration) ease-out 1 both;
-  }
+    animation:nova-panel-memory-in var(--nova-motion-duration) ease-out 1 both}
+  .art-nova:is(.is-hovering,.is-playing) .nova-panel-system{
+    animation:nova-panel-system-in var(--nova-motion-duration) ease-out 1 both}
   .art-nova:is(.is-hovering,.is-playing) .nova-wire-core{
-    animation:nova-wire-core-in var(--nova-motion-duration) ease-out 1 both;
-  }
-  .art-nova:is(.is-hovering,.is-playing) .nova-wire-system{
-    animation:nova-wire-system-in var(--nova-motion-duration) ease-out 1 both;
-  }
+    animation:nova-wire-core-in var(--nova-motion-duration) ease-out 1 both}
   .art-nova:is(.is-hovering,.is-playing) .nova-wire-memory{
-    animation:nova-wire-memory-in var(--nova-motion-duration) ease-out 1 both;
-  }
+    animation:nova-wire-memory-in var(--nova-motion-duration) ease-out 1 both}
+  .art-nova:is(.is-hovering,.is-playing) .nova-wire-system{
+    animation:nova-wire-system-in var(--nova-motion-duration) ease-out 1 both}
+  .art-nova:is(.is-hovering,.is-playing) .nova-panel strong,
+  .art-nova:is(.is-hovering,.is-playing) .nova-panel dl,
+  .art-nova:is(.is-hovering,.is-playing) .nova-panel small{
+    animation:nova-hud-text-in var(--nova-motion-duration) linear 1 both}
 }
 @keyframes nova-orbit-activate{
-  0%,25%{transform:translate(-50%,-50%) scale(.62);opacity:.84}
+  0%,25%{transform:translate(-50%,-50%) scale(.38);opacity:.85}
   50%,100%{transform:translate(-50%,-50%) scale(1);opacity:1}
 }
 @keyframes nova-rings-open{
-  0%,25%{opacity:.08}
+  0%,25%{opacity:.09}
   50%,100%{opacity:1}
 }
 @keyframes nova-core-activate{
-  0%,25%{transform:scale(.9);filter:brightness(.82)}
-  50%,100%{transform:scale(1);filter:brightness(1)}
+  0%,25%{transform:scale(.88);opacity:.8}
+  50%,100%{transform:scale(1);opacity:1}
 }
 @keyframes nova-point-activate{
-  0%,25%{transform:rotate(-24deg);opacity:.55}
+  0%,25%{transform:rotate(-24deg);opacity:.5}
   50%,100%{transform:rotate(34deg);opacity:1}
 }
-@keyframes nova-panel-core-in{
-  0%,49%{opacity:0;transform:translateX(-8px)}
-  61%,100%{opacity:1;transform:translateX(0)}
-}
-@keyframes nova-panel-system-in{
-  0%,59%{opacity:0;transform:translateX(8px)}
-  71%,100%{opacity:1;transform:translateX(0)}
-}
-@keyframes nova-panel-memory-in{
-  0%,69%{opacity:0;transform:translateX(8px)}
-  83%,100%{opacity:1;transform:translateX(0)}
-}
-@keyframes nova-wire-core-in{
-  0%,49%{opacity:0;transform:scaleX(0)}
-  59%,100%{opacity:1;transform:scaleX(1)}
-}
-@keyframes nova-wire-system-in{
-  0%,59%{opacity:0;transform:scaleX(0)}
-  69%,100%{opacity:1;transform:scaleX(1)}
-}
-@keyframes nova-wire-memory-in{
-  0%,69%{opacity:0;transform:scaleX(0)}
-  81%,100%{opacity:1;transform:scaleX(1)}
-}
-
+@keyframes nova-wire-core-in{0%,48%{opacity:0;transform:scaleX(0)}58%,100%{opacity:1;transform:scaleX(1)}}
+@keyframes nova-wire-memory-in{0%,58%{opacity:0;transform:scaleX(0)}68%,100%{opacity:1;transform:scaleX(1)}}
+@keyframes nova-wire-system-in{0%,68%{opacity:0;transform:scaleX(0)}78%,100%{opacity:1;transform:scaleX(1)}}
+@keyframes nova-panel-core-in{0%,52%{opacity:0;clip-path:inset(0 100% 0 0)}61%,100%{opacity:1;clip-path:inset(0 0 0 0)}}
+@keyframes nova-panel-memory-in{0%,62%{opacity:0;clip-path:inset(0 100% 0 0)}71%,100%{opacity:1;clip-path:inset(0 0 0 0)}}
+@keyframes nova-panel-system-in{0%,72%{opacity:0;clip-path:inset(0 100% 0 0)}83%,100%{opacity:1;clip-path:inset(0 0 0 0)}}
+@keyframes nova-hud-text-in{0%,56%{opacity:0}87%,100%{opacity:1}}
 .art-university{background:linear-gradient(145deg,#222d36,#101920);color:#f4f7f6}.art-university::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 65% 40%,#30718a24,transparent 70%)}.university-panel{position:absolute;top:23%;left:11%;right:11%;background:#172630;border:1px solid #54738077;border-radius:9px;overflow:hidden;transform:rotate(-4deg);box-shadow:18px 24px 28px #0006}.up-top{display:flex;align-items:center;gap:10px;padding:16px 18px;color:#bfd6dd;font:11px var(--font-mono);border-bottom:1px solid #3b5d6977}.up-top i{margin-left:auto;background:#7ed4a9;width:7px;height:7px;border-radius:50%}.up-icon{width:29px;height:29px;border:1px solid #729ba6;border-radius:6px;display:grid;place-items:center;font:14px var(--font-ui)}.up-icon span{color:#57e4d6}.up-content{padding:13px 17px 18px}.up-line{display:flex;align-items:center;gap:9px;padding:10px 0;font:11px var(--font-mono);color:#d1e0e3;border-bottom:1px solid #31505b66}.up-line:last-child{border:0}.up-line em{margin-left:auto;color:#8bbaab;font-style:normal;font-size:9px}.up-bullet{width:7px;height:7px;border-radius:2px;background:#689af2}.up-bullet.green{background:#7dc8a5}.up-bullet.orange{background:#ddc18b}
 .art-assignment{background:#ebeae6;color:#1b2422}.art-assignment .art-cap,.art-assignment .art-bottom{color:#53605a}.check-panel{position:absolute;top:22%;left:12%;right:12%;background:#fff;border:1px solid #d6d7d1;box-shadow:13px 16px 0 #cdd1cb}.check-top{display:flex;justify-content:space-between;padding:18px 17px;border-bottom:1px solid #e4e7e2;font-size:20px;font-weight:760;letter-spacing:-.06em}.check-top span{font:10px var(--font-mono);color:#89948d;letter-spacing:0}.check-item{display:flex;align-items:center;gap:11px;padding:12px 17px;border-bottom:1px solid #edf0eb;font-size:12px;font-weight:600}.check-item:last-child{border:0}.check-box{width:22px;height:22px;flex-shrink:0;border:1px solid #bac2bc;border-radius:4px;display:grid;place-items:center;font-size:13px}.check-box.checked{background:#283c35;border-color:#283c35;color:#fff}.check-label{margin-left:auto;color:#2c7c61;font:9px var(--font-mono)}.check-label.muted{color:#a1a9a1}
 .art-messe{background:#dfe8de;color:#152923}.art-messe .art-cap,.art-messe .art-bottom{color:#537263}.messe-panel{position:absolute;top:22%;left:11%;right:11%;background:#f8fbf5;border:1px solid #9eb4a5;box-shadow:16px 18px 0 #aac3b0}.messe-top{display:flex;justify-content:space-between;align-items:center;padding:14px 15px;background:#264c39;color:#e7fff0;font:11px var(--font-mono);letter-spacing:.05em}.messe-top span{color:#d3e5d7}.messe-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:18px 15px}.messe-list{display:grid;gap:8px;align-content:start}.messe-list div{padding-bottom:7px;border-bottom:1px solid #c4d3c6;font:10px var(--font-mono);letter-spacing:.04em}.messe-list i{font-style:normal;color:#718f78;margin-right:13px}.messe-map{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.messe-map span{display:grid;place-items:center;background:#d3e4d5;min-height:31px;color:#54745b;font:8px var(--font-mono)}.messe-map span:nth-child(4){background:#34624b;color:#fff}
