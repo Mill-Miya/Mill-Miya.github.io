@@ -17,33 +17,52 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .art-sorava .art-cap{top:12px}
 .art-sorava .art-bottom{bottom:7px}
 .sorava-sharing-drawing text{font-family:var(--font-mono);pointer-events:none}
-.sorava-brand{font-size:17px;fill:#d9eff4;font-weight:700;letter-spacing:-.05em}
-.sorava-role{font-size:11px;fill:#83bcca;letter-spacing:.1em;font-weight:700}
-.sorava-object-name{fill:#c5fff0;font-size:19px;font-weight:750}
-.sorava-object-detail{fill:#d1e6eb;font-size:10px;letter-spacing:.045em}
-.sorava-object-data{fill:#94ddd0;font-size:8px;letter-spacing:.12em}
-.sorava-waiting-label{fill:#9bb6c9;font-size:11px;letter-spacing:.08em}
+.sorava-brand{font-size:15px;fill:#d9eff4;font-weight:700;letter-spacing:-.05em}
+.sorava-role{font-size:10px;fill:#83bcca;letter-spacing:.1em;font-weight:700}
+.sorava-object-name{fill:#c5fff0;font-size:18px;font-weight:750}
+.sorava-object-detail{fill:#d1e6eb;font-size:8.5px;letter-spacing:.035em}
+.sorava-object-data{fill:#94ddd0;font-size:7px;letter-spacing:.08em}
+.sorava-waiting-label{fill:#9bb6c9;font-size:10px;letter-spacing:.06em}
+.sorava-map-label{fill:#82b7c6;font-size:8px;letter-spacing:.08em}
 .sorava-footer-text{fill:#83acc1;font-size:7px;letter-spacing:.08em}
 .sorava-device-label{font-size:13px;letter-spacing:.22em;fill:#acc9d9;font-weight:700}
-.sorava-host-picked,.sorava-guest-received{opacity:0}
-.sorava-guest-waiting{opacity:1}
-.sorava-wifi-node{opacity:.28;transform-box:view-box;transform-origin:310px 195px}
-.sorava-data-packet{opacity:0}
-.art-sorava.is-complete .sorava-host-picked,.art-sorava.is-complete .sorava-guest-received{opacity:1}
-.art-sorava.is-complete .sorava-guest-waiting{opacity:0}
+.sorava-host-picked,.sorava-guest-received,.sorava-guest-synced-label{opacity:0}
+.sorava-guest-waiting,.sorava-guest-local-label{opacity:1}
+/* The guest starts aimed 32 SVG units to the right and 34 up, a visibly different field of view. */
+.sorava-guest-field{transform:translate(32px,-34px)}
+.sorava-wifi-node{opacity:.28}
+.art-sorava.is-complete .sorava-host-picked,.art-sorava.is-complete .sorava-guest-received,
+.art-sorava.is-complete .sorava-guest-synced-label{opacity:1}
+.art-sorava.is-complete .sorava-guest-waiting,.art-sorava.is-complete .sorava-guest-local-label{opacity:0}
+.art-sorava.is-complete .sorava-guest-field{transform:translate(0,0)}
 .art-sorava.is-complete .sorava-wifi-node{opacity:.9}
 @media(prefers-reduced-motion:no-preference){
   .art-sorava:is(.is-hovering,.is-playing) .sorava-host-picked{animation:sorava-host-pick 7.2s ease-in-out 1 both}
-  .art-sorava:is(.is-hovering,.is-playing) .sorava-wifi-node{animation:sorava-wifi-send 7.2s ease-in-out 1 both}
-  .art-sorava:is(.is-hovering,.is-playing) .sorava-data-packet{animation:sorava-packet-flight 7.2s linear 1 both}
+  .art-sorava:is(.is-hovering,.is-playing) .sorava-wifi-node{animation:sorava-wifi-blink 7.2s linear 1 both}
+  .art-sorava:is(.is-hovering,.is-playing) .sorava-guest-field{animation:sorava-guest-pointing 7.2s ease-in-out 1 both}
+  .art-sorava:is(.is-hovering,.is-playing) .sorava-guest-local-label{animation:sorava-guest-wait 7.2s linear 1 both}
+  .art-sorava:is(.is-hovering,.is-playing) .sorava-guest-synced-label{animation:sorava-guest-receive 7.2s ease-in-out 1 both}
   .art-sorava:is(.is-hovering,.is-playing) .sorava-guest-waiting{animation:sorava-guest-wait 7.2s linear 1 both}
   .art-sorava:is(.is-hovering,.is-playing) .sorava-guest-received{animation:sorava-guest-receive 7.2s ease-in-out 1 both}
 }
 @keyframes sorava-host-pick{0%,10%{opacity:0}22%,100%{opacity:1}}
-@keyframes sorava-wifi-send{0%,26%{opacity:.28}38%,67%{opacity:1}80%,100%{opacity:.9}}
-@keyframes sorava-packet-flight{0%,37%{opacity:0;transform:translateX(0)}43%{opacity:1;transform:translateX(10px)}63%{opacity:1;transform:translateX(66px)}70%,100%{opacity:0;transform:translateX(76px)}}
-@keyframes sorava-guest-wait{0%,56%{opacity:1}72%,100%{opacity:0}}
-@keyframes sorava-guest-receive{0%,56%{opacity:0}73%,100%{opacity:1}}
+/* The Wi-Fi symbol ITSELF blinks three times; no wandering signal dot. */
+@keyframes sorava-wifi-blink{
+  0%,25%{opacity:.28}
+  33%{opacity:1}
+  40%{opacity:.13}
+  50%{opacity:1}
+  56%{opacity:.13}
+  62%{opacity:1}
+  68%{opacity:.27}
+  76%,100%{opacity:.9}
+}
+@keyframes sorava-guest-pointing{
+  0%,40%{transform:translate(32px,-34px)}
+  76%,100%{transform:translate(0,0)}
+}
+@keyframes sorava-guest-wait{0%,62%{opacity:1}79%,100%{opacity:0}}
+@keyframes sorava-guest-receive{0%,62%{opacity:0}80%,100%{opacity:1}}
 .project-sheet[data-theme="sorava"] .sheet-visual .project-art{aspect-ratio:620 / 430}
 .art-wallpipe{background:radial-gradient(circle at 62% 44%,#34614b,#152a22 47%,#071613 100%);color:#e9f9ee}.art-wallpipe::before{content:"";position:absolute;inset:0;opacity:.22;background-image:linear-gradient(#b0d8b41f 1px,transparent 1px),linear-gradient(90deg,#b0d8b41f 1px,transparent 1px);background-size:31px 31px}.pipe-drawing{position:absolute;width:94%;height:90%;left:3%;top:7%;filter:drop-shadow(11px 13px 17px #000b)}.wallpipe-callout{position:absolute;z-index:4;bottom:15%;left:6%;display:flex;gap:9px;align-items:center;padding:11px 15px;background:#112c24cd;border:1px solid #54826c91;color:#bbebd0;font:10px var(--font-mono);letter-spacing:.05em}.callout-indicator{width:7px;height:7px;background:#9ee3b6;border-radius:50%;box-shadow:0 0 14px #abf8c6}
 .art-nova{background:radial-gradient(circle at 50% 45%,#102b35,#040d14 67%,#02060b);color:#d1faff}.art-nova::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#87b8b411 1px,transparent 1px),linear-gradient(#87b8b411 1px,transparent 1px);background-size:40px 40px;mask-image:linear-gradient(90deg,transparent,#000 40%,transparent)}.nova-orbits{position:absolute;left:50%;top:43%;height:220px;width:220px;transform:translate(-50%,-50%);border:1px solid #8eddf04d;border-radius:50%;box-shadow:0 0 70px #4de8fa22,inset 0 0 45px #38cfec15}.nova-orbits::before,.nova-orbits::after{content:"";position:absolute;border-radius:50%;inset:21px;border:1px solid #8fd7ec75}.nova-orbits::after{inset:47px;border-color:#d4fbff90;box-shadow:0 0 24px #7de4ff55}.nova-core{position:absolute;inset:75px;border-radius:50%;background:radial-gradient(circle at 32% 33%,#d8fdff,#77dce2 25%,#225d76 53%,#061627 74%);box-shadow:0 0 20px #60d8f6,0 0 70px #0ec3ff77;z-index:1}.nova-dot{position:absolute;right:8px;top:60px;width:9px;height:9px;background:#ecc78c;border-radius:50%;box-shadow:0 0 19px #f9c16a}.nova-ui-caption{position:absolute;z-index:3;bottom:18%;left:8%;display:grid;gap:5px}.nova-ui-caption span{font:9px var(--font-mono);letter-spacing:.09em;color:#83a8b7}.nova-ui-caption strong{font-size:30px;font-weight:620;letter-spacing:.2em}
