@@ -369,38 +369,38 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 
 /* Each 6.4 s cycle: target > phone > radio > ESP32 > coupled belt drive. */
 @media(prefers-reduced-motion:no-preference){
-  .sheet-visual .art-eqmount:is(:hover,.is-playing) .eq-target-ring{
-    animation:eq-target-select 6.4s ease-in-out infinite;
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-target-ring{
+    animation:eq-target-select 6.4s ease-in-out 1 both;
   }
-  .sheet-visual .art-eqmount:is(:hover,.is-playing) .eq-phone-target{
-    animation:eq-phone-accept 6.4s ease-in-out infinite;
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-phone-target{
+    animation:eq-phone-accept 6.4s ease-in-out 1 both;
   }
-  .sheet-visual .art-eqmount:is(:hover,.is-playing) .eq-wifi-inner{
-    animation:eq-radio-inner 6.4s linear infinite;
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-wifi-inner{
+    animation:eq-radio-inner 6.4s linear 1 both;
   }
-  .sheet-visual .art-eqmount:is(:hover,.is-playing) .eq-wifi-outer{
-    animation:eq-radio-outer 6.4s linear infinite;
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-wifi-outer{
+    animation:eq-radio-outer 6.4s linear 1 both;
   }
-  .sheet-visual .art-eqmount:is(:hover,.is-playing) .eq-wifi-dot{
-    animation:eq-radio-dot 6.4s linear infinite;
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-wifi-dot{
+    animation:eq-radio-dot 6.4s linear 1 both;
   }
-  .sheet-visual .art-eqmount:is(:hover,.is-playing) .eq-esp-led{
-    animation:eq-controller-led 6.4s ease-in-out infinite;
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-esp-led{
+    animation:eq-controller-led 6.4s ease-in-out 1 both;
   }
-  .sheet-visual .art-eqmount:is(:hover,.is-playing) .eq-command-path{
-    animation:eq-controller-output 6.4s linear infinite;
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-command-path{
+    animation:eq-controller-output 6.4s linear 1 both;
   }
-  .sheet-visual .art-eqmount:is(:hover,.is-playing) .eq-small-rotor{
-    animation:eq-motor-turn 6.4s linear infinite,eq-drive-visibility 6.4s linear infinite;
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-small-rotor{
+    animation:eq-motor-turn 6.4s linear 1 both,eq-drive-visibility 6.4s linear 1 both;
   }
-  .sheet-visual .art-eqmount:is(:hover,.is-playing) .eq-large-rotor{
-    animation:eq-pulley-turn 6.4s linear infinite;
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-large-rotor{
+    animation:eq-pulley-turn 6.4s linear 1 both;
   }
-  .sheet-visual .art-eqmount:is(:hover,.is-playing) .eq-belt-upper{
-    animation:eq-belt-forward 6.4s linear infinite,eq-drive-visibility 6.4s linear infinite;
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-belt-upper{
+    animation:eq-belt-forward 6.4s linear 1 both,eq-drive-visibility 6.4s linear 1 both;
   }
-  .sheet-visual .art-eqmount:is(:hover,.is-playing) .eq-belt-lower{
-    animation:eq-belt-return 6.4s linear infinite,eq-drive-visibility 6.4s linear infinite;
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-belt-lower{
+    animation:eq-belt-return 6.4s linear 1 both,eq-drive-visibility 6.4s linear 1 both;
   }
 }
 @keyframes eq-target-select{
