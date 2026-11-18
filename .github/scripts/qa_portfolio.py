@@ -549,6 +549,26 @@ with sync_playwright() as p:
                 fail("N.O.V.A. reduced-motion final HUD must be visible", width)
         if nova.locator(".nova-wire").count()!=3:
             fail("The authentic sparse three-panel HUD connectors are missing", width)
+        if nova.locator(".nova-idle-hint").count()!=1:
+            fail("N.O.V.A. floating phase must include the original quiet-presence note", width)
+        # At narrow card widths the full-size source panel's detailed rows are
+        # intentionally abbreviated rather than clipped or rendered microscopically.
+        if nova.evaluate("(el)=>el.getBoundingClientRect().width")<=365:
+            if nova.locator(".nova-panel dl").first.evaluate(
+                    "(el)=>getComputedStyle(el).display")!="none":
+                fail("Compact N.O.V.A. card must hide fine-print HUD rows", width)
+            for panel in nova.locator(".nova-panel").all():
+                overflow=panel.evaluate("""el=>{
+                  const h=el.querySelector('strong');
+                  return {actual:h.scrollWidth,available:h.clientWidth,
+                          lines:h.getBoundingClientRect().height /
+                                parseFloat(getComputedStyle(h).lineHeight)};
+                }""")
+                if overflow["actual"]>overflow["available"]+2 or overflow["lines"]>3:
+                    fail("N.O.V.A. condensed HUD text overflows on small screens: "+str(overflow), width)
+        if width in (390,1440):
+            nova.screenshot(path=str(OUT/f"nova_card_{width}.png"),animations="disabled")
+
         if nova.locator(".nova-panel-core").evaluate(
                 "(el)=>getComputedStyle(el).backgroundColor") not in ("rgba(0, 0, 0, 0)", "transparent"):
             fail("HUD must use unobtrusive lines rather than solid card backgrounds", width)
