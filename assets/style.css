@@ -120,7 +120,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .art-wallpipe.is-complete .wp-status-closed{opacity:0}
 .art-wallpipe.is-complete .wp-status-open{opacity:1}
 @media(prefers-reduced-motion:no-preference){
-  /* Subtle completed-part docking: 20–22 SVG units, no elastic overshoot. */
+  /* Readable, still restrained docking: 18–42 SVG units and no bounce. */
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-part-left{
     animation:wp-dock-left var(--wp-motion-duration) linear 1 both;
   }
@@ -182,21 +182,21 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
    inlet 0–0.7s, valve 0.7–1.35s, outlet 1.35–2.05s.
    Each holds perfectly still after its seating click. */
 @keyframes wp-dock-left{
-  0%{opacity:0;transform:translateX(-20px)}
-  1%{opacity:1;transform:translateX(-18px)}
-  7.65%{opacity:1;transform:translateX(-3px)}
+  0%,1%{opacity:0;transform:translateX(-38px)}
+  1.01%{opacity:1;transform:translateX(-38px)}
+  7.7%{opacity:1;transform:translateX(-9px)}
   9.72%,100%{opacity:1;transform:translateX(0)}
 }
 @keyframes wp-dock-center{
-  0%,9.72%{opacity:0;transform:translateY(-11px)}
-  10.4%{opacity:1;transform:translateY(-10px)}
-  16.7%{opacity:1;transform:translateY(-2px)}
+  0%,9.72%{opacity:0;transform:translateY(-18px)}
+  10.4%{opacity:1;transform:translateY(-18px)}
+  16.7%{opacity:1;transform:translateY(-6px)}
   18.75%,100%{opacity:1;transform:translateY(0)}
 }
 @keyframes wp-dock-right{
-  0%,18.75%{opacity:0;transform:translateX(22px)}
-  19.4%{opacity:1;transform:translateX(20px)}
-  26.2%{opacity:1;transform:translateX(3px)}
+  0%,18.75%{opacity:0;transform:translateX(42px)}
+  19.4%{opacity:1;transform:translateX(42px)}
+  26.2%{opacity:1;transform:translateX(10px)}
   28.47%,100%{opacity:1;transform:translateX(0)}
 }
 @keyframes wp-coupler-left{
