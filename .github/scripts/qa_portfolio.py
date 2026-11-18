@@ -163,17 +163,80 @@ with sync_playwright() as p:
         if concept.count()!=1:
             fail("concept SVG absent from seventh card", width)
         labels = concept.locator("text").all_text_contents()
-        for value in ("TARGET", "SKYSAFARI", "CONTROL", "MOTION"):
-            if value not in labels:
-                fail("concept stage missing: "+value, width)
+        expected_stages = ("SKYSAFARI", "CONTROL", "MOTION", "TARGET")
+        stage_positions = [labels.index(value) if value in labels else -1 for value in expected_stages]
+        if -1 in stage_positions or stage_positions != sorted(stage_positions):
+            fail("concept stages are not ordered phone to acquired target", width)
         if page.locator('.project-card[data-project="07"] .eqmount-mode, .project-card[data-project="07"] .art-cap, .project-card[data-project="07"] .art-bottom').count():
             fail("duplicated outdated art labels remain", width)
         if concept.locator('path[d="M192 178L214 191L236 190"][fill="none"]').count()!=1:
             fail("smartphone star path lost no-fill correction", width)
-        if concept.locator('path:not(.eq-belt-teeth)[d="M463.3 295.3L535.6 269.8"][fill="none"]').count()!=1:
-            fail("tangent-aligned bottom belt path missing", width)
+        if concept.locator('path.eq-belt-upper-run[d="M447.01 277.98L479.18 201.16"]').count()!=1:
+            fail("upper belt does not meet the common pulley radius", width)
+        if concept.locator('path.eq-belt-lower-run[d="M465.52 294.25L537.57 252.47"]').count()!=1:
+            fail("lower belt does not meet the common pulley radius", width)
+        if concept.locator(".eq-target-object").count()!=1:
+            fail("offset target marker absent from final reticle", width)
+        # Both contact points must be on the same 41-unit pitch circle, with
+        # the line normal perpendicular to each run (external tangents).
+        tangent_error = concept.evaluate("""svg => {
+          const c1 = {x:459,y:283,r:13}, c2 = {x:517,y:217,r:41};
+          const paths = [
+            svg.querySelector('.eq-belt-upper-run'),
+            svg.querySelector('.eq-belt-lower-run')
+          ];
+          return paths.map(p => {
+            const v = p.getAttribute('d').match(/[-+]?[0-9]*\\.?[0-9]+/g).map(Number);
+            const [x1,y1,x2,y2] = v;
+            const rad1 = Math.hypot(x1-c1.x,y1-c1.y);
+            const rad2 = Math.hypot(x2-c2.x,y2-c2.y);
+            const dot = ((x2-x1)*(x2-c2.x)+(y2-y1)*(y2-c2.y)) /
+              (Math.hypot(x2-x1,y2-y1)*rad2);
+            return Math.max(Math.abs(rad1-c1.r),Math.abs(rad2-c2.r),Math.abs(dot));
+          });
+        }""")
+        if any(v > 0.015 for v in tangent_error):
+            fail("belt tangent geometry is inconsistent: "+str(tangent_error), width)
         if concept.evaluate("(el) => getComputedStyle(el).filter")!="none":
             fail("old artwork drop shadow remains", width)
+        if width in (390, 1440):
+            # The card itself now animates on hover, despite its transparent click overlay.
+            page.emulate_media(reduced_motion="no-preference")
+            card_media = page.locator('.project-card[data-project="07"] .project-media')
+            card_art = card_media.locator(".art-eqmount")
+            card_media.hover()
+            if "is-hovering" not in (card_art.get_attribute("class") or ""):
+                fail("listing card did not start motion under the overlay", width)
+            if "eq-pulley-turn" not in card_art.locator(".eq-large-rotor").evaluate(
+                "(el) => getComputedStyle(el).animationName"):
+                fail("pulley did not animate in listing", width)
+            # At end, the target reaches the reticle and all pulley arrows
+            # return to their original orientation after whole turns.
+            final = card_art.evaluate("""el => {
+              const matrix = selector => {
+                const n=el.querySelector(selector);
+                const a=n.getAnimations().find(x=>x.animationName);
+                a.currentTime=6400;
+                return getComputedStyle(n).transform;
+              };
+              return {
+                target:matrix('.eq-target-object'),
+                motor:matrix('.eq-small-rotor'),
+                pulley:matrix('.eq-large-rotor')
+              };
+            }""")
+            if "-40" not in final["target"] or "36" not in final["target"]:
+                fail("target never arrives at reticle center: "+str(final), width)
+            if "1800" not in page.locator(".eq-small-rotor").first.evaluate(
+                "(el) => el.getAnimations().find(x=>x.animationName==='eq-motor-turn')?.effect.getKeyframes().at(-1).transform || ''"):
+                fail("motor does not complete five full turns", width)
+            if "360" not in page.locator(".eq-large-rotor").first.evaluate(
+                "(el) => el.getAnimations().find(x=>x.animationName==='eq-pulley-turn')?.effect.getKeyframes().at(-1).transform || ''"):
+                fail("large pulley does not complete one full turn", width)
+            page.mouse.move(0,0)
+            if "is-hovering" in (card_art.get_attribute("class") or ""):
+                fail("listing animation did not reset when pointer left", width)
+            page.emulate_media(reduced_motion="reduce")
         if width in (390, 1440):
             page.locator('.project-card[data-project="07"] .project-art').screenshot(
                 path=str(OUT/f"eqmount_concept_card_{width}.png"), animations="disabled"
