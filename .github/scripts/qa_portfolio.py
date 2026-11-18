@@ -198,6 +198,11 @@ with sync_playwright() as p:
         for cls in (".wp-water-core", ".wp-water-stream", ".wp-flow-cutaway", ".wp-flow-trace"):
             if wallpipe.locator(cls).get_attribute("mask")!="url(#wp-flow-reveal)":
                 fail("Every water or water-window layer must use the flow-front mask: "+cls, width)
+        if wallpipe.locator(".wp-upstream-water").count()!=1:
+            fail("Continuously flowing upstream section is missing", width)
+        for cls in (".wp-upstream-window", ".wp-upstream-core", ".wp-upstream-stream"):
+            if wallpipe.locator(cls).count()!=1:
+                fail("Upstream flow layer is missing: "+cls, width)
         if wallpipe.locator(".wp-valve-housing").count()!=1:
             fail("Cast mechanical valve housing is missing", width)
         if wallpipe.locator('.wp-valve rect[x="329"][width="65"]').count():
@@ -255,6 +260,9 @@ with sync_playwright() as p:
                 fail("WallPipe hover wheel must play only once", width)
             if abs(preview_seconds-4.5)>.02:
                 fail("WallPipe hover must run exactly 1.6x (4.5s)", width)
+            if pipe_art.locator(".wp-upstream-stream").evaluate(
+                    "(el) => getComputedStyle(el).animationName")!="wp-upstream-travel":
+                fail("Left-side water must move immediately upon preview start", width)
             page.mouse.move(0,0)
             if "is-hovering" in (pipe_art.get_attribute("class") or ""):
                 fail("WallPipe hover did not reset", width)
@@ -309,40 +317,42 @@ with sync_playwright() as p:
             if (phases["held"]["assembly"]<.9 or phases["held"]["water"]<.9 or
                     phases["held"]["front"]>.4 or phases["held"]["open"]<.95):
                 fail("WallPipe must hold final opened state rather than repeat: "+str(phases), width)
-            # A white SVG mask is progressively traced out from the center valve.
-            # Verify that neither pipe end is flooded at initial opening.
+            # The left-side inlet is already supplied with moving water while
+            # the wheel is still closed; only the right outlet fills after opening.
             front=pipe_sheet.evaluate("""art => {
               const l=art.querySelector('.wp-reveal-left');
               const r=art.querySelector('.wp-reveal-right');
-              const la=l.getAnimations().find(a=>a.animationName==='wp-propagate-left');
+              const u=art.querySelector('.wp-upstream-stream');
               const ra=r.getAnimations().find(a=>a.animationName==='wp-propagate-right');
-              if(!la || !ra) return null;
+              const ua=u.getAnimations().find(a=>a.animationName==='wp-upstream-travel');
+              if(!ra || !ua) return null;
               const snap=t=>{
-                la.currentTime=t; ra.currentTime=t;
-                return [parseFloat(getComputedStyle(l).strokeDasharray),
-                        parseFloat(getComputedStyle(r).strokeDasharray)];
+                ra.currentTime=t; ua.currentTime=t;
+                return [
+                  parseFloat(getComputedStyle(l).strokeDasharray),
+                  parseFloat(getComputedStyle(r).strokeDasharray),
+                  parseFloat(getComputedStyle(u).strokeDashoffset),
+                  parseFloat(getComputedStyle(u).opacity)
+                ];
               };
-              return {initial:snap(0),opening:snap(3450),
+              return {initial:snap(0),closed:snap(2800),opening:snap(3450),
                       halfway:snap(4200),finished:snap(7050)};
             }""")
             if not front:
-                diagnostic=pipe_sheet.evaluate("""art => {
-                  const cls=['.wp-reveal-left','.wp-reveal-right','.wp-water-core','.wp-wheel-spin'];
-                  return cls.map(sel=>{
-                    const el=art.querySelector(sel);
-                    return {selector:sel,present:!!el,animationName:el?getComputedStyle(el).animationName:null,
-                      dash:el?getComputedStyle(el).strokeDasharray:null,
-                      animations:el?el.getAnimations().map(a=>a.animationName):[]};
-                  });
-                }""")
-                fail("Valve-originated water front masking is missing: "+str(diagnostic), width)
-            if any(v>1 for v in front["initial"]):
-                fail("Flow should not reach any pipe until valve starts opening: "+str(front), width)
-            if (not 0<front["opening"][0]<70 or not 0<front["opening"][1]<70 or
-                    front["halfway"][0]>=150 or front["halfway"][1]>=100):
-                fail("Water is reaching open pipe ends too early: "+str(front), width)
-            if front["finished"][0]<340 or front["finished"][1]<160:
-                fail("Water must reach both pipe ends by the final open state: "+str(front), width)
+                fail("Upstream motion or downstream arrival animation is missing", width)
+            if any(frame[0]<340 or frame[3]<.95 for frame in front.values()):
+                fail("Left inlet must be continuously supplied and visible: "+str(front), width)
+            if front["initial"][1]>1 or front["closed"][1]>1:
+                fail("Right outlet must remain dry while the valve is closed: "+str(front), width)
+            if abs(front["closed"][2]-front["initial"][2])<30:
+                fail("Left-side water must visibly move before the valve opens: "+str(front), width)
+            if (not 0<front["opening"][1]<70 or front["halfway"][1]>=100):
+                fail("Downstream water is reaching the right end too early: "+str(front), width)
+            if front["finished"][1]<160:
+                fail("Downstream water must reach the right end by the final state: "+str(front), width)
+            if pipe_sheet.locator(".wp-upstream-stream").evaluate(
+                    "(el) => getComputedStyle(el).animationIterationCount")!="1":
+                fail("Upstream animation must stop after the single playback", width)
             page.locator(".sheet-motion-play").click()
             if "is-playing" not in (pipe_sheet.get_attribute("class") or ""):
                 fail("WallPipe replay did not restart", width)
