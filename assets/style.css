@@ -332,3 +332,44 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 @media(max-width:380px){
   .sheet-copy-side:has(.sheet-extra:not([hidden])){padding:26px 20px 36px}
 }
+
+
+/* DIY automatic equatorial mount — photographed hardware translated into site-native vector art. */
+.art-eqmount{
+  background:radial-gradient(circle at 65% 41%,#324e58 0%,#162e3d 49%,#091924 100%);
+  color:#d4f3ec;
+}
+.art-eqmount::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(#c0d9d70b 1px,transparent 1px),linear-gradient(90deg,#c0d9d70b 1px,transparent 1px);
+  background-size:32px 32px;
+}
+.art-eqmount .art-cap,.art-eqmount .art-bottom{color:#c5e1dcad}
+.eqmount-drawing{
+  position:absolute;z-index:2;top:4%;left:1%;width:98%;height:92%;
+  filter:drop-shadow(5px 9px 10px #03121950);
+}
+.eqmount-mode{
+  position:absolute;z-index:4;left:6%;top:20%;display:flex;gap:7px;align-items:center;
+  padding:9px 12px;background:#0c2636db;border:1px solid #8bb7b68b;
+  font:600 9px var(--font-mono);color:#c8ebde;letter-spacing:.05em;
+}
+.eqmount-mode-dot{
+  display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:#80d2ca;box-shadow:0 0 11px #8aeed4;
+}
+#physical-group-label{margin-top:40px;border-top:2px solid #2e525e}
+.project-sheet[data-theme="diy-equatorial-mount"]{
+  --sheet-accent:#32677b;--sheet-panel:#dce9e6;--sheet-muted:#49777b;
+}
+.project-sheet[data-theme="diy-equatorial-mount"] .sheet-visual .project-art{aspect-ratio:1.32/1}
+@media(max-width:760px){
+  .filters{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+  .filter{justify-content:center;padding:8px 7px;font-size:11px}
+  .project-sheet[data-theme="diy-equatorial-mount"] .sheet-visual .project-art{aspect-ratio:1.48/1}
+  #physical-group-label{margin-top:20px}
+}
+@media(max-width:380px){
+  .filter{font-size:10px;letter-spacing:-.015em}
+  .eqmount-mode{font-size:8px;padding:7px 9px}
+}

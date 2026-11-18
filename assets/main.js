@@ -16,7 +16,9 @@
     const featuredLabel = document.querySelector("#featured-group-label");
     const archiveLabel = document.querySelector("#archive-group-label");
     if (featuredLabel) featuredLabel.hidden = !cards.some(card => card.classList.contains("featured") && !card.hidden);
-    if (archiveLabel) archiveLabel.hidden = !cards.some(card => !card.classList.contains("featured") && !card.classList.contains("is-locked") && !card.hidden);
+    if (archiveLabel) archiveLabel.hidden = !cards.some(card => !card.classList.contains("featured") && !card.classList.contains("is-locked") && !card.classList.contains("is-physical") && !card.hidden);
+    const physicalLabel = document.querySelector("#physical-group-label");
+    if (physicalLabel) physicalLabel.hidden = !cards.some(card => card.classList.contains("is-physical") && !card.hidden);
     const lockedLabel = document.querySelector("#locked-group-label");
     if (lockedLabel) lockedLabel.hidden = !cards.some(card => card.classList.contains("is-locked") && !card.hidden);
     for (const button of buttons) {

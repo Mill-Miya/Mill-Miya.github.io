@@ -13,7 +13,7 @@ INDEX = (ROOT / "index.html").resolve().as_uri()
 WIDTHS = [320, 360, 375, 390, 430, 480, 560, 640, 768, 820, 821, 900, 1024, 1280, 1440]
 VISUALS = {
     "art-sorava", "art-wallpipe", "art-nova", "art-university",
-    "art-assignment", "art-messe",
+    "art-assignment", "art-messe", "art-eqmount",
 }
 
 def fail(msg, width):
@@ -70,7 +70,7 @@ with sync_playwright() as p:
         if metrics["hasJPOutside"]: fail("unwanted Japanese text outside work cards", width)
         if metrics["sourceLinks"]: fail("source-code link was reintroduced", width)
         if metrics["emptyAnchors"]: fail("broken internal anchors: "+repr(metrics["emptyAnchors"]), width)
-        if len(metrics["cards"]) != 6 or len(metrics["visuals"]) != 6:
+        if len(metrics["cards"]) != 7 or len(metrics["visuals"]) != 7:
             fail("lost project card or concept artwork", width)
         visual_classes=set()
         for visual in metrics["visuals"]:
@@ -105,10 +105,24 @@ with sync_playwright() as p:
             if page.locator('.project-card:visible').count()!=2:
                 fail("AI filter not preserving its two projects", width)
             page.locator('button[data-filter="all"]').click()
-            if page.locator('.project-card:visible').count()!=6:
-                fail("All filter does not restore all six projects", width)
-            if page.locator('#visible-count').inner_text().strip()!="06":
+            if page.locator('.project-card:visible').count()!=7:
+                fail("All filter does not restore all seven projects", width)
+            if page.locator('#visible-count').inner_text().strip()!="07":
                 fail("filter counter incorrect", width)
+            page.locator('button[data-filter="hardware"]').click()
+            if page.locator('.project-card:visible').count()!=1:
+                fail("Hardware filter should show one physical work", width)
+            if not page.locator('#physical-group-label').is_visible():
+                fail("Physical work label hidden by Hardware filter", width)
+            if page.locator('#archive-group-label').is_visible():
+                fail("Software archive header visible without software cards", width)
+            page.locator('button[data-filter="engineering"]').click()
+            if page.locator('.project-card:visible').count()!=3:
+                fail("Engineering filter should show three engineering works", width)
+            page.locator('button[data-filter="ai"]').click()
+            if page.locator('#physical-group-label').is_visible():
+                fail("Physical work header did not follow active filter", width)
+            page.locator('button[data-filter="all"]').click()
         # Two works remain visible but may not open a sheet or a live demo.
         for project_number, art_class, url_fragment in (
             ("05", "art-assignment", "assignment-checker/"),
@@ -138,13 +152,13 @@ with sync_playwright() as p:
                 fail("lock mark not vertically centered", width)
             if mark["width"] > bounds["width"] + 1 or mark["height"] > bounds["height"] + 1:
                 fail("lock mark overflows artwork", width)
-        if page.locator('.project-card [data-open-sheet]').count()!=12:
-            fail("expected four sheet-enabled works", width)
+        if page.locator('.project-card [data-open-sheet]').count()!=15:
+            fail("expected five sheet-enabled works", width)
         if page.locator(".project-card .project-links a[href]").count()!=3:
             fail("expected three public live site links", width)
         if page.locator("a[href*='assignment-checker/'], a[href*='suwa-messe-2026/']").count()!=0:
             fail("locked public demo URLs leaked into the page", width)
-        # Four eligible projects open sheets without replacing public demo links.
+        # Five eligible projects open sheets; the physical project has no live demo.
         if width in (320, 390, 820, 1440):
             trigger = page.locator('.project-card[data-project="01"] .project-media-hit')
             trigger.click()
@@ -161,7 +175,7 @@ with sync_playwright() as p:
                 fail("sheet feature count incorrect", width)
             if "見ている天体や場所" not in page.locator("#sheet-extra").inner_text():
                 fail("Sorava primary sharing claim missing", width)
-            if page.locator(".project-sheet-detail").count()!=4:
+            if page.locator(".project-sheet-detail").count()!=5:
                 fail("not all approved project details exist", width)
             if page.locator('.project-card[data-project="05"] .project-sheet-detail, .project-card[data-project="06"] .project-sheet-detail').count():
                 fail("locked project has unpublished details", width)
@@ -209,11 +223,26 @@ with sync_playwright() as p:
             page.locator("#sheet-close").click()
             page.locator('.project-card[data-project="04"] .project-title-button').click()
             page.locator("#sheet-next").click()
+            if page.locator("#sheet-title").inner_text().strip() != "DIY Automatic Equatorial Mount":
+                fail("sheet navigation did not reach the physical project", width)
+            if page.locator("#sheet-extra .sheet-feature").count()!=3:
+                fail("physical sheet feature list missing", width)
+            if "20Tと100T" not in page.locator("#sheet-extra").inner_text():
+                fail("hardware specifications missing from physical sheet", width)
+            if "SkySafari 7 Pro" not in page.locator("#sheet-extra").inner_text():
+                fail("SkySafari control context missing", width)
+            if page.locator("#sheet-actions a").count():
+                fail("hardware sheet contains an invented demo link", width)
+            if page.locator('#sheet-visual .art-eqmount').count()!=1:
+                fail("original equatorial mount illustration missing in sheet", width)
+            if width in (390,1440):
+                page.screenshot(path=str(OUT/f"equatorial_sheet_{width}.png"), animations="disabled")
+            page.locator("#sheet-next").click()
             if page.locator("#sheet-title").inner_text().strip() != "Sorava / SkyShare":
-                fail("sheet navigation did not skip both locked projects", width)
+                fail("sheet navigation did not skip locked works", width)
             page.locator("#sheet-prev").click()
-            if page.locator("#sheet-title").inner_text().strip() != "University AI":
-                fail("reverse navigation did not skip locked projects", width)
+            if page.locator("#sheet-title").inner_text().strip() != "DIY Automatic Equatorial Mount":
+                fail("reverse navigation did not reach the hardware sheet", width)
             page.locator("#sheet-close").click()
             if errors: fail("JavaScript error after sheet controls: "+repr(errors), width)
         print("QA_PASS",width,"cards",len(boxes),"width",metrics["scrollWidth"],flush=True)
