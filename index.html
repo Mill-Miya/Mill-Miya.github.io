@@ -18,7 +18,7 @@
   <link rel="icon" href="assets/favicon-48.png?v=3" sizes="48x48" type="image/png">
   <link rel="icon" href="assets/favicon.svg?v=3" type="image/svg+xml" sizes="any">
   <link rel="apple-touch-icon" href="assets/icon-180.png?v=3">
-  <link rel="stylesheet" href="assets/style.css?v=23">
+  <link rel="stylesheet" href="assets/style.css?v=24">
   <script src="assets/main.js?v=13" defer></script>
   <title>Mill-Miya — Selected Works</title>
 </head>
@@ -201,6 +201,39 @@
     <linearGradient id="eq-concept-bg" x1="0" y1="0" x2="1" y2="1">
       <stop stop-color="#142e3b"/><stop offset="1" stop-color="#0a202d"/>
     </linearGradient>
+    <!-- When the straight belt runs enter the outer pulley face (r=56)
+         they pass behind the rim on their way to the common r=41 track.
+         Fade only that hidden end, never the exposed tangent section. -->
+    <linearGradient id="eq-belt-upper-fade" gradientUnits="userSpaceOnUse" x1="447.01" y1="277.98" x2="479.18" y2="201.16">
+      <stop offset="0" stop-color="#9ddfd2" stop-opacity="1"/>
+      <stop offset=".53" stop-color="#9ddfd2" stop-opacity="1"/>
+      <stop offset=".56" stop-color="#9ddfd2" stop-opacity=".39"/>
+      <stop offset="1" stop-color="#9ddfd2" stop-opacity=".39"/>
+    </linearGradient>
+    <linearGradient id="eq-belt-lower-fade" gradientUnits="userSpaceOnUse" x1="465.52" y1="294.25" x2="537.57" y2="252.47">
+      <stop offset="0" stop-color="#9ddfd2" stop-opacity="1"/>
+      <stop offset=".53" stop-color="#9ddfd2" stop-opacity="1"/>
+      <stop offset=".56" stop-color="#9ddfd2" stop-opacity=".39"/>
+      <stop offset="1" stop-color="#9ddfd2" stop-opacity=".39"/>
+    </linearGradient>
+    <linearGradient id="eq-belt-teeth-upper-opacity" gradientUnits="userSpaceOnUse" x1="447.01" y1="277.98" x2="479.18" y2="201.16">
+      <stop offset="0" stop-color="white"/>
+      <stop offset=".53" stop-color="white"/>
+      <stop offset=".56" stop-color="white" stop-opacity=".36"/>
+      <stop offset="1" stop-color="white" stop-opacity=".36"/>
+    </linearGradient>
+    <linearGradient id="eq-belt-teeth-lower-opacity" gradientUnits="userSpaceOnUse" x1="465.52" y1="294.25" x2="537.57" y2="252.47">
+      <stop offset="0" stop-color="white"/>
+      <stop offset=".53" stop-color="white"/>
+      <stop offset=".56" stop-color="white" stop-opacity=".36"/>
+      <stop offset="1" stop-color="white" stop-opacity=".36"/>
+    </linearGradient>
+    <mask id="eq-belt-upper-teeth-mask" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="0" y="0" width="620" height="430">
+      <rect width="620" height="430" fill="url(#eq-belt-teeth-upper-opacity)"/>
+    </mask>
+    <mask id="eq-belt-lower-teeth-mask" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="0" y="0" width="620" height="430">
+      <rect width="620" height="430" fill="url(#eq-belt-teeth-lower-opacity)"/>
+    </mask>
   </defs>
   <rect width="620" height="430" fill="url(#eq-concept-bg)"/>
   <path d="M0 68H620M0 365H620" stroke="#8db5bd" stroke-opacity=".17"/>
@@ -234,7 +267,6 @@
   <g fill="none" stroke="#9bd8d1" stroke-width="2" stroke-linecap="round">
     <path class="eq-wifi-outer" d="M269 208Q281 196 293 208" opacity=".73"/>
     <path class="eq-wifi-inner" d="M274 215Q281 208 288 215"/>
-    <path d="M281 223V233" stroke-dasharray="3 4"/>
   </g>
   <circle class="eq-wifi-dot" cx="281" cy="221" r="2.5" fill="#a4f0d4"/>
   </g>
@@ -265,24 +297,31 @@
     <path d="M445 268H479M445 298H479" stroke="#94c4c0" stroke-width="1.7" opacity=".65"/>
     <circle cx="459" cy="283" r="13" fill="#15343f" stroke="#c0e5d9" stroke-width="2"/>
     <g class="eq-small-rotor" stroke="#d7f9ec" stroke-width="2"><path d="M459 274V279M459 287V292M450 283H455M463 283H468"/></g>
-    <!-- Face plate beneath the belt. Both runs attach to the SAME r=41 pulley track. -->
+    <!-- Outer face plate and the r=41 track lie UNDER the belt. -->
     <circle cx="517" cy="217" r="56" fill="#1e434e" stroke="#b2ddcf" stroke-width="5"/>
-    <!-- Common external tangents: motor (459,283), r=13; large track (517,217), r=41. -->
-    <g class="eq-belt-runs" fill="none" stroke="#9ddfd2" stroke-width="5" opacity=".68">
-      <path class="eq-belt-upper-run" d="M447.01 277.98L479.18 201.16"/>
-      <path class="eq-belt-lower-run" d="M465.52 294.25L537.57 252.47"/>
+    <circle cx="517" cy="217" r="41" fill="none" stroke="#80aeb9" stroke-width="2.2" opacity=".50"/>
+    <!-- Exact common external tangent points, with a 217.2-degree wrap
+         across the right/top/bottom of the big pulley and a 142.8-degree
+         return around the small r=13 motor pulley: a continuous closed belt. -->
+    <g class="eq-belt-runs" fill="none" stroke="#9ddfd2" stroke-width="5" opacity=".76">
+      <path class="eq-belt-upper-run" d="M447.01 277.98L479.18 201.16" stroke="url(#eq-belt-upper-fade)"/>
+      <path class="eq-belt-large-wrap-run" d="M479.18 201.16A41 41 0 1 1 537.57 252.47"/>
+      <path class="eq-belt-lower-run" d="M465.52 294.25L537.57 252.47" stroke="url(#eq-belt-lower-fade)"/>
+      <path class="eq-belt-small-wrap-run" d="M465.52 294.25A13 13 0 0 1 447.01 277.98" stroke-opacity=".48"/>
     </g>
-    <!-- Animated belt travel follows the exact same geometry and remains hidden until driven. -->
+    <!-- Matching moving timing-belt teeth; the faded straight end is behind
+         the outer rim rather than painted at full brightness through it. -->
     <g fill="none" stroke="#d5fff0" stroke-width="2" stroke-dasharray="5 7">
-      <path class="eq-belt-teeth eq-belt-upper" d="M447.01 277.98L479.18 201.16"/>
-      <path class="eq-belt-teeth eq-belt-lower" d="M465.52 294.25L537.57 252.47"/>
+      <path class="eq-belt-teeth eq-belt-upper" mask="url(#eq-belt-upper-teeth-mask)" d="M447.01 277.98L479.18 201.16"/>
+      <path class="eq-belt-teeth eq-belt-wrap" d="M479.18 201.16A41 41 0 1 1 537.57 252.47"/>
+      <path class="eq-belt-teeth eq-belt-lower" mask="url(#eq-belt-lower-teeth-mask)" d="M465.52 294.25L537.57 252.47"/>
+      <path class="eq-belt-teeth eq-belt-small-wrap" d="M465.52 294.25A13 13 0 0 1 447.01 277.98" stroke-opacity=".48"/>
     </g>
-    <circle cx="517" cy="217" r="41" fill="none" stroke="#80aeb9" stroke-width="2.2" opacity=".8"/>
     <circle cx="517" cy="217" r="17" fill="#102e3a" stroke="#c0e9dc" stroke-width="2.7"/>
     <circle cx="517" cy="217" r="4.8" fill="#a5ecd3"/>
     <g class="eq-large-rotor">
+      <!-- Rotation indices are plain radial strokes, not pointed arrowheads. -->
       <path d="M517 184V164M517 249V270" stroke="#d2f0e7" stroke-width="2"/>
-      <path d="M510 172L517 163L524 172M510 262L517 271L524 262" stroke="#d2f0e7" stroke-width="2" fill="none"/>
     </g>
   </g>
   </g>
