@@ -203,6 +203,25 @@ with sync_playwright() as p:
         if wallpipe.locator(".wp-upstream-stream").get_attribute("stroke-dasharray")!= \
                 wallpipe.locator(".wp-flow-trace").get_attribute("stroke-dasharray"):
             fail("Moving water dashes should have matching cadence on both sides", width)
+        # SVG drawing order is essential: a color match alone is insufficient.
+        # Drawing the dark right-hand cutaway on top of its cyan core hides the
+        # bright water (the earlier regression). Paint the core above the
+        # cutaway and below the moving highlight, as on the left side.
+        water_layers=wallpipe.evaluate("""svg=>{
+          const nodes=['.wp-flow-cutaway','.wp-water-core','.wp-flow-trace',
+                       '.wp-upstream-window','.wp-upstream-core','.wp-upstream-stream']
+            .map(s=>svg.querySelector(s));
+          if(nodes.some(x=>!x)) return null;
+          const root=svg.querySelector('.wp-pipe-assembly');
+          return nodes.map(el=>{
+            const ordered=[...root.querySelectorAll('*')];
+            return ordered.indexOf(el);
+          });
+        }""")
+        if not water_layers or not (water_layers[0]<water_layers[1]<water_layers[2]):
+            fail("Right-side cyan water must paint on top of its dark cutaway and below water stripes", width)
+        if not (water_layers[3]<water_layers[4]<water_layers[5]):
+            fail("Upstream water layer order has changed", width)
         for left, right in (
             (".wp-upstream-window",".wp-flow-cutaway"),
             (".wp-upstream-core",".wp-water-core"),
