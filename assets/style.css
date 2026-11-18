@@ -561,3 +561,28 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   .hero-links { margin-top:20px; }
   .hero-visual { width:min(100%,max(280px,calc(100svh - 170px))); }
 }
+
+/* Locked preview: pendulum-like, decaying left/right swing.
+   Normal playback speed: do not inherit the 1.6x project preview motion.
+   The padlock alone moves; cards stay locked and their labels stay still. */
+.project-media--locked .project-lock-mark svg{
+  transform-box:fill-box;
+  transform-origin:50% 15%;
+}
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+  .project-media--locked:hover .project-lock-mark svg{
+    animation:mm-lock-damped-swing 3.2s ease-in-out 1 both;
+  }
+}
+@keyframes mm-lock-damped-swing{
+  0%{transform:rotate(0deg)}
+  11%{transform:rotate(12deg)}
+  25%{transform:rotate(-8deg)}
+  39%{transform:rotate(5.4deg)}
+  53%{transform:rotate(-3.5deg)}
+  66%{transform:rotate(2.1deg)}
+  78%{transform:rotate(-1.1deg)}
+  89%{transform:rotate(.45deg)}
+  96%{transform:rotate(-.12deg)}
+  100%{transform:rotate(0deg)}
+}
