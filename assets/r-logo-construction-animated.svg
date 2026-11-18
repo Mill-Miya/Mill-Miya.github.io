@@ -44,6 +44,21 @@
 @keyframes recolor-node-stroke{to{stroke:#D8A657}}
 @keyframes recolor-node-fill{to{fill:#D8A657}}
 @keyframes recolor-label{to{fill:#AFC3CF}}
+
+/* Exact P2/P3 geometric studies, revealed before master artwork. */
+.leg-contour{fill:none;stroke:#a3b4bf;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:100;stroke-dashoffset:100;animation:leg-trace 1.06s var(--delay,1.65s) ease-out forwards,leg-blue .55s 3.16s ease forwards}
+.leg-contour.secondary{stroke-width:1.9;animation:leg-trace 1.06s var(--delay,1.65s) ease-out forwards,leg-sky .55s 3.16s ease forwards}
+.leg-construction{fill:none;stroke:#92a7b1;stroke-width:1.35;stroke-dasharray:7 10;opacity:0;animation:leg-appear .56s var(--delay,2.2s) ease forwards,leg-gray .55s 3.16s ease forwards}
+.leg-point{stroke:#a5b4bd;fill:#a5b4bd;opacity:0;animation:leg-appear .38s var(--delay,2.5s) ease forwards,leg-gold-stroke .55s 3.16s ease forwards,leg-gold-fill .55s 3.16s ease forwards}
+.leg-label{font:21px ui-monospace,Consolas,monospace;letter-spacing:.5px;fill:#a4b5c0;opacity:0;animation:leg-appear .4s var(--delay,2.7s) ease forwards,leg-label-color .55s 3.16s ease forwards}
+@keyframes leg-trace{to{stroke-dashoffset:0}}
+@keyframes leg-appear{to{opacity:.8}}
+@keyframes leg-blue{to{stroke:#088FC9}}
+@keyframes leg-sky{to{stroke:#5FA8C9}}
+@keyframes leg-gray{to{stroke:#7E8F9A}}
+@keyframes leg-gold-stroke{to{stroke:#D8A657}}
+@keyframes leg-gold-fill{to{fill:#D8A657}}
+@keyframes leg-label-color{to{fill:#AFC3CF}}
 @keyframes grid-in{to{opacity:.24}}
 @keyframes appear{to{opacity:.9}}
 @keyframes leader-in{to{opacity:.7}}
@@ -68,6 +83,13 @@
 .wipe{animation:none;stroke-dashoffset:0}
 .finish-mask{animation:none;opacity:1}
 .trace{animation:none;opacity:0}
+
+.leg-contour{animation:none;stroke:#088FC9;stroke-dashoffset:0}
+.leg-contour.secondary{animation:none;stroke:#5FA8C9;stroke-dashoffset:0}
+.leg-construction{animation:none;stroke:#7E8F9A;opacity:.65}
+.leg-point{animation:none;stroke:#D8A657;fill:#D8A657;opacity:.8}
+.leg-label{animation:none;fill:#AFC3CF;opacity:.8}
+
 }
 </style>
 <rect width="1254" height="1254" class="grid" fill="url(#technical-grid)"/>
@@ -109,6 +131,37 @@
 <path class="arc-draw" style="--delay:1.69s" pathLength="100" d="M 431.1624428343677,800.0 A 203.14379616335947,203.14379616335947 0 0,0 457.67486846618317,850.0"/>
 <path class="arc-draw" style="--delay:1.81s" pathLength="100" d="M 457.67486846618317,850.0 A 280.0,280.0 0 0,1 627.0,347.0"/>
 <path class="arc-draw" style="--delay:1.92s" pathLength="100" d="M 627.0,347.0 A 280.0,280.0 0 0,1 858.8075879650387,469.94827704248837"/></g>
+
+<!-- P2: actual long-leg outline and original Bezier/arc constructions. -->
+<g class="leg-guides" pointer-events="none">
+<g>
+  <path class="leg-contour" style="--delay:1.62s" pathLength="100" d="M730.93679 664.73753 C628.1909007585219 670.4051661174622 616.1611539819643 720.0610768413272 614.4477138429185 728.2912513300691 A64 64 0 0 0 626.5258272576347 780.5508014155092"/>
+  <path class="leg-contour secondary" style="--delay:1.81s" pathLength="100" d="M644.3639642626957 728.7509878514275 C657.2022050904571 718.0012696667102 673.9360973010882 714.7451001519297 700 714.7451001519297 A312.94148883285516 312.94148883285516 0 0 1 745 717.9974296121586 C776.6295883041212 722.5934299260505 825.2849473210729 734.6113587294444 830 735.7710078550373 A709.5027564752111 709.5027564752111 0 0 0 895 748.5724134095996"/>
+  <path class="leg-contour" style="--delay:2.02s" pathLength="100" d="M895 748.5724134095996 C896.2615651228084 748.7601811018825 912.515145372656 751.1758396213418 930 752.8956053990611 C942.5586446797965 754.1308417104385 955.1172893595931 754.9445927947128 967.6759340393896 753.4519424129464 A18 18 0 0 0 983.4702470825283 737.2861860803645 A570.4520265052622 570.4520265052622 0 0 0 985.4314733231299 656.6815612400471"/>
+  <path class="leg-contour secondary" style="--delay:2.18s" pathLength="100" d="M985.4314733231299 656.6815612400471 C984.3114172418129 666.0153619176886 974.2759746056636 678.1441102997983 950 685.1387828697292 A107.8593553584303 107.8593553584303 0 0 1 920 689.3551329594382 C888.9811611738791 689.3156725895058 835.6023038008613 675.8668596952393 825 673.3078961196654 A324.6917715870368 324.6917715870368 0 0 0 730.93679 664.73753"/>
+  <!-- P3: the long right-hand wedge is bounded by this exact original arc. -->
+  <path class="leg-contour" style="--delay:2.30s" pathLength="100" d="M951.975 471.975 A576.4520265052622 576.4520265052622 0 0 1 988.9223461045462 743.0674539088453"/>
+  <path class="leg-contour secondary" style="--delay:2.46s" pathLength="100" d="M990.283697185027 743.716302814973 L1077.30152 656.69848 A42 42 0 0 0 1077.30152 597.30152 L951.975 471.975"/>
+</g>
+<!-- True control polygon of P2's first cubic, instead of a fabricated circle. -->
+<g>
+  <path class="leg-construction" style="--delay:2.29s" d="M730.93679 664.73753 L628.1909007585219 670.4051661174622 L616.1611539819643 720.0610768413272 L614.4477138429185 728.2912513300691"/>
+  <path class="leg-construction" style="--delay:2.42s" d="M644.3639642626957 728.7509878514275 L657.2022050904571 718.0012696667102 L673.9360973010882 714.7451001519297 L700 714.7451001519297"/>
+  <path class="leg-construction" style="--delay:2.53s" d="M745 717.9974296121586 L776.6295883041212 722.5934299260505 L825.2849473210729 734.6113587294444 L830 735.7710078550373"/>
+  <path class="leg-construction" style="--delay:2.64s" d="M985.4314733231299 656.6815612400471 L984.3114172418129 666.0153619176886 L974.2759746056636 678.1441102997983 L950 685.1387828697292"/>
+</g>
+<g>
+  <circle class="leg-point" style="--delay:2.40s" cx="628.1909007585219" cy="670.4051661174622" r="4"/>
+  <circle class="leg-point" style="--delay:2.50s" cx="616.1611539819643" cy="720.0610768413272" r="4"/>
+  <circle class="leg-point" style="--delay:2.62s" cx="673.9360973010882" cy="714.7451001519297" r="4"/>
+  <circle class="leg-point" style="--delay:2.74s" cx="825.2849473210729" cy="734.6113587294444" r="4"/>
+  <circle class="leg-point" style="--delay:2.81s" cx="985.4314733231299" cy="656.6815612400471" r="4"/>
+  <circle class="leg-point" style="--delay:2.88s" cx="951.975" cy="471.975" r="4"/>
+  <text class="leg-label" style="--delay:2.70s" x="790" y="615">P2 / BEZIER</text>
+  <text class="leg-label" style="--delay:2.80s" x="1010" y="525">P3</text>
+  <text class="leg-label" style="--delay:2.90s" x="992" y="783">R576.45</text>
+</g>
+</g>
 <g class="detail-line"><path d="M652.5078 611.16L623.5309148 627.97943 M572.82786 628L614.01086 619.9435 M730.93679 664.73753 L628.1909 670.40517 M614.44771 728.29125 L616.16115 720.06107"/></g>
 <g><g class="node" style="--delay:1.60s"><circle cx="627" cy="627" r="4"/><path d="M619 627h16 M627 619v16"/></g>
 <g class="node" style="--delay:1.65s"><circle cx="627" cy="347" r="4"/><path d="M619 347h16 M627 339v16"/></g>
