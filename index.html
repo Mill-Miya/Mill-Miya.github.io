@@ -18,7 +18,7 @@
   <link rel="icon" href="assets/favicon-48.png?v=3" sizes="48x48" type="image/png">
   <link rel="icon" href="assets/favicon.svg?v=3" type="image/svg+xml" sizes="any">
   <link rel="apple-touch-icon" href="assets/icon-180.png?v=3">
-  <link rel="stylesheet" href="assets/style.css?v=34">
+  <link rel="stylesheet" href="assets/style.css?v=35">
   <script src="assets/main.js?v=14" defer></script>
   <title>Mill-Miya — Selected Works</title>
 </head>
@@ -192,38 +192,60 @@
               <g class="wp-scene">
                 <g class="wp-pipe-assembly" stroke-linecap="round" stroke-linejoin="round">
                   <!-- Exactly two 90-degree elbows: right, up, right. -->
-                  <path class="wp-pipe-shadow" d="M98 300H205V183H523" stroke="#102d2d" stroke-opacity=".45" stroke-width="55"/>
-                  <path class="wp-pipe-outline" d="M98 290H205V173H523" stroke="#234841" stroke-width="52"/>
-                  <path class="wp-pipe-back" d="M98 290H205V173H523" stroke="#72998d" stroke-width="45"/>
-                  <path class="wp-pipe-bore" d="M98 290H205V173H523" stroke="url(#wp-bore)" stroke-width="31"/>
-                  <path class="wp-water-core" d="M98 290H205V173H523" stroke="#58d6f2" stroke-width="13" opacity=".96"/>
-                  <path class="wp-water-stream" d="M98 290H205V173H523" stroke="#e4fdff" stroke-width="5" stroke-dasharray="11 18"/>
+                  <path class="wp-pipe-shadow" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" transform="translate(2 10)" stroke="#102d2d" stroke-opacity=".45" stroke-width="55"/>
+                  <path class="wp-pipe-outline" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="#234841" stroke-width="52"/>
+                  <path class="wp-pipe-back" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="#72998d" stroke-width="45"/>
+                  <path class="wp-pipe-bore" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="url(#wp-bore)" stroke-width="31"/>
+                  <path class="wp-water-core" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="#58d6f2" stroke-width="13" opacity=".96"/>
+                  <path class="wp-water-stream" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="#e4fdff" stroke-width="5" stroke-dasharray="11 18"/>
                   <!-- The metallic near wall initially hides the water, then becomes translucent. -->
-                  <path class="wp-pipe-front" d="M98 290H205V173H523" stroke="url(#wp-metal)" stroke-width="40"/>
+                  <path class="wp-pipe-front" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="url(#wp-metal)" stroke-width="40"/>
                   <!-- A narrow cutaway window reveals water in the pipe core, not on the metal surface. -->
-                  <path class="wp-flow-cutaway" d="M98 290H205V173H523" stroke="#0e5868" stroke-width="16"/>
-                  <path class="wp-flow-trace" d="M98 290H205V173H523" stroke="#9eefff" stroke-width="6" stroke-dasharray="18 14"/>
-                  <path class="wp-pipe-highlight" d="M98 275H190V158H517" stroke="#f4fff7" stroke-width="3" opacity=".66"/>
+                  <path class="wp-flow-cutaway" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="#0e5868" stroke-width="16"/>
+                  <path class="wp-flow-trace" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="#9eefff" stroke-width="6" stroke-dasharray="18 14"/>
+                  <path class="wp-pipe-highlight" d="M109 274H170A19 19 0 0 0 189 255V208A51 51 0 0 1 240 157H510" stroke="#f4fff7" stroke-width="3" opacity=".66"/>
                   <g class="wp-pipe-collars" stroke="#cce5d8" stroke-width="3" fill="#315f55">
                     <path d="M117 267V313M133 267V313M489 149V197M505 149V197" opacity=".85"/>
                     <rect x="322" y="142" width="14" height="62" rx="3" fill="url(#wp-valve)"/>
                     <rect x="387" y="142" width="14" height="62" rx="3" fill="url(#wp-valve)"/>
                   </g>
+                  <!-- Two hollow pipe mouths oriented perpendicular to the cylinder axis. -->
+                  <g class="wp-pipe-ends">
+                    <g class="wp-pipe-mouth wp-pipe-mouth-in">
+                      <ellipse cx="98" cy="290" rx="9.5" ry="25" fill="#587f75" stroke="#c7e3d6" stroke-width="3.8"/>
+                      <ellipse cx="98" cy="290" rx="5.4" ry="16.1" fill="#0b3539" stroke="#224f4a" stroke-width="1.8"/>
+                      <path d="M96 275Q92 290 96 305" stroke="#8bd2d0" stroke-opacity=".58" stroke-width="1.7" fill="none"/>
+                    </g>
+                    <g class="wp-pipe-mouth wp-pipe-mouth-out">
+                      <ellipse cx="523" cy="173" rx="9.5" ry="25" fill="#587f75" stroke="#c7e3d6" stroke-width="3.8"/>
+                      <ellipse cx="523" cy="173" rx="5.4" ry="16.1" fill="#0b3539" stroke="#224f4a" stroke-width="1.8"/>
+                      <path d="M525 158Q529 173 525 188" stroke="#8bd2d0" stroke-opacity=".58" stroke-width="1.7" fill="none"/>
+                    </g>
+                  </g>
                   <g class="wp-valve">
-                    <rect x="329" y="145" width="65" height="56" rx="11" fill="url(#wp-valve)" stroke="#d3e9dc" stroke-width="3"/>
-                    <rect x="343" y="154" width="37" height="38" rx="8" fill="#294c46" stroke="#88b6a8" stroke-width="2"/>
-                    <path d="M360 145V113" stroke="#d3e9de" stroke-width="13"/>
-                    <path d="M360 145V113" stroke="#52776d" stroke-width="7"/>
-                    <rect x="347" y="121" width="26" height="10" rx="3" fill="#91ada4" stroke="#d7ece2" stroke-width="2"/>
-                    <!-- A four-spoke handwheel with a distinctive index rivet shows rotation. -->
-                    <g class="wp-wheel-tilt" transform="translate(360 93) scale(1 .72)">
+                    <!-- Cast housing with chamfered shoulders, bonnet and circular cover. -->
+                    <path class="wp-valve-housing" d="M335 153L346 145H378L392 155V190L380 200H346L335 191Z" fill="url(#wp-valve)" stroke="#d1e9da" stroke-width="3.2"/>
+                    <path d="M340 157H387M342 190Q364 198 386 190" stroke="#e6f3e9" stroke-width="2.4" opacity=".6"/>
+                    <ellipse cx="364" cy="173" rx="21" ry="22" fill="#335f56" stroke="#b4d2c4" stroke-width="3.5"/>
+                    <ellipse cx="364" cy="173" rx="13" ry="14" fill="#1c4845" stroke="#77a69a" stroke-width="2"/>
+                    <g fill="#d7e9dd" stroke="#456d61" stroke-width="1">
+                      <circle cx="342" cy="154" r="3"/><circle cx="384" cy="154" r="3"/>
+                      <circle cx="342" cy="193" r="3"/><circle cx="384" cy="193" r="3"/>
+                    </g>
+                    <path d="M345 148V140Q345 132 353 132H373Q381 132 381 140V148Z" fill="url(#wp-valve)" stroke="#d7e9df" stroke-width="2.5"/>
+                    <path d="M360 132V94" stroke="#244a43" stroke-width="12" stroke-linecap="round"/>
+                    <path d="M360 132V94" stroke="#d4e7dc" stroke-width="5.5" stroke-linecap="round"/>
+                    <rect x="349" y="123" width="23" height="11" rx="3" fill="#688f82" stroke="#dcefe3" stroke-width="2"/>
+                    <!-- Four open spokes; the wall is visible through the wheel. -->
+                    <g class="wp-wheel-tilt" transform="translate(360 88) scale(1 .76)">
                       <g class="wp-wheel-spin">
-                        <circle r="46" fill="#1a3a36" stroke="#365b52" stroke-width="13"/>
-                        <circle r="46" stroke="#c5dfd2" stroke-width="6"/>
-                        <circle r="37" stroke="#749a8f" stroke-width="2"/>
-                        <path d="M0-40V40M-40 0H40" stroke="#c4ded1" stroke-width="10"/>
-                        <path d="M0-40V40M-40 0H40" stroke="#567d72" stroke-width="3"/>
-                        <circle r="14" fill="#426c62" stroke="#e3f1e8" stroke-width="3"/>
+                        <circle r="46" fill="none" stroke="#284f45" stroke-width="14"/>
+                        <circle r="46" fill="none" stroke="#c7e0d2" stroke-width="7"/>
+                        <circle r="37" fill="none" stroke="#658d80" stroke-width="2"/>
+                        <path d="M0-40V40M-40 0H40" stroke="#a5beb0" stroke-width="11" stroke-linecap="round"/>
+                        <path d="M0-40V40M-40 0H40" stroke="#e3f2e8" stroke-width="4" stroke-linecap="round"/>
+                        <circle r="14" fill="#466c5e" stroke="#e3f1e8" stroke-width="3"/>
+                        <circle r="5" fill="#c4ddcd"/>
                         <circle cx="0" cy="-46" r="5.5" fill="#e2ad5c" stroke="#ffe7b4" stroke-width="1.3"/>
                       </g>
                     </g>
