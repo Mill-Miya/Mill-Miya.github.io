@@ -18,7 +18,7 @@
   <link rel="icon" href="assets/favicon-48.png?v=3" sizes="48x48" type="image/png">
   <link rel="icon" href="assets/favicon.svg?v=3" type="image/svg+xml" sizes="any">
   <link rel="apple-touch-icon" href="assets/icon-180.png?v=3">
-  <link rel="stylesheet" href="assets/style.css?v=42">
+  <link rel="stylesheet" href="assets/style.css?v=43">
   <script src="assets/main.js?v=15" defer></script>
   <title>Mill-Miya — Selected Works</title>
 </head>
@@ -181,7 +181,7 @@
                 <linearGradient id="wp-bore" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#0b444b"/><stop offset=".5" stop-color="#125d67"/><stop offset="1" stop-color="#082f37"/></linearGradient>
                 <linearGradient id="wp-valve" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c3d9ce"/><stop offset=".4" stop-color="#61877b"/><stop offset="1" stop-color="#284e48"/></linearGradient>
                 <mask id="wp-flow-reveal" x="57" y="119" width="525" height="240" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
-                  <!-- Flow reaches the valve first, then extends independently toward both open ends. -->
+                  <!-- Upstream flows continuously; only downstream water advances after the valve opens. -->
                   <path class="wp-reveal-left" d="M364 173H240A35 35 0 0 0 205 208V255A35 35 0 0 1 170 290H98" fill="none" stroke="#fff" stroke-width="37" stroke-linecap="butt"/>
                   <path class="wp-reveal-right" d="M364 173H523" fill="none" stroke="#fff" stroke-width="37" stroke-linecap="butt"/>
                 </mask>
@@ -208,6 +208,12 @@
                   <!-- A narrow cutaway window reveals water in the pipe core, not on the metal surface. -->
                   <path class="wp-flow-cutaway" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" mask="url(#wp-flow-reveal)" stroke="#0e5868" stroke-width="16"/>
                   <path class="wp-flow-trace" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" mask="url(#wp-flow-reveal)" stroke="#9eefff" stroke-width="6" stroke-dasharray="18 14"/>
+                  <!-- Upstream supply is already moving when the valve is closed. -->
+                  <g class="wp-upstream-water" stroke-linecap="butt" stroke-linejoin="round">
+                    <path class="wp-upstream-window" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H337" stroke="#0e5664" stroke-width="16"/>
+                    <path class="wp-upstream-core" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H337" stroke="#5cc8e1" stroke-opacity=".65" stroke-width="9"/>
+                    <path class="wp-upstream-stream" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H337" stroke="#b3f1ff" stroke-width="5" stroke-dasharray="14 17"/>
+                  </g>
                   <path class="wp-pipe-highlight" d="M109 274H170A19 19 0 0 0 189 255V208A51 51 0 0 1 240 157H510" stroke="#f4fff7" stroke-width="3" opacity=".66"/>
                   <g class="wp-pipe-collars" stroke="#cce5d8" stroke-width="3" fill="#315f55">
                     <path d="M117 267V313M133 267V313M489 149V197M505 149V197" opacity=".85"/>
