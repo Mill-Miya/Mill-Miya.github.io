@@ -18,7 +18,7 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="assets/favicon-48.png" sizes="48x48" type="image/png">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/style.css?v=13">
+  <link rel="stylesheet" href="assets/style.css?v=14">
   <script src="assets/main.js?v=7" defer></script>
   <title>Mill-Miya — Selected Works</title>
 </head>
@@ -137,10 +137,13 @@
   </g>
   </g>
   <!-- Operational order: SkySafari -> Wi-Fi -> ESP32 -> drive -> acquired target. -->
-  <path d="M142 219H151M146 214L152 219L146 224" fill="none" stroke="#9dd8ce" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M291 222H313M307 216L314 222L307 228" fill="none" stroke="#a6e3d5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M459 219H483M477 213L484 219L477 225" fill="none" stroke="#a6e3d5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <g transform="translate(-121 0)">
+  <!-- Equal-sized arrows mark transitions between the four stages. -->
+  <g class="eq-flow-arrows" fill="none" stroke="#a6e3d5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <path class="eq-flow-arrow" d="M142 219H160M154 213L161 219L154 225"/>
+    <path class="eq-flow-arrow" d="M291 222H309M303 216L310 222L303 228"/>
+    <path class="eq-flow-arrow" d="M459 219H477M471 213L478 219L471 225"/>
+  </g>
+  <g transform="translate(-121 -25)">
   <!-- Wi-Fi bridge, not an additional hardware box. -->
   <g fill="none" stroke="#9bd8d1" stroke-width="2" stroke-linecap="round">
     <path class="eq-wifi-outer" d="M269 208Q281 196 293 208" opacity=".73"/>
@@ -162,6 +165,12 @@
     <circle class="eq-esp-led" cx="352" cy="247" r="2.9" fill="#a0e9d4"/>
     <text x="350.5" y="271" font-family="Arial, sans-serif" font-size="9.5" letter-spacing="1" text-anchor="middle" fill="#c8e7df">ESP32</text>
   </g>
+  </g>
+  <!-- Two actual signal-wire runs from ESP32 right-side pins to motor enclosure.
+       Route around the command arrow; positions are in global SVG coordinates. -->
+  <g class="eq-control-wire" fill="none" stroke="#7fbfc8" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" opacity=".9">
+    <path d="M286 233H292C307 233 304 258 314 268L320 269"/>
+    <path d="M286 252H288C306 252 301 283 313 285H320"/>
   </g>
   <g transform="translate(-116 0)">
   <!-- Abstract physical drive icon: one small motor driving a larger pulley. -->
@@ -193,13 +202,14 @@
   </g>
   </g>
   <g transform="translate(448 0)">
-  <!-- The observing goal, reduced to a target marker instead of a second device. -->
+  <!-- Fixed reticle with a moving star field: the motor slews the telescope,
+       so the target and all surrounding stars drift together through its view. -->
   <g stroke-linecap="round" stroke-linejoin="round">
     <circle cx="87" cy="219" r="44" fill="#1c3b49" stroke="#a3d1cc" stroke-width="2.2"/>
     <circle class="eq-target-ring" cx="87" cy="219" r="25" fill="none" stroke="#bce5df" stroke-width="2"/>
-    <circle class="eq-target-object" cx="127" cy="183" r="5.5" fill="#a4f0d4"/>
     <path d="M87 164V184M87 254V274M32 219H52M122 219H142" stroke="#a3d9d2" stroke-width="2"/>
-    <g fill="#b9e0dc" opacity=".78">
+    <g class="eq-target-field" fill="#b9e0dc" opacity=".78">
+      <circle class="eq-target-object" cx="127" cy="183" r="5.5" fill="#a4f0d4"/>
       <circle cx="60" cy="150" r="2"/><circle cx="113" cy="151" r="1.5"/>
       <circle cx="41" cy="276" r="1.5"/><circle cx="129" cy="295" r="1.8"/>
     </g>

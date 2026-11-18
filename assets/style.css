@@ -366,14 +366,14 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .art-eqmount .eq-phone-target{transform-box:view-box;transform-origin:212px 219px}
 .art-eqmount .eq-small-rotor{transform-box:view-box;transform-origin:459px 283px}
 .art-eqmount .eq-large-rotor{transform-box:view-box;transform-origin:517px 217px}
-.art-eqmount .eq-target-object{transform-box:view-box;transform-origin:127px 183px}
-.art-eqmount.is-complete .eq-target-object{transform:translate(-40px,36px)}
+.art-eqmount .eq-target-field{transform-box:view-box;transform-origin:87px 219px}
+.art-eqmount.is-complete .eq-target-field{transform:translate(-40px,36px)}
 
 
-/* Each 6.4 s cycle: target > phone > radio > ESP32 > coupled belt drive. */
+/* Each 6.4 s cycle: phone > radio > ESP32 > motor and starfield slewing together. */
 @media(prefers-reduced-motion:no-preference){
-  .art-eqmount:is(.is-hovering,.is-playing) .eq-target-object{
-    animation:eq-target-acquire 6.4s cubic-bezier(.2,.7,.25,1) 1 both;
+  .art-eqmount:is(.is-hovering,.is-playing) .eq-target-field{
+    animation:eq-target-acquire 6.4s cubic-bezier(.2,.68,.25,1) 1 both;
   }
   .art-eqmount:is(.is-hovering,.is-playing) .eq-target-ring{
     animation:eq-target-select 6.4s ease-in-out 1 both;
@@ -410,8 +410,8 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   }
 }
 @keyframes eq-target-acquire{
-  0%,80%{transform:translate(0px,0px)}
-  98%,100%{transform:translate(-40px,36px)}
+  0%,58%{transform:translate(0px,0px)}
+  100%{transform:translate(-40px,36px)}
 }
 @keyframes eq-target-select{
   0%,85%,100%{transform:scale(1);stroke:#bce5df}
@@ -445,24 +445,24 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   49%,57%{stroke-dasharray:4 5;stroke-dashoffset:-18;opacity:.9}
 }
 @keyframes eq-motor-turn{
-  0%,60%{transform:rotate(0deg)}
+  0%,58%{transform:rotate(0deg)}
   100%{transform:rotate(1800deg)}
 }
 @keyframes eq-pulley-turn{
-  0%,60%{transform:rotate(0deg)}
+  0%,58%{transform:rotate(0deg)}
   100%{transform:rotate(360deg)}
 }
 @keyframes eq-belt-forward{
-  0%,60%{stroke-dashoffset:0}
+  0%,58%{stroke-dashoffset:0}
   100%{stroke-dashoffset:-72}
 }
 @keyframes eq-belt-return{
-  0%,60%{stroke-dashoffset:0}
+  0%,58%{stroke-dashoffset:0}
   100%{stroke-dashoffset:72}
 }
 @keyframes eq-drive-visibility{
-  0%,58%,100%{opacity:0}
-  62%,97%{opacity:.85}
+  0%,56%,100%{opacity:0}
+  60%,97%{opacity:.85}
 }
 
 #physical-group-label{margin-top:40px;border-top:2px solid #2e525e}
