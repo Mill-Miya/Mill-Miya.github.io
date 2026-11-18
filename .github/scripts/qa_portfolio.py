@@ -478,8 +478,13 @@ with sync_playwright() as p:
                     fail("belt-motion animation not active on replay", width)
                 # Record an early state without allowing a screenshot to complete the cycle.
                 page.locator("#sheet-next").click()
-                if page.locator("#sheet-visual .art-eqmount").count()!=0 or play_button.is_visible():
+                if page.locator("#sheet-visual .art-eqmount").count()!=0:
                     fail("sheet switching did not clear equatorial motion", width)
+                page.wait_for_function("""() =>
+                  document.querySelector('#sheet-visual .art-sorava')?.classList.contains('is-playing')
+                """, timeout=1500)
+                if not play_button.is_visible() or "Sorava" not in (play_button.get_attribute("aria-label") or ""):
+                    fail("NEXT did not switch the replay control to Sorava", width)
                 page.locator("#sheet-prev").click()
                 page.wait_for_function("""() => document.querySelector('#sheet-visual .art-eqmount')?.classList.contains('is-playing')""", timeout=1500)
                 # Old animation is discarded on navigation; reopening starts
@@ -513,6 +518,92 @@ with sync_playwright() as p:
                 if page.locator("#sheet-visual .art-eqmount.is-hovering").count():
                     fail("second PREV navigation required hover to restart", width)
             page.locator("#sheet-close").click()
+            if width in (390, 1440):
+                # Sorava uses the identical lifecycle as the equatorial mount:
+                # hover on card, one-shot autoplay on opening, no sheet hover
+                # dependency, replay at visual bottom-right, and new autoplay
+                # on navigation back from an adjacent sheet.
+                page.emulate_media(reduced_motion="no-preference")
+                sorava_media = page.locator('.project-card[data-project="01"] .project-media')
+                sorava_card = sorava_media.locator('.art-sorava')
+                sorava_media.hover()
+                if "is-hovering" not in (sorava_card.get_attribute("class") or ""):
+                    fail("Sorava card hover animation did not start", width)
+                if sorava_card.locator(".sorava-skyfield").evaluate(
+                    "(el) => getComputedStyle(el).animationName")!="sorava-field-track":
+                    fail("Sorava starfield did not animate on card hover", width)
+                page.mouse.move(0, 0)
+                if "is-hovering" in (sorava_card.get_attribute("class") or ""):
+                    fail("Sorava listing animation did not reset on pointer exit", width)
+                page.locator('.project-card[data-project="01"] .project-title-button').click()
+                sorava_sheet = page.locator("#sheet-visual .art-sorava")
+                page.wait_for_function("""() =>
+                  document.querySelector('#sheet-visual .art-sorava')?.classList.contains('is-playing')
+                """, timeout=1500)
+                if sorava_sheet.locator(".sorava-skyfield .star").count()!=7:
+                    fail("Sorava moving sky does not include all seven stars", width)
+                if sorava_sheet.locator(".sky-reticle").evaluate(
+                    "(el) => !!el.closest('.sorava-skyfield')"):
+                    fail("Sorava reticle must stay fixed", width)
+                replay = page.locator(".sheet-motion-play")
+                if not replay.is_visible() or "Sorava" not in (replay.get_attribute("aria-label") or ""):
+                    fail("Sorava does not expose its bottom-right replay", width)
+                if not replay.evaluate("(el) => el.parentElement.classList.contains('sheet-visual-bottom')"):
+                    fail("Sorava replay position is not the artwork footer", width)
+                # Scrub the CSS animation: halfway through, the target has not
+                # arrived; at 7200ms its center coincides with the reticle.
+                acquisition = sorava_sheet.evaluate("""art => {
+                  const field=art.querySelector('.sorava-skyfield');
+                  const star=art.querySelector('.sorava-target-star');
+                  const reticle=art.querySelector('.sky-reticle');
+                  const share=art.querySelector('.sorava-share-symbol');
+                  const animation=field.getAnimations().find(a => a.animationName==='sorava-field-track');
+                  const distance=()=>{
+                    const a=star.getBoundingClientRect(), b=reticle.getBoundingClientRect();
+                    return Math.hypot((a.x+a.width/2)-(b.x+b.width/2),
+                                      (a.y+a.height/2)-(b.y+b.height/2));
+                  };
+                  animation.currentTime=4000;
+                  const before=distance();
+                  animation.currentTime=7200;
+                  const after=distance();
+                  const finalTransform=getComputedStyle(field).transform;
+                  const shareAnim=share.getAnimations().find(a => a.animationName==='sorava-sharing');
+                  if(shareAnim) shareAnim.currentTime=7200;
+                  return {before,after,finalTransform,shareOpacity:Number(getComputedStyle(share).opacity)};
+                }""")
+                if acquisition["before"] < 5 or acquisition["after"] > 1.2:
+                    fail("Sorava target did not track into fixed reticle: "+str(acquisition), width)
+                if acquisition["shareOpacity"] < .7:
+                    fail("Sorava share signal did not activate at acquisition", width)
+                replay.click()
+                if "is-playing" not in (sorava_sheet.get_attribute("class") or ""):
+                    fail("Sorava replay did not start", width)
+                # Pointer motion must not start another cycle or stop autoplay.
+                page.mouse.move(0,0)
+                sorava_sheet.hover(position={"x":15,"y":15})
+                page.mouse.move(0,0)
+                if sorava_sheet.locator(".sorava-skyfield").evaluate(
+                    "(el) => getComputedStyle(el).animationName")!="sorava-field-track":
+                    fail("Sorava sheet motion was interrupted by pointer travel", width)
+                page.locator("#sheet-next").click()
+                if page.locator("#sheet-visual .art-sorava").count()!=0 or replay.is_visible():
+                    fail("Sorava animation not cleared by NEXT", width)
+                page.locator("#sheet-prev").click()
+                page.wait_for_function("""() =>
+                  document.querySelector('#sheet-visual .art-sorava')?.classList.contains('is-playing')
+                """, timeout=1500)
+                if page.locator("#sheet-visual .art-sorava.is-hovering").count()!=0:
+                    fail("Sorava navigation autoplay unexpectedly requires hover", width)
+                page.locator("#sheet-close").click()
+                page.emulate_media(reduced_motion="reduce")
+                page.locator('.project-card[data-project="01"] .project-title-button').click()
+                if page.locator(".sheet-motion-play").is_visible():
+                    fail("reduced-motion Sorava wrongly exposes replay", width)
+                if page.locator("#sheet-visual .sorava-skyfield").evaluate(
+                    "(el) => getComputedStyle(el).animationName")!="none":
+                    fail("Sorava motion ignores reduced-motion preference", width)
+                page.locator("#sheet-close").click()
             if errors: fail("JavaScript error after sheet controls: "+repr(errors), width)
         print("QA_PASS",width,"cards",len(boxes),"width",metrics["scrollWidth"],flush=True)
         page.close()
