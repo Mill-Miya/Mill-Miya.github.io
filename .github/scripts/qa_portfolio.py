@@ -109,6 +109,58 @@ with sync_playwright() as p:
                 fail("All filter does not restore all six projects", width)
             if page.locator('#visible-count').inner_text().strip()!="06":
                 fail("filter counter incorrect", width)
+        # One L3 work is visibly preview-locked while remaining in the list.
+        locked = page.locator('.project-card[data-project="06"]')
+        if locked.count()!=1 or locked.locator('.project-art.art-messe').count()!=1:
+            fail("Suwa Messe work disappeared", width)
+        if locked.locator(".project-lock-mark svg").count()!=1:
+            fail("Suwa Messe lock visual missing", width)
+        if locked.locator("[data-open-sheet], a[href]").count()!=0:
+            fail("locked work has active sheet or demo controls", width)
+        if page.locator('a[href*="suwa-messe-2026"]').count()!=0:
+            fail("locked public demo URL leaked into site", width)
+        if page.locator('.project-card [data-open-sheet]').count()!=15:
+            fail("expected five sheet-enabled works", width)
+        if page.locator(".project-card .project-links a[href]").count()!=4:
+            fail("expected four public live site links", width)
+        # Five eligible projects open sheets without replacing public demo links.
+        if width in (320, 390, 820, 1440):
+            trigger = page.locator('.project-card[data-project="01"] .project-media-hit')
+            trigger.click()
+            sheet = page.locator('#project-sheet')
+            if not sheet.evaluate("(el) => el.open"):
+                fail("sheet did not open", width)
+            if page.locator("#sheet-title").inner_text().strip() != "Sorava / SkyShare":
+                fail("wrong first sheet content", width)
+            stage = sheet.bounding_box()
+            if not stage or stage["x"] < -1 or stage["x"] + stage["width"] > width + 1:
+                fail("sheet escapes viewport", width)
+            if width in (390, 1440):
+                page.screenshot(path=str(OUT/f"sheet_{width}.png"),animations="disabled")
+            page.locator("#sheet-next").click()
+            if page.locator("#sheet-title").inner_text().strip() != "WallPipe AR":
+                fail("sheet next navigation broken", width)
+            page.keyboard.press("ArrowLeft")
+            if page.locator("#sheet-title").inner_text().strip() != "Sorava / SkyShare":
+                fail("sheet keyboard navigation broken", width)
+            page.keyboard.press("Escape")
+            if sheet.evaluate("(el) => el.open"):
+                fail("Escape did not close dialog", width)
+            if not trigger.evaluate("(el) => document.activeElement === el"):
+                fail("focus did not return to opener", width)
+            # Project without a public demo still needs a detail sheet.
+            page.locator('.project-card[data-project="04"] .project-title-button').click()
+            if page.locator("#sheet-title").inner_text().strip() != "University AI":
+                fail("non-demo project sheet missing", width)
+            if page.locator("#sheet-actions a").count():
+                fail("private demo link unexpectedly appeared", width)
+            page.locator("#sheet-close").click()
+            page.locator('.project-card[data-project="05"] .project-title-button').click()
+            page.locator("#sheet-next").click()
+            if page.locator("#sheet-title").inner_text().strip() != "Sorava / SkyShare":
+                fail("sheet navigation did not skip locked Suwa Messe", width)
+            page.locator("#sheet-close").click()
+            if errors: fail("JavaScript error after sheet controls: "+repr(errors), width)
         print("QA_PASS",width,"cards",len(boxes),"width",metrics["scrollWidth"],flush=True)
         page.close()
     browser.close()

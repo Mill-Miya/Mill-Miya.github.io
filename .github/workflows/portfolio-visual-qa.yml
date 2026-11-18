@@ -41,3 +41,14 @@ jobs:
           path: qa-evidence/*.png
           retention-days: 5
           if-no-files-found: warn
+
+      - name: Upload standalone static preview
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: portfolio-preview-site
+          path: |
+            index.html
+            assets/
+          retention-days: 5
+          if-no-files-found: error
