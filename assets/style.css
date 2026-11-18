@@ -346,8 +346,8 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   display:block;filter:none;
 }
 
-/* Project sheet / equatorial-mount proof of concept.
-   The project listing stays static; only the cloned, expanded artwork moves. */
+/* Equatorial-mount concept animation: one cycle per hover or intentional replay.
+   Every motor turn ends at the original orientation (5:1 ratio). */
 .eq-small-rotor,.eq-belt-teeth{opacity:0}
 .sheet-motion-play{
   border:1px solid currentColor;border-radius:2px;padding:8px 10px;
@@ -362,54 +362,64 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 @media(hover:hover) and (pointer:fine){
   .sheet-visual .art-eqmount{cursor:crosshair}
 }
-.sheet-visual .eq-target-ring{transform-box:view-box;transform-origin:87px 219px}
-.sheet-visual .eq-phone-target{transform-box:view-box;transform-origin:212px 219px}
-.sheet-visual .eq-small-rotor{transform-box:view-box;transform-origin:459px 283px}
-.sheet-visual .eq-large-rotor{transform-box:view-box;transform-origin:517px 217px}
+.art-eqmount .eq-target-ring{transform-box:view-box;transform-origin:87px 219px}
+.art-eqmount .eq-phone-target{transform-box:view-box;transform-origin:212px 219px}
+.art-eqmount .eq-small-rotor{transform-box:view-box;transform-origin:459px 283px}
+.art-eqmount .eq-large-rotor{transform-box:view-box;transform-origin:517px 217px}
+.art-eqmount .eq-target-object{transform-box:view-box;transform-origin:127px 183px}
+.art-eqmount.is-complete .eq-target-object{transform:translate(-40px,36px)}
+
 
 /* Each 6.4 s cycle: target > phone > radio > ESP32 > coupled belt drive. */
 @media(prefers-reduced-motion:no-preference){
-  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-target-ring{
+  .art-eqmount:is(.is-hovering,.is-playing) .eq-target-object{
+    animation:eq-target-acquire 6.4s cubic-bezier(.2,.7,.25,1) 1 both;
+  }
+  .art-eqmount:is(.is-hovering,.is-playing) .eq-target-ring{
     animation:eq-target-select 6.4s ease-in-out 1 both;
   }
-  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-phone-target{
+  .art-eqmount:is(.is-hovering,.is-playing) .eq-phone-target{
     animation:eq-phone-accept 6.4s ease-in-out 1 both;
   }
-  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-wifi-inner{
+  .art-eqmount:is(.is-hovering,.is-playing) .eq-wifi-inner{
     animation:eq-radio-inner 6.4s linear 1 both;
   }
-  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-wifi-outer{
+  .art-eqmount:is(.is-hovering,.is-playing) .eq-wifi-outer{
     animation:eq-radio-outer 6.4s linear 1 both;
   }
-  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-wifi-dot{
+  .art-eqmount:is(.is-hovering,.is-playing) .eq-wifi-dot{
     animation:eq-radio-dot 6.4s linear 1 both;
   }
-  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-esp-led{
+  .art-eqmount:is(.is-hovering,.is-playing) .eq-esp-led{
     animation:eq-controller-led 6.4s ease-in-out 1 both;
   }
-  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-command-path{
+  .art-eqmount:is(.is-hovering,.is-playing) .eq-command-path{
     animation:eq-controller-output 6.4s linear 1 both;
   }
-  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-small-rotor{
+  .art-eqmount:is(.is-hovering,.is-playing) .eq-small-rotor{
     animation:eq-motor-turn 6.4s linear 1 both,eq-drive-visibility 6.4s linear 1 both;
   }
-  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-large-rotor{
+  .art-eqmount:is(.is-hovering,.is-playing) .eq-large-rotor{
     animation:eq-pulley-turn 6.4s linear 1 both;
   }
-  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-belt-upper{
+  .art-eqmount:is(.is-hovering,.is-playing) .eq-belt-upper{
     animation:eq-belt-forward 6.4s linear 1 both,eq-drive-visibility 6.4s linear 1 both;
   }
-  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-belt-lower{
+  .art-eqmount:is(.is-hovering,.is-playing) .eq-belt-lower{
     animation:eq-belt-return 6.4s linear 1 both,eq-drive-visibility 6.4s linear 1 both;
   }
 }
+@keyframes eq-target-acquire{
+  0%,80%{transform:translate(0px,0px)}
+  98%,100%{transform:translate(-40px,36px)}
+}
 @keyframes eq-target-select{
-  0%,4%,16%,100%{transform:scale(1);stroke:#bce5df}
-  8%,12%{transform:scale(1.11);stroke:#e0fff3}
+  0%,85%,100%{transform:scale(1);stroke:#bce5df}
+  92%,96%{transform:scale(1.1);stroke:#e0fff3}
 }
 @keyframes eq-phone-accept{
-  0%,13%,29%,100%{transform:scale(1);stroke:#c2e9e3}
-  19%,24%{transform:scale(1.1);stroke:#f2fff9}
+  0%,1%,17%,100%{transform:scale(1);stroke:#c2e9e3}
+  6%,12%{transform:scale(1.1);stroke:#f2fff9}
 }
 @keyframes eq-radio-inner{
   0%,25%,44%,100%{opacity:.85}
@@ -436,11 +446,11 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 }
 @keyframes eq-motor-turn{
   0%,60%{transform:rotate(0deg)}
-  100%{transform:rotate(360deg)}
+  100%{transform:rotate(1800deg)}
 }
 @keyframes eq-pulley-turn{
   0%,60%{transform:rotate(0deg)}
-  100%{transform:rotate(72deg)}
+  100%{transform:rotate(360deg)}
 }
 @keyframes eq-belt-forward{
   0%,60%{stroke-dashoffset:0}
