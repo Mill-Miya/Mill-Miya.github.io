@@ -75,8 +75,7 @@
         finishAnimation: "sorava-guest-receive", finishTarget: "sorava-guest-received"
       },
       "wallpipe-ar": {
-        selector: ".art-wallpipe", duration: 7200,
-        finishAnimation: "wp-open-status", finishTarget: "wp-status-open"
+        selector: ".art-wallpipe", duration: 7200, loop: true
       }
     };
     const activeMotion = () => motions[activeCard?.dataset.sheetId] || null;
@@ -109,7 +108,7 @@
       void art.getBoundingClientRect().width;
       art.classList.add("is-playing");
       // Safety fallback if the browser suppresses animationend (e.g. hidden tab).
-      motionTimer = window.setTimeout(() => finishSheetMotion(art), motion.duration + 250);
+      if (!motion.loop) motionTimer = window.setTimeout(() => finishSheetMotion(art), motion.duration + 250);
     }
     motionButton.addEventListener("click", playSheetMotion);
     // On listing cards, hover starts a single cycle even with the transparent
@@ -161,7 +160,7 @@
       const art = card.querySelector(".project-art")?.cloneNode(true);
       if (art) {
         const motion = motions[card.dataset.sheetId];
-        if (motion) {
+        if (motion && !motion.loop) {
           art.addEventListener("animationend", event => {
             if (event.animationName === motion.finishAnimation &&
                 event.target.classList.contains(motion.finishTarget)) {
@@ -190,6 +189,7 @@
       }
       const showMotion = Boolean(motions[card.dataset.sheetId]) && motionAllowed();
       motionButton.hidden = !showMotion;
+      motionButton.textContent = motions[card.dataset.sheetId]?.loop ? "RESTART" : "REPLAY";
       motionButton.setAttribute("aria-label", `${sheetTitle.textContent} のアニメーションを再生`);
       if (sheetVisualBrand) sheetVisualBrand.hidden = showMotion;
       // Each sheet starts at the beginning of its own right-side content.
