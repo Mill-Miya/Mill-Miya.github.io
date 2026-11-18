@@ -80,7 +80,7 @@
       },
       nova: {
         selector: ".art-nova", duration: 6000,
-        finishAnimation: "nova-panel-memory-in", finishTarget: "nova-panel-memory"
+        finishAnimation: "nova-panel-system-in", finishTarget: "nova-panel-system"
       }
     };
     const activeMotion = () => motions[activeCard?.dataset.sheetId] || null;
