@@ -93,7 +93,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .art-wallpipe .art-bottom{color:#ddf2e5b5}
 .wp-scene{transform:none}
 .wp-pipe-assembly{opacity:1}
-.wp-part-left,.wp-part-center,.wp-part-right,.wp-valve{opacity:1;transform:translate(0,0)}
+.wp-part-left,.wp-part-right,.wp-valve{opacity:1;transform:translate(0,0)}
 .wp-lock-left,.wp-lock-right{opacity:.78}
 /* Rim and spokes are exactly symmetric about the stationary SVG hub. */
 .wp-wheel-spin{transform-box:fill-box;transform-origin:50% 50%;transform:rotate(900deg)}
@@ -124,7 +124,6 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-part-left{
     animation:wp-dock-left var(--wp-motion-duration) linear 1 both;
   }
-  .art-wallpipe:is(.is-hovering,.is-playing) .wp-part-center,
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-valve{
     animation:wp-dock-center var(--wp-motion-duration) linear 1 both;
   }
