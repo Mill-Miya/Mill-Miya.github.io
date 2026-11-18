@@ -519,90 +519,116 @@ with sync_playwright() as p:
                     fail("second PREV navigation required hover to restart", width)
             page.locator("#sheet-close").click()
             if width in (390, 1440):
-                # Sorava uses the identical lifecycle as the equatorial mount:
-                # hover on card, one-shot autoplay on opening, no sheet hover
-                # dependency, replay at visual bottom-right, and new autoplay
-                # on navigation back from an adjacent sheet.
+                # Two screen-dominant phones, central Wi-Fi, a selected
+                # M42 on the host, and a distinct guest before and after sync.
                 page.emulate_media(reduced_motion="no-preference")
                 sorava_media = page.locator('.project-card[data-project="01"] .project-media')
-                sorava_card = sorava_media.locator('.art-sorava')
+                sorava_card = sorava_media.locator(".art-sorava")
+                if sorava_card.locator(".sorava-phone-host").count()!=1 or sorava_card.locator(".sorava-phone-guest").count()!=1:
+                    fail("Sorava concept must show two phone screens", width)
+                if sorava_card.locator(".sorava-wifi-node").count()!=1:
+                    fail("Sorava Wi-Fi symbol must be between the two phones", width)
+                phone_geometry = sorava_card.evaluate("""art => {
+                  const rect = el => el.getBoundingClientRect();
+                  const host = art.querySelector('.sorava-phone-host');
+                  const guest = art.querySelector('.sorava-phone-guest');
+                  const wifi = art.querySelector('.sorava-wifi-node');
+                  const hostBody = rect(host.querySelector('rect:first-child'));
+                  const guestBody = rect(guest.querySelector('rect:first-child'));
+                  const hostScreen = rect(host.querySelector('rect:nth-child(2)'));
+                  const guestScreen = rect(guest.querySelector('rect:nth-child(2)'));
+                  const point = rect(wifi);
+                  return {
+                    screenFraction:hostScreen.width/hostBody.width,
+                    guestFraction:guestScreen.width/guestBody.width,
+                    phoneWidths:[hostBody.width,guestBody.width],
+                    centered: Math.abs((point.left + point.right)/2-(hostBody.right+guestBody.left)/2),
+                    space: guestBody.left - hostBody.right,
+                    screenInside: hostScreen.left>hostBody.left && hostScreen.right<hostBody.right &&
+                                  guestScreen.left>guestBody.left && guestScreen.right<guestBody.right
+                  };
+                }""")
+                if (phone_geometry["screenFraction"] < .89 or phone_geometry["guestFraction"] < .89 or
+                        phone_geometry["space"] < 14 or not phone_geometry["screenInside"] or
+                        phone_geometry["centered"] > 2):
+                    fail("Sorava phones/wifi are not large and centered: "+str(phone_geometry), width)
                 sorava_media.hover()
                 if "is-hovering" not in (sorava_card.get_attribute("class") or ""):
-                    fail("Sorava card hover animation did not start", width)
-                if sorava_card.locator(".sorava-skyfield").evaluate(
-                    "(el) => getComputedStyle(el).animationName")!="sorava-field-track":
-                    fail("Sorava starfield did not animate on card hover", width)
+                    fail("Sorava listing hover did not start playback", width)
+                if sorava_card.locator(".sorava-guest-received").evaluate(
+                    "(el) => getComputedStyle(el).animationName")!="sorava-guest-receive":
+                    fail("Sorava guest reception animation is missing on card hover", width)
                 page.mouse.move(0, 0)
                 if "is-hovering" in (sorava_card.get_attribute("class") or ""):
-                    fail("Sorava listing animation did not reset on pointer exit", width)
+                    fail("Sorava listing animation did not reset", width)
                 page.locator('.project-card[data-project="01"] .project-title-button').click()
                 sorava_sheet = page.locator("#sheet-visual .art-sorava")
                 page.wait_for_function("""() =>
                   document.querySelector('#sheet-visual .art-sorava')?.classList.contains('is-playing')
                 """, timeout=1500)
-                if sorava_sheet.locator(".sorava-skyfield .star").count()!=7:
-                    fail("Sorava moving sky does not include all seven stars", width)
-                if sorava_sheet.locator(".sky-reticle").evaluate(
-                    "(el) => !!el.closest('.sorava-skyfield')"):
-                    fail("Sorava reticle must stay fixed", width)
+                if sorava_sheet.locator(".sorava-phone-host").count()!=1 or sorava_sheet.locator(".sorava-phone-guest").count()!=1:
+                    fail("Sorava clone lost its phones", width)
                 replay = page.locator(".sheet-motion-play")
                 if not replay.is_visible() or "Sorava" not in (replay.get_attribute("aria-label") or ""):
-                    fail("Sorava does not expose its bottom-right replay", width)
+                    fail("Sorava missing replay control", width)
                 if not replay.evaluate("(el) => el.parentElement.classList.contains('sheet-visual-bottom')"):
-                    fail("Sorava replay position is not the artwork footer", width)
-                # Scrub the CSS animation: halfway through, the target has not
-                # arrived; at 7200ms its center coincides with the reticle.
-                acquisition = sorava_sheet.evaluate("""art => {
-                  const field=art.querySelector('.sorava-skyfield');
-                  const star=art.querySelector('.sorava-target-star');
-                  const reticle=art.querySelector('.sky-reticle');
-                  const share=art.querySelector('.sorava-share-symbol');
-                  const animation=field.getAnimations().find(a => a.animationName==='sorava-field-track');
-                  const distance=()=>{
-                    const a=star.getBoundingClientRect(), b=reticle.getBoundingClientRect();
-                    return Math.hypot((a.x+a.width/2)-(b.x+b.width/2),
-                                      (a.y+a.height/2)-(b.y+b.height/2));
+                    fail("Sorava replay must stay below art on right side", width)
+                phases = sorava_sheet.evaluate("""art => {
+                  const get = sel => art.querySelector(sel);
+                  const host=get('.sorava-host-picked'),guest=get('.sorava-guest-received');
+                  const waiting=get('.sorava-guest-waiting'),wifi=get('.sorava-wifi-node');
+                  const nodes=[host,guest,waiting,wifi];
+                  const animations=nodes.map(node=>node.getAnimations()[0]);
+                  const state=t=>{
+                    animations.forEach(animation=>animation.currentTime=t);
+                    return nodes.map(node=>Number(getComputedStyle(node).opacity));
                   };
-                  animation.currentTime=4000;
-                  const before=distance();
-                  animation.currentTime=7200;
-                  const after=distance();
-                  const finalTransform=getComputedStyle(field).transform;
-                  const shareAnim=share.getAnimations().find(a => a.animationName==='sorava-sharing');
-                  if(shareAnim) shareAnim.currentTime=7200;
-                  return {before,after,finalTransform,shareOpacity:Number(getComputedStyle(share).opacity)};
+                  return {start:state(0),host:state(1900),transfer:state(3600),
+                          guest:state(6100),end:state(7200),
+                          hostM42:get('.sorava-phone-host').textContent.includes('M42'),
+                          guestM42:get('.sorava-phone-guest').textContent.includes('M42'),
+                          finishName:animations[1].animationName};
                 }""")
-                if acquisition["before"] < 5 or acquisition["after"] > 1.2:
-                    fail("Sorava target did not track into fixed reticle: "+str(acquisition), width)
-                if acquisition["shareOpacity"] < .7:
-                    fail("Sorava share signal did not activate at acquisition", width)
+                if not phases["hostM42"] or not phases["guestM42"] or phases["finishName"]!="sorava-guest-receive":
+                    fail("Sorava M42 synchronization target or finish animation missing", width)
+                if phases["start"][0]>.05 or phases["start"][1]>.05 or phases["start"][2]<.95:
+                    fail("Sorava initial screen state incorrect: "+str(phases), width)
+                if phases["host"][0]<.95 or phases["host"][1]>.05:
+                    fail("Sorava host must select M42 before guest: "+str(phases), width)
+                if phases["transfer"][3]<.8 or phases["transfer"][1]>.05:
+                    fail("Sorava Wi-Fi phase is not between host and guest: "+str(phases), width)
+                if phases["guest"][1]<.95 or phases["guest"][2]>.05:
+                    fail("Sorava guest did not receive M42: "+str(phases), width)
+                if phases["end"][1]<.95 or phases["end"][2]>.05:
+                    fail("Sorava did not finish showing both M42 screens: "+str(phases), width)
+                if width in (390,1440):
+                    sorava_sheet.screenshot(path=str(OUT/f"sorava_two_phones_{width}.png"),animations="disabled")
                 replay.click()
                 if "is-playing" not in (sorava_sheet.get_attribute("class") or ""):
-                    fail("Sorava replay did not start", width)
-                # Pointer motion must not start another cycle or stop autoplay.
+                    fail("Sorava REPLAY failed to restart animation", width)
                 page.mouse.move(0,0)
                 sorava_sheet.hover(position={"x":15,"y":15})
                 page.mouse.move(0,0)
-                if sorava_sheet.locator(".sorava-skyfield").evaluate(
-                    "(el) => getComputedStyle(el).animationName")!="sorava-field-track":
-                    fail("Sorava sheet motion was interrupted by pointer travel", width)
+                if sorava_sheet.locator(".sorava-guest-received").evaluate(
+                    "(el) => getComputedStyle(el).animationName")!="sorava-guest-receive":
+                    fail("Sorava sheet playback interrupted by mouse position", width)
                 page.locator("#sheet-next").click()
                 if page.locator("#sheet-visual .art-sorava").count()!=0 or replay.is_visible():
-                    fail("Sorava animation not cleared by NEXT", width)
+                    fail("Sorava sheet failed to stop and clear on NEXT", width)
                 page.locator("#sheet-prev").click()
                 page.wait_for_function("""() =>
                   document.querySelector('#sheet-visual .art-sorava')?.classList.contains('is-playing')
                 """, timeout=1500)
                 if page.locator("#sheet-visual .art-sorava.is-hovering").count()!=0:
-                    fail("Sorava navigation autoplay unexpectedly requires hover", width)
+                    fail("Sorava NEXT/PREV autoplay requires pointer hover", width)
                 page.locator("#sheet-close").click()
                 page.emulate_media(reduced_motion="reduce")
                 page.locator('.project-card[data-project="01"] .project-title-button').click()
                 if page.locator(".sheet-motion-play").is_visible():
-                    fail("reduced-motion Sorava wrongly exposes replay", width)
-                if page.locator("#sheet-visual .sorava-skyfield").evaluate(
+                    fail("Sorava reduced motion unexpectedly exposes replay", width)
+                if page.locator("#sheet-visual .sorava-guest-received").evaluate(
                     "(el) => getComputedStyle(el).animationName")!="none":
-                    fail("Sorava motion ignores reduced-motion preference", width)
+                    fail("Sorava ignores reduced-motion settings", width)
                 page.locator("#sheet-close").click()
             if errors: fail("JavaScript error after sheet controls: "+repr(errors), width)
         print("QA_PASS",width,"cards",len(boxes),"width",metrics["scrollWidth"],flush=True)
