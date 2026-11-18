@@ -427,7 +427,7 @@ with sync_playwright() as p:
                     abs(m["outletDone"][3]["x"])>.1):
                 fail("All rigid parts must remain perfectly stationary after docking: "+str(m), width)
             if (m["start"][4]["opacity"]>.01 or m["start"][5]["opacity"]>.01 or
-                    m["valveDone"][4]["opacity"]<.7 or
+                    m["outletMove"][4]["opacity"]<.7 or
                     m["outletDone"][5]["opacity"]<.7):
                 fail("Mechanical locks must close at their respective insertion events: "+str(m), width)
             # Upstream water is physically in motion before the valve opens,
