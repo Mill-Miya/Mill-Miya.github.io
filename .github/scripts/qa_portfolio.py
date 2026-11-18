@@ -177,6 +177,48 @@ with sync_playwright() as p:
             fail("lower belt does not meet the common pulley radius", width)
         if concept.locator('path[d="M551 217H570"]').count()!=0:
             fail("stray dashed stroke still protrudes right of pulley", width)
+        # The old vertical dotted stroke under the Wi-Fi node was visual noise.
+        if concept.locator('path[d="M281 223V233"]').count()!=0:
+            fail("extra dotted line still hangs below equatorial Wi-Fi", width)
+        # The two straight rotor ticks stay, but their chevrons are removed.
+        if concept.locator('path[d*="M510 172L517 163L524 172"]').count()!=0:
+            fail("pulley rotor still has unwanted arrowheads", width)
+        if concept.locator('path[d="M517 184V164M517 249V270"]').count()!=1:
+            fail("straight rotor orientation strokes missing", width)
+        # Exact big/small wrap arcs complete the two external tangent runs.
+        for selector, expected in (
+            ('.eq-belt-large-wrap-run', 'M479.18 201.16A41 41 0 1 1 537.57 252.47'),
+            ('.eq-belt-small-wrap-run', 'M465.52 294.25A13 13 0 0 1 447.01 277.98'),
+        ):
+            if concept.locator(selector).count()!=1 or concept.locator(selector).get_attribute("d")!=expected:
+                fail("belt has no continuous wrap around one of the pulleys: "+selector, width)
+        if concept.locator('.eq-belt-wrap').get_attribute("d")!=concept.locator('.eq-belt-large-wrap-run').get_attribute("d"):
+            fail("large pulley belt teeth do not match curved belt body", width)
+        if concept.locator('.eq-belt-small-wrap').get_attribute("d")!=concept.locator('.eq-belt-small-wrap-run').get_attribute("d"):
+            fail("motor pulley teeth do not match curved belt body", width)
+        if concept.locator('.eq-belt-teeth').count()!=4:
+            fail("both straight belt runs and both wrap arcs need matching animated teeth", width)
+        # The portions inside the r=56 outer face fade; the two exposed tangent
+        # sections remain bright. The moving teeth are faded by matching masks.
+        hidden_belt=concept.evaluate("""svg => {
+          const upper=svg.querySelector('.eq-belt-upper-run');
+          const lower=svg.querySelector('.eq-belt-lower-run');
+          const grad=id=>[...svg.querySelector('#'+id).querySelectorAll('stop')].map(n=>Number(n.getAttribute('stop-opacity') ?? 1));
+          return {
+            upperStroke:upper.getAttribute('stroke'),
+            lowerStroke:lower.getAttribute('stroke'),
+            upperFade:grad('eq-belt-upper-fade'),
+            lowerFade:grad('eq-belt-lower-fade'),
+            upperMask:svg.querySelector('.eq-belt-upper').getAttribute('mask'),
+            lowerMask:svg.querySelector('.eq-belt-lower').getAttribute('mask')
+          };
+        }""")
+        if (hidden_belt["upperStroke"]!="url(#eq-belt-upper-fade)" or
+                hidden_belt["lowerStroke"]!="url(#eq-belt-lower-fade)" or
+                min(hidden_belt["upperFade"])>.45 or min(hidden_belt["lowerFade"])>.45 or
+                hidden_belt["upperMask"]!="url(#eq-belt-upper-teeth-mask)" or
+                hidden_belt["lowerMask"]!="url(#eq-belt-lower-teeth-mask)"):
+            fail("belt segments behind pulley outer face are not faded: "+str(hidden_belt), width)
         if concept.locator(".eq-target-object").count()!=1:
             fail("offset target marker absent from final reticle", width)
         # No separator arrows, and the Wi-Fi point lies at the exact midpoint
@@ -444,14 +486,14 @@ with sync_playwright() as p:
                     fail("replay control not at bottom-right under fixed image: "+str(replay_position), width)
                 if not play_button.is_visible():
                     fail("equatorial motion replay control not visible", width)
-                if art.locator(".eq-large-rotor").count()!=1 or art.locator(".eq-belt-teeth").count()!=2:
-                    fail("rotor or belt travel elements missing", width)
+                if art.locator(".eq-large-rotor").count()!=1 or art.locator(".eq-belt-teeth").count()!=4:
+                    fail("rotor or continuous belt travel elements missing", width)
                 eq_sheet_seconds=art.locator(".eq-large-rotor").evaluate(
                     "(el) => parseFloat(getComputedStyle(el).animationDuration)")
                 if abs(eq_sheet_seconds - 6.4) > .02:
                     fail("equatorial detail sheet must keep normal 6.4s playback", width)
-                if page.locator('.project-card[data-project="07"] .eq-belt-teeth').count()!=2:
-                    fail("listing lost its static SVG artwork", width)
+                if page.locator('.project-card[data-project="07"] .eq-belt-teeth').count()!=4:
+                    fail("listing lost its continuous wrapped belt artwork", width)
                 if page.locator('.project-card[data-project="07"] .eq-small-rotor').evaluate(
                     "(el) => getComputedStyle(el).opacity")!="0":
                     fail("noninteractive listing unexpectedly shows motor animation markers", width)
@@ -483,6 +525,12 @@ with sync_playwright() as p:
                 if "eq-belt-forward" not in art.locator(".eq-belt-upper").evaluate(
                     "(el) => getComputedStyle(el).animationName"):
                     fail("belt-motion animation not active on replay", width)
+                if "eq-belt-forward" not in art.locator(".eq-belt-wrap").evaluate(
+                    "(el) => getComputedStyle(el).animationName"):
+                    fail("wrapped pulley teeth are not animated during playback", width)
+                if "eq-belt-forward" not in art.locator(".eq-belt-small-wrap").evaluate(
+                    "(el) => getComputedStyle(el).animationName"):
+                    fail("small pulley wrap is not animated", width)
                 # Record an early state without allowing a screenshot to complete the cycle.
                 page.locator("#sheet-next").click()
                 if page.locator("#sheet-visual .art-eqmount").count()!=0:
@@ -640,8 +688,8 @@ with sync_playwright() as p:
                     fail("Host reticle should appear only after M42 selection; guest stays blank: "+str(phases), width)
                 if phases["transfer"][3]<.8 or phases["transfer"][1]>.05:
                     fail("Sorava Wi-Fi phase is not between host and guest: "+str(phases), width)
-                if phases["transfer"][6]<.95 or phases["transfer"][5]>.05:
-                    fail("Guest must see directional arrow instead of reticle while pointing: "+str(phases), width)
+                if phases["transfer"][6]<.95 or phases["transfer"][5]<.95:
+                    fail("Guest reticle and direction arrow must appear together while pointing: "+str(phases), width)
                 if phases["guest"][1]<.95 or phases["guest"][2]>.05:
                     fail("Sorava guest did not receive M42: "+str(phases), width)
                 if phases["end"][1]<.95 or phases["end"][2]>.05:
