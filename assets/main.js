@@ -37,6 +37,7 @@
   if (dialog && typeof dialog.showModal === "function") {
     const sheetTitle = document.getElementById("sheet-title");
     const sheetDescription = document.getElementById("sheet-description");
+    const sheetExtra = document.getElementById("sheet-extra");
     const sheetKind = document.getElementById("sheet-kind");
     const sheetTags = document.getElementById("sheet-tags");
     const sheetVisual = document.getElementById("sheet-visual");
@@ -60,7 +61,12 @@
       activeCard = card;
       dialog.dataset.theme = card.dataset.sheetId || "";
       sheetTitle.textContent = card.querySelector(".project-info h3")?.textContent?.trim() || "";
+      const details = card.querySelector("template.project-sheet-detail");
       sheetDescription.textContent = card.querySelector(".project-info > p")?.textContent?.trim() || "";
+      sheetDescription.hidden = Boolean(details);
+      sheetExtra.replaceChildren();
+      if (details) sheetExtra.appendChild(details.content.cloneNode(true));
+      sheetExtra.hidden = !details;
       sheetKind.textContent = card.querySelector(".project-year")?.textContent?.trim() || "PROJECT";
       const number = card.dataset.project || String(current + 1).padStart(2, "0");
       sheetCounter.textContent = "PROJECT / " + number.padStart(3, "0");

@@ -153,6 +153,18 @@ with sync_playwright() as p:
                 fail("sheet did not open", width)
             if page.locator("#sheet-title").inner_text().strip() != "Sorava / SkyShare":
                 fail("wrong first sheet content", width)
+            if page.locator("#sheet-description").is_visible():
+                fail("card summary incorrectly duplicated in detailed sheet", width)
+            if not page.locator("#sheet-extra").is_visible():
+                fail("approved sheet content not visible", width)
+            if page.locator("#sheet-extra .sheet-feature").count()!=3:
+                fail("sheet feature count incorrect", width)
+            if "見ている天体や場所" not in page.locator("#sheet-extra").inner_text():
+                fail("Sorava primary sharing claim missing", width)
+            if page.locator(".project-sheet-detail").count()!=4:
+                fail("not all approved project details exist", width)
+            if page.locator('.project-card[data-project="05"] .project-sheet-detail, .project-card[data-project="06"] .project-sheet-detail').count():
+                fail("locked project has unpublished details", width)
             stage = sheet.bounding_box()
             if not stage or stage["x"] < -1 or stage["x"] + stage["width"] > width + 1:
                 fail("sheet escapes viewport", width)
@@ -161,6 +173,8 @@ with sync_playwright() as p:
             page.locator("#sheet-next").click()
             if page.locator("#sheet-title").inner_text().strip() != "WallPipe AR":
                 fail("sheet next navigation broken", width)
+            if "手をかざす" not in page.locator("#sheet-extra").inner_text():
+                fail("hand-operation lead not presented", width)
             page.keyboard.press("ArrowLeft")
             if page.locator("#sheet-title").inner_text().strip() != "Sorava / SkyShare":
                 fail("sheet keyboard navigation broken", width)
@@ -173,8 +187,25 @@ with sync_playwright() as p:
             page.locator('.project-card[data-project="04"] .project-title-button').click()
             if page.locator("#sheet-title").inner_text().strip() != "University AI":
                 fail("non-demo project sheet missing", width)
+            if "連携も実装済み" not in page.locator("#sheet-extra").inner_text():
+                fail("University AI linkage status wrong", width)
+            page.locator("#sheet-prev").click()
+            if page.locator("#sheet-title").inner_text().strip() != "N.O.V.A.":
+                fail("N.O.V.A. sheet navigation missing", width)
+            if "連携を実装済み" not in page.locator("#sheet-extra").inner_text():
+                fail("N.O.V.A. linkage status wrong", width)
+            page.locator("#sheet-next").click()
             if page.locator("#sheet-actions a").count():
                 fail("private demo link unexpectedly appeared", width)
+            # Verify long-form sheet remains scrollable without horizontal clipping.
+            overflows = sheet.evaluate("""(el) => ({
+                viewport: el.clientWidth,
+                total: el.scrollWidth,
+                contentHeight: el.scrollHeight,
+                viewportHeight: el.clientHeight
+            })""")
+            if overflows["total"] > overflows["viewport"] + 1:
+                fail("work sheet overflows horizontally", width)
             page.locator("#sheet-close").click()
             page.locator('.project-card[data-project="04"] .project-title-button').click()
             page.locator("#sheet-next").click()

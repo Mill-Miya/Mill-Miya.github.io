@@ -299,3 +299,36 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   .project-lock-mark{min-width:56%;min-height:122px;gap:9px;padding:16px 19px;font-size:10px}
   .project-lock-mark svg{width:46px;height:46px}
 }
+
+
+/* Editorial project-sheet copy, sourced from the private publication registry. */
+.sheet-summary[hidden],.sheet-extra[hidden]{display:none}
+.sheet-extra{display:grid;gap:25px;margin-bottom:31px}
+.sheet-detail-section{padding-top:18px;border-top:1px solid #d6ded6}
+.sheet-detail-heading{margin-bottom:13px;color:#697871;font:650 10px/1.4 var(--font-mono);letter-spacing:.095em}
+.sheet-purpose{margin:0;color:#3e4b43;font-size:15px;line-height:1.86;font-weight:450;letter-spacing:.004em}
+.sheet-feature-list{display:grid;gap:0}
+.sheet-feature{display:grid;grid-template-columns:25px minmax(0,1fr);gap:12px;padding:11px 0;border-top:1px solid #e0e5de}
+.sheet-feature:first-child{border-top:0;padding-top:2px}
+.sheet-feature-index{padding-top:3px;color:var(--sheet-accent,var(--electric));font:11px var(--font-mono);letter-spacing:.03em}
+.sheet-feature h3{margin:0 0 5px;font-size:14px;line-height:1.45;font-weight:700;letter-spacing:-.02em}
+.sheet-feature p{margin:0;color:#657067;font-size:13px;line-height:1.72}
+.sheet-note{border-left:2px solid var(--sheet-accent,var(--electric));background:#e8ede7a3;padding:14px 17px}
+.sheet-note .sheet-detail-heading{margin-bottom:8px}
+.sheet-note p{margin:0;color:#59655d;font-size:12px;line-height:1.8}
+.sheet-copy-side:has(.sheet-extra:not([hidden])){padding-top:clamp(26px,3vw,48px);padding-bottom:35px}
+.sheet-copy-side:has(.sheet-extra:not([hidden])) .sheet-eyebrow{margin-bottom:16px}
+.sheet-copy-side:has(.sheet-extra:not([hidden])) h2{font-size:clamp(32px,3.5vw,52px);margin-bottom:22px}
+.sheet-copy-side:has(.sheet-extra:not([hidden])) .sheet-rule{margin-bottom:23px}
+.sheet-copy-side:has(.sheet-extra:not([hidden])) .sheet-info{margin-bottom:25px}
+@media(max-width:760px){
+  .sheet-copy-side:has(.sheet-extra:not([hidden])){padding:28px 24px 36px}
+  .sheet-copy-side:has(.sheet-extra:not([hidden])) h2{font-size:clamp(34px,9vw,52px)}
+  .sheet-extra{gap:22px;margin-bottom:24px}
+  .sheet-purpose{font-size:14px;line-height:1.8}
+  .sheet-feature h3{font-size:13.5px}
+  .sheet-feature p{font-size:12.5px}
+}
+@media(max-width:380px){
+  .sheet-copy-side:has(.sheet-extra:not([hidden])){padding:26px 20px 36px}
+}
