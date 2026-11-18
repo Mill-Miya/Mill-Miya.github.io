@@ -326,7 +326,16 @@ with sync_playwright() as p:
                       halfway:snap(4200),finished:snap(7050)};
             }""")
             if not front:
-                fail("Valve-originated water front masking is missing", width)
+                diagnostic=pipe_sheet.evaluate("""art => {
+                  const cls=['.wp-reveal-left','.wp-reveal-right','.wp-water-core','.wp-wheel-spin'];
+                  return cls.map(sel=>{
+                    const el=art.querySelector(sel);
+                    return {selector:sel,present:!!el,animationName:el?getComputedStyle(el).animationName:null,
+                      dash:el?getComputedStyle(el).strokeDasharray:null,
+                      animations:el?el.getAnimations().map(a=>a.animationName):[]};
+                  });
+                }""")
+                fail("Valve-originated water front masking is missing: "+str(diagnostic), width)
             if any(v>1 for v in front["initial"]):
                 fail("Flow should not reach any pipe until valve starts opening: "+str(front), width)
             if (not 0<front["opening"][0]<70 or not 0<front["opening"][1]<70 or
