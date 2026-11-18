@@ -18,7 +18,7 @@
   <link rel="icon" href="assets/favicon-48.png?v=3" sizes="48x48" type="image/png">
   <link rel="icon" href="assets/favicon.svg?v=3" type="image/svg+xml" sizes="any">
   <link rel="apple-touch-icon" href="assets/icon-180.png?v=3">
-  <link rel="stylesheet" href="assets/style.css?v=37">
+  <link rel="stylesheet" href="assets/style.css?v=38">
   <script src="assets/main.js?v=14" defer></script>
   <title>Mill-Miya — Selected Works</title>
 </head>
@@ -209,6 +209,20 @@
                     <rect x="322" y="142" width="14" height="62" rx="3" fill="url(#wp-valve)"/>
                     <rect x="387" y="142" width="14" height="62" rx="3" fill="url(#wp-valve)"/>
                   </g>
+                  <!-- The end lips widen only the final short stretches of tubing;
+                       neither opening is covered by a disc or closed with an ellipse. -->
+                  <g class="wp-mouth-flares" stroke-linejoin="round">
+                    <g class="wp-mouth-in">
+                      <path d="M98 251Q118 260 143 264L143 269Q118 265 98 267Z" fill="#91b7a9" stroke="#cce8da" stroke-width="1.8"/>
+                      <path d="M98 329Q118 320 143 316L143 311Q118 315 98 313Z" fill="#416b60" stroke="#8eb7a9" stroke-width="1.8"/>
+                      <path d="M98 251Q118 259 143 264M98 329Q118 321 143 316" fill="none" stroke="#e0f4e7" stroke-width="2.5"/>
+                    </g>
+                    <g class="wp-mouth-out">
+                      <path d="M478 147Q501 145 523 135L523 151Q501 152 478 154Z" fill="#91b7a9" stroke="#cce8da" stroke-width="1.8"/>
+                      <path d="M478 199Q501 201 523 211L523 195Q501 194 478 192Z" fill="#416b60" stroke="#8eb7a9" stroke-width="1.8"/>
+                      <path d="M478 147Q501 145 523 135M478 199Q501 201 523 211" fill="none" stroke="#e0f4e7" stroke-width="2.5"/>
+                    </g>
+                  </g>
                   <g class="wp-valve">
                     <!-- Cast housing with chamfered shoulders, bonnet and circular cover. -->
                     <path class="wp-valve-housing" d="M335 153L346 145H378L392 155V190L380 200H346L335 191Z" fill="url(#wp-valve)" stroke="#d1e9da" stroke-width="3.2"/>
@@ -219,7 +233,8 @@
                       <circle cx="342" cy="154" r="3"/><circle cx="384" cy="154" r="3"/>
                       <circle cx="342" cy="193" r="3"/><circle cx="384" cy="193" r="3"/>
                     </g>
-                    <!-- Handwheel mounted on the visible valve face at the pipe centerline. -->
+                    <!-- The rim and four spokes rotate around the fixed local origin (0,0).
+                         The hub is deliberately a separate stationary element. -->
                     <g class="wp-wheel-tilt" transform="translate(364 173) scale(.70 .70)">
                       <g class="wp-wheel-spin">
                         <circle r="46" fill="none" stroke="#284f45" stroke-width="14"/>
@@ -227,9 +242,10 @@
                         <circle r="37" fill="none" stroke="#658d80" stroke-width="2"/>
                         <path d="M0-40V40M-40 0H40" stroke="#a5beb0" stroke-width="11" stroke-linecap="round"/>
                         <path d="M0-40V40M-40 0H40" stroke="#e3f2e8" stroke-width="4" stroke-linecap="round"/>
+                      </g>
+                      <g class="wp-wheel-hub">
                         <circle r="14" fill="#466c5e" stroke="#e3f1e8" stroke-width="3"/>
                         <circle r="5" fill="#c4ddcd"/>
-                        <circle cx="0" cy="-46" r="5.5" fill="#e2ad5c" stroke="#ffe7b4" stroke-width="1.3"/>
                       </g>
                     </g>
                   </g>
