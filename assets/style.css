@@ -10,30 +10,30 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .hero-visual{position:relative;min-width:0;aspect-ratio:1/1.08;background:#141a1d;color:#9eaeb1;border-radius:2px;box-shadow:22px 24px 0 #e0e4de;overflow:hidden}.hero-visual::after{content:"";pointer-events:none;position:absolute;inset:0;border:1px solid #414d4f66}.hero-visual::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 52%,#2b3739 0,transparent 64%),linear-gradient(130deg,#26303411,#080d0f80)}.hero-visual-top,.hero-visual-bottom{position:absolute;left:25px;right:25px;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:7px;color:#b0bdbd;font:9px var(--font-mono);letter-spacing:.12em}.hero-visual-top{top:22px}.hero-visual-bottom{bottom:19px;color:#748587}.hero-logo-wrap{position:absolute;inset:8% 7%;display:grid;place-items:center}.hero-logo-wrap img{position:relative;z-index:2;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 14px 25px #0007)}.guide{position:absolute;z-index:0;background:#4e626255}.guide-h{height:1px;width:112%;left:-6%;top:50%}.guide-v{width:1px;height:112%;left:50%;top:-6%}.hero-bottom{display:flex;align-items:center;justify-content:space-between;gap:18px;padding-top:clamp(55px,6.5vw,100px);font-size:10px;color:#818c87}.hero-bottom a{text-decoration:none;color:var(--ink);font-weight:700}.hero-bottom a span{margin-left:9px;color:var(--electric)}
 .section-pad{padding:clamp(80px,8vw,145px) clamp(24px,4.65vw,84px)}.works,.approach,.contact,.about{scroll-margin-top:70px}.works,.approach{max-width:1900px;margin:0 auto}.section-top{display:flex;align-items:center;gap:23px;font-size:10px;font-weight:600;color:#697370}.section-index{white-space:nowrap;color:#24302e}.section-rule{height:1px;flex:1;background:#ccd1ca}.section-side{white-space:nowrap;color:#939c98}.section-intro{display:grid;grid-template-columns:1fr minmax(260px,415px);align-items:end;gap:35px;margin:50px 0 46px}.section-eyebrow{text-transform:uppercase;color:var(--electric);font-weight:700;font-size:10px;letter-spacing:.1em;margin:0 0 17px}.section-intro h2{font-size:clamp(42px,4.5vw,72px);font-weight:730;letter-spacing:-.08em;line-height:1.2;margin:0}.punct{color:var(--electric)}.section-lead{color:#737c78;font-size:14px;line-height:2;max-width:430px;margin:0 0 8px}.works-toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px;border-bottom:1px solid #cbd0cb;margin-bottom:25px;padding-bottom:19px}.filters{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.filter{display:flex;align-items:center;gap:10px;color:#727b77;background:transparent;border:1px solid transparent;padding:10px 16px;border-radius:100px;cursor:pointer;font-size:12px;font-weight:670;transition:background .2s,border-color .2s,color .2s}.filter.active{border-color:var(--ink);background:var(--ink);color:#fff}.filter:not(.active):hover{background:#e5e8e2;color:#1e2826}.filter span{font:9px var(--font-mono);opacity:.7}.works-count{color:#818a85;font-size:10px;white-space:nowrap}.works-count strong{font-size:12px;color:#22292a}
 .project-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(27px,3vw,51px) clamp(19px,2.9vw,48px)}.project-card{min-width:0}.project-card[hidden]{display:none!important}.project-art{position:relative;aspect-ratio:1.25/1;overflow:hidden;border-radius:3px;isolation:isolate}.featured .project-art{aspect-ratio:1.27/1}.art-cap,.art-bottom{position:absolute;z-index:5;left:22px;right:22px;display:flex;justify-content:space-between;align-items:center;gap:8px;color:#e2f2f1aa;font-size:9px}.art-cap{top:20px}.art-bottom{bottom:18px}.art-bottom span:last-child{text-align:right}
-.art-sorava{--sorava-motion-duration:7.2s;background:radial-gradient(circle at 50% 48%,#24445b 0%,#0e202e 66%,#081521 100%);color:#d9ecf4}
+.art-sorava{--sorava-motion-duration:7.2s;background:#161c20;color:#e8efec}
 /* Listing previews run at 1.6×; full-size sheets retain the 7.2s storytelling pace. */
 .project-card .art-sorava.is-hovering{--sorava-motion-duration:4.5s}
 .art-sorava::after{content:none}
 .sorava-sharing-drawing{display:block;position:absolute;inset:0;width:100%;height:100%}
-.art-sorava .art-cap,.art-sorava .art-bottom{color:#d4e4ed9c;font:9px var(--font-mono);letter-spacing:.045em}
+.art-sorava .art-cap,.art-sorava .art-bottom{color:#a9bdc5;font:9px var(--font-mono);letter-spacing:.045em}
 .art-sorava .art-cap{top:12px}
 .art-sorava .art-bottom{bottom:7px}
 .sorava-sharing-drawing text{font-family:var(--font-mono);pointer-events:none}
-.sorava-brand{font-size:15px;fill:#d9eff4;font-weight:700;letter-spacing:-.05em}
-.sorava-role{font-size:10px;fill:#83bcca;letter-spacing:.1em;font-weight:700}
-.sorava-object-name{fill:#c5fff0;font-size:18px;font-weight:750}
-.sorava-object-detail{fill:#d1e6eb;font-size:8.5px;letter-spacing:.035em}
-.sorava-object-data{fill:#94ddd0;font-size:7px;letter-spacing:.08em}
-.sorava-waiting-label{fill:#9bb6c9;font-size:10px;letter-spacing:.06em}
-.sorava-map-label{fill:#82b7c6;font-size:8px;letter-spacing:.08em}
-.sorava-footer-text{fill:#83acc1;font-size:7px;letter-spacing:.08em}
-.sorava-device-label{font-size:13px;letter-spacing:.22em;fill:#acc9d9;font-weight:700}
+.sorava-brand{font-size:15px;fill:#e8efec;font-weight:700;letter-spacing:-.05em}
+.sorava-role{font-size:10px;fill:#a9bdc5;letter-spacing:.1em;font-weight:700}
+.sorava-object-name{fill:#e8efec;font-size:18px;font-weight:750}
+.sorava-object-detail{fill:#b8c8cb;font-size:8.5px;letter-spacing:.035em}
+.sorava-object-data{fill:#65bfdf;font-size:7px;letter-spacing:.08em}
+.sorava-waiting-label{fill:#a9bdc5;font-size:10px;letter-spacing:.06em}
+.sorava-map-label{fill:#a9bdc5;font-size:8px;letter-spacing:.08em}
+.sorava-footer-text{fill:#a9bdc5;font-size:7px;letter-spacing:.08em}
+.sorava-device-label{font-size:13px;letter-spacing:.22em;fill:#e8efec;font-weight:700}
 .sorava-host-picked,.sorava-guest-received,.sorava-guest-synced-label{opacity:0}
 .sorava-guest-waiting,.sorava-guest-local-label{opacity:1}
 .sorava-guest-guiding-label{opacity:0}
 /* Reticles are selection/acquisition indicators, never pre-drawn decoration. */
 .sorava-host-reticle,.sorava-guest-reticle,.sorava-guest-direction{opacity:0}
-.sorava-direction-label{fill:#d1f7ed;font-size:9px;font-weight:700;letter-spacing:.06em;stroke:none}
+.sorava-direction-label{fill:#e8efec;font-size:9px;font-weight:700;letter-spacing:.06em;stroke:none}
 /* The guest starts aimed 32 SVG units to the right and 34 up, a visibly different field of view. */
 .sorava-guest-field{transform:translate(32px,-34px)}
 .sorava-wifi-node{opacity:.28}
@@ -426,7 +426,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .sheet-navigation button{min-width:83px;border:1px solid #bdc6bd;padding:10px 13px;background:transparent;color:inherit;cursor:pointer;font:10px var(--font-mono);letter-spacing:.03em}
 .sheet-navigation button:not(:disabled):hover{border-color:var(--ink);background:var(--ink);color:#fff}
 .sheet-navigation button:disabled{opacity:.35;cursor:not-allowed}
-.project-sheet[data-theme="sorava"]{--sheet-accent:#286ca6;--sheet-panel:#e0e8ed;--sheet-muted:#577189}
+.project-sheet[data-theme="sorava"]{--sheet-accent:#076b93;--sheet-panel:#eef2f1;--sheet-muted:#56727d}
 .project-sheet[data-theme="wallpipe-ar"]{--sheet-accent:#27674d;--sheet-panel:#e0eae2;--sheet-muted:#4d705c}
 .project-sheet[data-theme="nova"]{--sheet-accent:#237d91;--sheet-panel:#dce7e9;--sheet-muted:#48747d}
 .project-sheet[data-theme="university-ai"]{--sheet-accent:#3e6678;--sheet-panel:#e4e9eb;--sheet-muted:#61777f}
@@ -533,8 +533,8 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 
 /* DIY automatic equatorial mount — photographed hardware translated into site-native vector art. */
 .art-eqmount{
-  background:#0a202d;
-  color:#c3e6df;
+  background:#f1f2ef;
+  color:#1e292c;
   aspect-ratio:620 / 430;
 }
 .art-eqmount::before{content:none}
@@ -612,12 +612,12 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   100%{transform:translate(-40px,36px)}
 }
 @keyframes eq-target-select{
-  0%,85%,100%{transform:scale(1);stroke:#bce5df}
-  92%,96%{transform:scale(1.1);stroke:#e0fff3}
+  0%,85%,100%{transform:scale(1);stroke:#088fc9}
+  92%,96%{transform:scale(1.1);stroke:#076b93}
 }
 @keyframes eq-phone-accept{
-  0%,1%,17%,100%{transform:scale(1);stroke:#c2e9e3}
-  6%,12%{transform:scale(1.1);stroke:#f2fff9}
+  0%,1%,17%,100%{transform:scale(1);stroke:#088fc9}
+  6%,12%{transform:scale(1.1);stroke:#076b93}
 }
 @keyframes eq-radio-inner{
   0%,25%,44%,100%{opacity:.85}
@@ -636,7 +636,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 }
 @keyframes eq-controller-led{
   0%,43%,64%,100%{opacity:.85;filter:none}
-  49%,57%{opacity:1;filter:drop-shadow(0 0 6px #b2fff0)}
+  49%,57%{opacity:1;filter:drop-shadow(0 0 3px #088fc955)}
 }
 @keyframes eq-motor-turn{
   0%,58%{transform:rotate(0deg)}
@@ -657,7 +657,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 
 #physical-group-label{margin-top:40px;border-top:2px solid #2e525e}
 .project-sheet[data-theme="diy-equatorial-mount"]{
-  --sheet-accent:#32677b;--sheet-panel:#dce9e6;--sheet-muted:#49777b;
+  --sheet-accent:#076b93;--sheet-panel:#e9eeec;--sheet-muted:#56727d;
 }
 .project-sheet[data-theme="diy-equatorial-mount"] .sheet-visual .project-art{aspect-ratio:620/430}
 @media(max-width:760px){
@@ -712,12 +712,6 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 }
 #lock-preview-a,#lock-preview-b{scroll-margin-top:110px}
 
-/* Muted, near-monochrome Sorava and ESP32 equatorial-mount concept art.
-   Keep enough blue/teal to read the signal flow; leave all motion unchanged.
-   Scope both listing previews and full project sheets; do not affect other artwork. */
-.project-card[data-sheet-id="sorava"] .project-art,
-.project-card[data-sheet-id="diy-equatorial-mount"] .project-art,
-.project-sheet[data-theme="sorava"] .sheet-visual .project-art,
-.project-sheet[data-theme="diy-equatorial-mount"] .sheet-visual .project-art{
-  filter:grayscale(.40) saturate(.72) brightness(1.07) contrast(.95);
-}
+/* Sorava uses neutral graphite for a night-observation interface;
+   the equatorial-mount schematic uses a pale paper ground.
+   Artwork is recolored per SVG role; no blanket filter or backdrop gradient. */
