@@ -86,12 +86,12 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 
 /* WallPipe AR: two 90-degree elbows, hand-free four-spoke valve and see-through near wall.
    Static/reduced-motion content shows the final state; a hover or sheet replay
-   resets the scene and tells the 7.2-second story once. */
+   continuously replays the 7.2-second operation without moving the scene. */
 .art-wallpipe{--wp-motion-duration:7.2s}
 .project-card .art-wallpipe.is-hovering{--wp-motion-duration:4.5s}
 .art-wallpipe .pipe-drawing{display:block}
 .art-wallpipe .art-bottom{color:#ddf2e5b5}
-.wp-scene{transform:translate(7px,-3px) skewX(-3deg);transform-origin:50% 50%}
+.wp-scene{transform:none}
 .wp-pipe-assembly{opacity:1}
 .wp-wheel-spin{transform-box:fill-box;transform-origin:center;transform:rotate(900deg)}
 .wp-pipe-front{opacity:.27}
@@ -110,9 +110,6 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .art-wallpipe.is-complete .wp-status-closed{opacity:0}
 .art-wallpipe.is-complete .wp-status-open{opacity:1}
 @media(prefers-reduced-motion:no-preference){
-  .art-wallpipe:is(.is-hovering,.is-playing) .wp-scene{
-    animation:wp-perspective var(--wp-motion-duration) ease-in-out infinite both;
-  }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-pipe-assembly{
     animation:wp-pipe-appear var(--wp-motion-duration) ease-out infinite both;
   }
@@ -148,12 +145,8 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   }
 }
 @keyframes wp-pipe-appear{
-  0%,8%{opacity:0;transform:translateY(10px)}
-  26%,100%{opacity:1;transform:translateY(0)}
-}
-@keyframes wp-perspective{
-  0%,77%{transform:translate(0,0) skewX(0deg)}
-  100%{transform:translate(7px,-3px) skewX(-3deg)}
+  0%,8%{opacity:0}
+  26%,100%{opacity:1}
 }
 @keyframes wp-wheel-open{
   0%,28%{transform:rotate(0deg)}
