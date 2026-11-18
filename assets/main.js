@@ -49,7 +49,7 @@
     motionButton.type = "button";
     motionButton.className = "sheet-motion-play";
     motionButton.textContent = "REPLAY";
-    motionButton.setAttribute("aria-label", "自動赤道儀の動作アニメーションを再生");
+    motionButton.setAttribute("aria-label", "作品アニメーションを再生");
     motionButton.hidden = true;
     // Keep replay in the image panel's bottom-right caption row, not over the art.
     sheetVisualBottom?.appendChild(motionButton);
@@ -64,19 +64,31 @@
     let activeCard = null;
     let lastOpener = null;
     let motionTimer = null;
-    const motionDuration = 6400;
+    // One-shot concept motions: each source card is cloned into its work sheet.
+    const motions = {
+      "diy-equatorial-mount": {
+        selector: ".art-eqmount", duration: 6400,
+        finishAnimation: "eq-target-acquire", finishTarget: "eq-target-field"
+      },
+      sorava: {
+        selector: ".art-sorava", duration: 7200,
+        finishAnimation: "sorava-field-track", finishTarget: "sorava-skyfield"
+      }
+    };
+    const activeMotion = () => motions[activeCard?.dataset.sheetId] || null;
     const motionAllowed = () => !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     function resetSheetMotion() {
       if (motionTimer !== null) {
         window.clearTimeout(motionTimer);
         motionTimer = null;
       }
-      sheetVisual.querySelector(".art-eqmount")?.classList.remove("is-playing", "is-hovering", "is-complete");
+      for (const art of sheetVisual.querySelectorAll(".art-eqmount, .art-sorava")) {
+        art.classList.remove("is-playing", "is-hovering", "is-complete");
+      }
     }
     function finishSheetMotion(art) {
       if (!art?.classList.contains("is-playing")) return;
-      // The CSS animationend event is authoritative: the motor arrows have
-      // completed all whole turns at the exact instant the target is centered.
+      // A completed CSS motion is authoritative; preserve the final visual pose.
       art.classList.add("is-complete");
       art.classList.remove("is-playing");
       if (motionTimer !== null) {
@@ -85,30 +97,34 @@
       }
     }
     function playSheetMotion() {
-      const art = sheetVisual.querySelector(".art-eqmount");
+      const motion = activeMotion();
+      const art = motion && sheetVisual.querySelector(motion.selector);
       if (!dialog.open || !art || !motionAllowed()) return;
       resetSheetMotion();
-      // Restart a previously completed cycle, including while the pointer stays over the sheet.
+      // Restart exactly one cycle even when replaying the same open sheet.
       void art.getBoundingClientRect().width;
       art.classList.add("is-playing");
-      // Safety fallback if the browser suppresses animationend (e.g. a hidden tab).
-      motionTimer = window.setTimeout(() => finishSheetMotion(art), motionDuration + 250);
+      // Safety fallback if the browser suppresses animationend (e.g. hidden tab).
+      motionTimer = window.setTimeout(() => finishSheetMotion(art), motion.duration + 250);
     }
     motionButton.addEventListener("click", playSheetMotion);
-    // The listing's transparent open-sheet button sits above the art. Listen
-    // on the media parent so the card animates even when the pointer hits it.
-    const listingMedia = document.querySelector('.project-card[data-sheet-id="diy-equatorial-mount"] .project-media');
-    const listingArt = listingMedia?.querySelector(".art-eqmount");
-    if (listingMedia && listingArt) {
-      listingMedia.addEventListener("pointerenter", event => {
+    // On listing cards, hover starts a single cycle even with the transparent
+    // sheet-opening button above the image. In work sheets it autoplays instead.
+    const listingArts = [];
+    for (const [id, motion] of Object.entries(motions)) {
+      const media = document.querySelector(`.project-card[data-sheet-id="${id}"] .project-media`);
+      const art = media?.querySelector(motion.selector);
+      if (!media || !art) continue;
+      listingArts.push(art);
+      media.addEventListener("pointerenter", event => {
         if (event.pointerType === "mouse" && motionAllowed() &&
             window.matchMedia("(hover:hover) and (pointer:fine)").matches) {
-          listingArt.classList.remove("is-complete");
-          listingArt.classList.add("is-hovering");
+          art.classList.remove("is-complete");
+          art.classList.add("is-hovering");
         }
       });
-      listingMedia.addEventListener("pointerleave", () => {
-        listingArt.classList.remove("is-hovering", "is-complete");
+      media.addEventListener("pointerleave", () => {
+        art.classList.remove("is-hovering", "is-complete");
       });
     }
     const eligible = () => cards.filter(card => !card.hidden && card.querySelector("[data-open-sheet]"));
@@ -116,7 +132,9 @@
     function openSheet(card, trigger) {
       if (!card || !card.querySelector("[data-open-sheet]")) return;
       resetSheetMotion();
-      listingArt?.classList.remove("is-hovering", "is-complete");
+      for (const listingArt of listingArts) {
+        listingArt.classList.remove("is-hovering", "is-complete");
+      }
       if (!dialog.open && trigger instanceof HTMLElement) lastOpener = trigger;
       const selection = eligible();
       const current = selection.indexOf(card);
@@ -138,15 +156,16 @@
       sheetVisualIndex.textContent = position;
       const art = card.querySelector(".project-art")?.cloneNode(true);
       if (art) {
-        if (card.dataset.sheetId === "diy-equatorial-mount") {
+        const motion = motions[card.dataset.sheetId];
+        if (motion) {
           art.addEventListener("animationend", event => {
-            if (event.animationName === "eq-target-acquire" &&
-                event.target.classList.contains("eq-target-field")) {
+            if (event.animationName === motion.finishAnimation &&
+                event.target.classList.contains(motion.finishTarget)) {
               finishSheetMotion(art);
             }
           });
-          // The sheet animation belongs to the sheet lifecycle, not pointer
-          // position. It autoplays once on open; only REPLAY restarts it.
+          // Work sheets never depend on pointer position.
+          // Direct opening and NEXT/PREV both initiate one full cycle.
         }
         // SVG identifiers must be unique when the original art remains in the listing.
         for (const node of art.querySelectorAll("[id]")) {
@@ -165,8 +184,9 @@
       } else {
         sheetVisual.replaceChildren();
       }
-      const showMotion = card.dataset.sheetId === "diy-equatorial-mount" && motionAllowed();
+      const showMotion = Boolean(motions[card.dataset.sheetId]) && motionAllowed();
       motionButton.hidden = !showMotion;
+      motionButton.setAttribute("aria-label", `${sheetTitle.textContent} のアニメーションを再生`);
       if (sheetVisualBrand) sheetVisualBrand.hidden = showMotion;
       // Each sheet starts at the beginning of its own right-side content.
       if (sheetCopySide) sheetCopySide.scrollTop = 0;
