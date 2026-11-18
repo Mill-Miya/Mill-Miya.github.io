@@ -72,7 +72,7 @@
       },
       sorava: {
         selector: ".art-sorava", duration: 7200,
-        finishAnimation: "sorava-field-track", finishTarget: "sorava-skyfield"
+        finishAnimation: "sorava-guest-receive", finishTarget: "sorava-guest-received"
       }
     };
     const activeMotion = () => motions[activeCard?.dataset.sheetId] || null;
