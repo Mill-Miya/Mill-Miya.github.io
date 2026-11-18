@@ -18,7 +18,7 @@
   <link rel="icon" href="assets/favicon-48.png?v=3" sizes="48x48" type="image/png">
   <link rel="icon" href="assets/favicon.svg?v=3" type="image/svg+xml" sizes="any">
   <link rel="apple-touch-icon" href="assets/icon-180.png?v=3">
-  <link rel="stylesheet" href="assets/style.css?v=25">
+  <link rel="stylesheet" href="assets/style.css?v=26">
   <script src="assets/main.js?v=13" defer></script>
   <title>Mill-Miya — Selected Works</title>
 </head>
@@ -172,22 +172,75 @@
   </svg>
   <div class="art-bottom"><span>SORAVA / SKYSHARE</span><span>FIND · POINT · SHARE</span></div>
 </div><button type="button" class="project-media-hit" data-open-sheet aria-label="Sorava / SkyShare の紹介シートを開く"></button></div><div class="project-info"><div class="project-topline"><span class="project-number">PROJECT / 001</span><span class="project-year">WEB APP</span></div><h3><button type="button" class="project-title-button" data-open-sheet>Sorava / SkyShare</button></h3><p>天体の位置計算、観望対象の案内、ホストとゲスト間のリアルタイム共有をまとめた観望会支援アプリ。</p><div class="tag-row"><span>TypeScript</span><span>React</span><span>Astronomy</span></div><div class="project-links"><button type="button" class="sheet-link" data-open-sheet>View sheet ↗</button><a href="https://mill-miya.github.io/SkyShare/" target="_blank" rel="noopener noreferrer">Live site ↗</a></div></div><template class="project-sheet-detail"><section class="sheet-detail-section" aria-label="Project concept"><div class="sheet-detail-heading">01 / CONCEPT</div><p class="sheet-purpose">観望会で、今見ている天体や場所を参加者同士でリアルタイムに共有できるWebアプリ。</p></section><section class="sheet-detail-section" aria-label="Key features"><div class="sheet-detail-heading">02 / KEY FEATURES</div><div class="sheet-feature-list"><div class="sheet-feature"><span class="sheet-feature-index">01</span><div><h3>観測情報の共有</h3><p>見ている天体や場所・方向を共有</p></div></div><div class="sheet-feature"><span class="sheet-feature-index">02</span><div><h3>天体案内</h3><p>月や惑星の位置を計算して表示</p></div></div><div class="sheet-feature"><span class="sheet-feature-index">03</span><div><h3>ホスト・ゲスト連携</h3><p>観望会の案内役と参加者をつなぐ</p></div></div></div></section><section class="sheet-note" aria-label="Development notes"><div class="sheet-detail-heading">DEVELOPMENT NOTES</div><p>開発中。リアルタイム共有には別途サーバーを使用。</p></section></template></article>
-        <article class="project-card featured" data-tags="web engineering" data-project="02" data-sheet-id="wallpipe-ar"><div class="project-media"><div class="project-art art-wallpipe" aria-label="配管とバルブをモチーフにしたWallPipe ARのイメージビジュアル">
+        <article class="project-card featured" data-tags="web engineering" data-project="02" data-sheet-id="wallpipe-ar"><div class="project-media"><div class="project-art art-wallpipe" aria-label="壁面に2か所の曲がりを持つ仮想金属配管が現れ、4本スポークの丸ハンドルが回ると配管内部の水流が見えるWallPipe ARの概念アニメーション">
             <div class="art-cap"><span>02 / AUGMENTED REALITY</span><span>EXPERIMENT</span></div>
             <svg class="pipe-drawing" aria-hidden="true" viewBox="0 0 620 430" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <defs><linearGradient id="pipe" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c4e8cc"/><stop offset=".4" stop-color="#7ab995"/><stop offset="1" stop-color="#23533e"/></linearGradient></defs>
-              <path d="M70 310H202V130H405V265H562" stroke="#2a5845" stroke-width="62" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M70 310H202V130H405V265H562" stroke="url(#pipe)" stroke-width="42" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M70 300H192V120H395V255H562" stroke="#e6ffec" stroke-opacity=".45" stroke-width="3" stroke-linejoin="round"/>
-              <circle cx="405" cy="130" r="55" fill="#16352c" stroke="#b4dcc3" stroke-width="8"/>
-              <circle cx="405" cy="130" r="29" stroke="#c7ffdb" stroke-width="8"/>
-              <path d="M366 91L444 169M444 91L366 169" stroke="#d3f5d9" stroke-width="7"/>
-              <circle cx="202" cy="310" r="15" fill="#d7ffdd"/><circle cx="202" cy="310" r="7" fill="#21583c"/>
-              <path d="M485 265H560" stroke="#c0ffff" stroke-width="4" stroke-linecap="round" stroke-dasharray="5 14"/>
-              <g stroke="#c7f0d2" stroke-opacity=".5" stroke-width="1"><path d="M70 335V360M562 240V218M370 64V31"/><path d="M70 346H160M475 230H562" stroke-dasharray="4 8"/></g>
+              <defs>
+                <linearGradient id="wp-wall" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e2eae3"/><stop offset=".52" stop-color="#aebdb5"/><stop offset="1" stop-color="#748e83"/></linearGradient>
+                <linearGradient id="wp-metal" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f1f8f2"/><stop offset=".23" stop-color="#c2d8d1"/><stop offset=".53" stop-color="#7faaa0"/><stop offset=".85" stop-color="#477a72"/><stop offset="1" stop-color="#31554f"/></linearGradient>
+                <linearGradient id="wp-bore" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#0b444b"/><stop offset=".5" stop-color="#125d67"/><stop offset="1" stop-color="#082f37"/></linearGradient>
+                <linearGradient id="wp-valve" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c3d9ce"/><stop offset=".4" stop-color="#61877b"/><stop offset="1" stop-color="#284e48"/></linearGradient>
+              </defs>
+              <!-- A simplified wall plane provides depth cues, not actual pipe detection. -->
+              <path class="wp-wall-plane" d="M56 70L539 45L574 360L80 388Z" fill="url(#wp-wall)" opacity=".9"/>
+              <path d="M92 117L549 96M87 188L557 166M82 259L564 237M77 329L572 309M168 65L192 382M289 58L305 376M412 52L419 369" stroke="#365d55" stroke-opacity=".14" stroke-width="1"/>
+              <path d="M56 70L539 45L574 360L80 388Z" stroke="#c9e9da" stroke-width="1.7" opacity=".75"/>
+              <g class="wp-tracking-frame" stroke="#d6fff0" stroke-width="2" opacity=".85">
+                <path d="M85 116V91H111M520 91H545V116M85 323V347H111M520 323V347H494"/>
+                <path d="M301 91V105M294 98H308M301 337V351M294 344H308" stroke-opacity=".48"/>
+              </g>
+              <g class="wp-scene">
+                <g class="wp-pipe-assembly" stroke-linecap="round" stroke-linejoin="round">
+                  <!-- Exactly two 90-degree elbows: right, up, right. -->
+                  <path class="wp-pipe-shadow" d="M98 300H205V183H523" stroke="#102d2d" stroke-opacity=".45" stroke-width="55"/>
+                  <path class="wp-pipe-outline" d="M98 290H205V173H523" stroke="#234841" stroke-width="52"/>
+                  <path class="wp-pipe-back" d="M98 290H205V173H523" stroke="#72998d" stroke-width="45"/>
+                  <path class="wp-pipe-bore" d="M98 290H205V173H523" stroke="url(#wp-bore)" stroke-width="31"/>
+                  <path class="wp-water-core" d="M98 290H205V173H523" stroke="#58d6f2" stroke-width="13" opacity=".96"/>
+                  <path class="wp-water-stream" d="M98 290H205V173H523" stroke="#e4fdff" stroke-width="5" stroke-dasharray="11 18"/>
+                  <!-- The metallic near wall initially hides the water, then becomes translucent. -->
+                  <path class="wp-pipe-front" d="M98 290H205V173H523" stroke="url(#wp-metal)" stroke-width="40"/>
+                  <path class="wp-pipe-highlight" d="M98 275H190V158H517" stroke="#f4fff7" stroke-width="3" opacity=".66"/>
+                  <g class="wp-pipe-collars" stroke="#cce5d8" stroke-width="3" fill="#315f55">
+                    <path d="M117 267V313M133 267V313M489 149V197M505 149V197" opacity=".85"/>
+                    <rect x="322" y="142" width="14" height="62" rx="3" fill="url(#wp-valve)"/>
+                    <rect x="387" y="142" width="14" height="62" rx="3" fill="url(#wp-valve)"/>
+                  </g>
+                  <g class="wp-valve">
+                    <rect x="329" y="145" width="65" height="56" rx="11" fill="url(#wp-valve)" stroke="#d3e9dc" stroke-width="3"/>
+                    <rect x="343" y="154" width="37" height="38" rx="8" fill="#294c46" stroke="#88b6a8" stroke-width="2"/>
+                    <path d="M360 145V113" stroke="#d3e9de" stroke-width="13"/>
+                    <path d="M360 145V113" stroke="#52776d" stroke-width="7"/>
+                    <rect x="347" y="121" width="26" height="10" rx="3" fill="#91ada4" stroke="#d7ece2" stroke-width="2"/>
+                    <!-- A four-spoke handwheel with a distinctive index rivet shows rotation. -->
+                    <g class="wp-wheel-tilt" transform="translate(360 93) scale(1 .72)">
+                      <g class="wp-wheel-spin">
+                        <circle r="46" fill="#1a3a36" stroke="#365b52" stroke-width="13"/>
+                        <circle r="46" stroke="#c5dfd2" stroke-width="6"/>
+                        <circle r="37" stroke="#749a8f" stroke-width="2"/>
+                        <path d="M0-40V40M-40 0H40" stroke="#c4ded1" stroke-width="10"/>
+                        <path d="M0-40V40M-40 0H40" stroke="#567d72" stroke-width="3"/>
+                        <circle r="14" fill="#426c62" stroke="#e3f1e8" stroke-width="3"/>
+                        <circle cx="0" cy="-46" r="5.5" fill="#e2ad5c" stroke="#ffe7b4" stroke-width="1.3"/>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+              </g>
+              <g class="wp-status-closed" font-family="monospace" font-size="10" letter-spacing="1" fill="#e9f6ed">
+                <rect x="387" y="261" width="158" height="32" rx="3" fill="#183f37" opacity=".9"/>
+                <circle cx="400" cy="277" r="4" fill="#e2b57e"/>
+                <text x="412" y="281">VALVE / CLOSED</text>
+              </g>
+              <g class="wp-status-open" font-family="monospace" font-size="10" letter-spacing="1" fill="#e9f6ed">
+                <rect x="387" y="261" width="158" height="32" rx="3" fill="#183f37" opacity=".9"/>
+                <circle cx="400" cy="277" r="4" fill="#56d3bd"/>
+                <text x="412" y="281">VALVE / OPEN</text>
+              </g>
+              <text x="102" y="352" font-family="monospace" font-size="10" letter-spacing="1.3" fill="#d8f1e1">VIRTUAL PIPE · SIMULATED FLOW</text>
             </svg>
             <div class="wallpipe-callout"><span class="callout-indicator"></span> SPATIAL / FLOW CONTROL</div>
-            <div class="art-bottom"><span>AR / 3D / HAND</span><span>INTERACTIVE PROTOTYPE</span></div>
+            <div class="art-bottom"><span>AR / 3D / FLOW</span><span>INTERACTIVE PROTOTYPE</span></div>
           </div><button type="button" class="project-media-hit" data-open-sheet aria-label="WallPipe AR の紹介シートを開く"></button></div><div class="project-info"><div class="project-topline"><span class="project-number">PROJECT / 002</span><span class="project-year">AR EXPERIMENT</span></div><h3><button type="button" class="project-title-button" data-open-sheet>WallPipe AR</button></h3><p>現実空間に仮想配管を配置し、バルブの操作や水流表現を検証するブラウザベースのAR実験。</p><div class="tag-row"><span>JavaScript</span><span>3D / AR</span><span>Interaction</span></div><div class="project-links"><button type="button" class="sheet-link" data-open-sheet>View sheet ↗</button><a href="https://mill-miya.github.io/wallpipe-ar/" target="_blank" rel="noopener noreferrer">Live site ↗</a></div></div><template class="project-sheet-detail"><section class="sheet-detail-section" aria-label="Project concept"><div class="sheet-detail-heading">01 / CONCEPT</div><p class="sheet-purpose">現実空間に仮想配管を重ね、手をかざしてバルブを操作する体験ができるARアプリ。</p></section><section class="sheet-detail-section" aria-label="Key features"><div class="sheet-detail-heading">02 / KEY FEATURES</div><div class="sheet-feature-list"><div class="sheet-feature"><span class="sheet-feature-index">01</span><div><h3>手による操作</h3><p>手をかざす・動かすことでバルブを操作</p></div></div><div class="sheet-feature"><span class="sheet-feature-index">02</span><div><h3>水流の可視化</h3><p>バルブの開度に応じて流れが変化</p></div></div><div class="sheet-feature"><span class="sheet-feature-index">03</span><div><h3>配管生成</h3><p>給水・空調・工場設備の配管を自動生成</p></div></div></div></section><section class="sheet-note" aria-label="Development notes"><div class="sheet-detail-heading">DEVELOPMENT NOTES</div><p>試作・検証中。実際の配管を検出するものではない。</p></section></template></article>
         <div class="project-group-label" id="archive-group-label"><span>PROJECT ARCHIVE / 04</span><span>Archive</span></div>
         <article class="project-card" data-tags="web ai" data-project="03" data-sheet-id="nova"><div class="project-media"><div class="project-art art-nova" aria-label="発光する円形コアをモチーフにしたN.O.V.A.のイメージビジュアル"><div class="art-cap"><span>03 / INTERFACE</span><span>AI PRESENCE</span></div><div class="nova-orbits" aria-hidden="true"><div class="nova-core"></div><div class="nova-dot"></div></div><div class="nova-ui-caption"><span>NEURAL ORBITAL VIRTUAL ASSISTANT</span><strong>N.O.V.A.</strong></div><div class="art-bottom"><span>UI / MOTION</span><span>VISUAL SIMULATION</span></div></div><button type="button" class="project-media-hit" data-open-sheet aria-label="N.O.V.A. の紹介シートを開く"></button></div><div class="project-info"><div class="project-topline"><span class="project-number">PROJECT / 003</span><span class="project-year">VISUAL STUDY</span></div><h3><button type="button" class="project-title-button" data-open-sheet>N.O.V.A.</button></h3><p>AIの状態や存在感を、光・動き・HUDで表現するインターフェース実験。</p><div class="tag-row"><span>Canvas</span><span>UI / UX</span><span>Motion</span></div><div class="project-links"><button type="button" class="sheet-link" data-open-sheet>View sheet ↗</button><a href="https://mill-miya.github.io/nova-visual-playground/visual-playground/" target="_blank" rel="noopener noreferrer">Live site ↗</a></div></div><template class="project-sheet-detail"><section class="sheet-detail-section" aria-label="Project concept"><div class="sheet-detail-heading">01 / CONCEPT</div><p class="sheet-purpose">AIの状態や存在感を光・動き・HUDで表現するインターフェース。University AIと連携して動作する。</p></section><section class="sheet-detail-section" aria-label="Key features"><div class="sheet-detail-heading">02 / KEY FEATURES</div><div class="sheet-feature-list"><div class="sheet-feature"><span class="sheet-feature-index">01</span><div><h3>状態表現</h3><p>思考・発話・待機などの状態を視覚化</p></div></div><div class="sheet-feature"><span class="sheet-feature-index">02</span><div><h3>可変インターフェース</h3><p>コアから詳細HUDへ展開</p></div></div><div class="sheet-feature"><span class="sheet-feature-index">03</span><div><h3>アプリ連携</h3><p>University AIと組み合わせて利用可能</p></div></div></div></section><section class="sheet-note" aria-label="Development notes"><div class="sheet-detail-heading">DEVELOPMENT NOTES</div><p>University AIとの連携を実装済み。視覚表現や操作性を継続改善中。</p></section></template></article>
