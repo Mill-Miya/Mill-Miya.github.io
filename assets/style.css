@@ -365,9 +365,6 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   .sheet-motion-play{min-height:27px;padding:5px 8px}
 }
 .sheet-visual .art-eqmount{cursor:default}
-@media(hover:hover) and (pointer:fine){
-  .sheet-visual .art-eqmount{cursor:crosshair}
-}
 .art-eqmount .eq-target-ring{transform-box:view-box;transform-origin:87px 219px}
 .art-eqmount .eq-phone-target{transform-box:view-box;transform-origin:212px 219px}
 .art-eqmount .eq-small-rotor{transform-box:view-box;transform-origin:459px 283px}
