@@ -254,7 +254,7 @@ with sync_playwright() as p:
               const clean = str => (str || '').replace(/\\s+/g,'');
               return {field:clean(beforeMovement?.transform),motor:clean(motorStart?.transform)};
             }""")
-            if timing != {"field":"translate(0px,0px)", "motor":"rotate(0deg)"}:
+            if timing["field"] not in ("translate(0px)", "translate(0px,0px)") or timing["motor"]!="rotate(0deg)":
                 fail("field movement is not synchronized with motor start: "+str(timing), width)
             if "1800" not in page.locator(".eq-small-rotor").first.evaluate(
                 "(el) => el.getAnimations().find(x=>x.animationName==='eq-motor-turn')?.effect.getKeyframes().at(-1).transform || ''"):
