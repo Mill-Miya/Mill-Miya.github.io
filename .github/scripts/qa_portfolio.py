@@ -203,6 +203,19 @@ with sync_playwright() as p:
         if wallpipe.locator(".wp-upstream-stream").get_attribute("stroke-dasharray")!= \
                 wallpipe.locator(".wp-flow-trace").get_attribute("stroke-dasharray"):
             fail("Moving water dashes should have matching cadence on both sides", width)
+        for left, right in (
+            (".wp-upstream-window",".wp-flow-cutaway"),
+            (".wp-upstream-core",".wp-water-core"),
+            (".wp-upstream-stream",".wp-water-stream"),
+            (".wp-upstream-stream",".wp-flow-trace")
+        ):
+            l=wallpipe.locator(left)
+            r=wallpipe.locator(right)
+            for attr in ("stroke","stroke-width"):
+                if l.get_attribute(attr)!=r.get_attribute(attr):
+                    fail("Right water color and thickness must match left: "+left+" "+right+" "+attr, width)
+            if left==".wp-upstream-core" and l.get_attribute("stroke-opacity")!=r.get_attribute("stroke-opacity"):
+                fail("Right-side core opacity must match the left", width)
         for cls in (".wp-upstream-window", ".wp-upstream-core", ".wp-upstream-stream"):
             if wallpipe.locator(cls).count()!=1:
                 fail("Upstream flow layer is missing: "+cls, width)
@@ -352,10 +365,10 @@ with sync_playwright() as p:
                   downOffset:parseFloat(getComputedStyle(downstream).strokeDashoffset)
                 };
               };
-              return {initial:snap(0),closed:snap(2800),transition:snap(3600),
-                      opening:snap(3450),halfway:snap(4200),
-                      speedStart:snap(4500),speedEnd:snap(6000),
-                      finished:snap(7050)};
+              return {initial:snap(0),preopen:snap(2200),closed:snap(2800),
+                      transition:snap(3600),opening:snap(3450),
+                      halfway:snap(4200),speedStart:snap(4500),
+                      speedEnd:snap(6000),finished:snap(7050)};
             }""")
             if not front:
                 fail("Upstream visibility gating or either flow animation is missing", width)
@@ -367,8 +380,8 @@ with sync_playwright() as p:
                 fail("Left-side water must appear only as the near wall becomes translucent: "+str(front), width)
             if front["finished"]["upGroupOpacity"]<.98:
                 fail("The left water must be visible when the near wall is translucent: "+str(front), width)
-            if front["initial"]["rightLength"]>1 or front["closed"]["rightLength"]>1:
-                fail("The outlet must remain dry while the valve is closed: "+str(front), width)
+            if front["initial"]["rightLength"]>1 or front["preopen"]["rightLength"]>1:
+                fail("The right outlet must remain dry until the valve begins opening: "+str(front), width)
             if abs(front["closed"]["upOffset"]-front["initial"]["upOffset"])<30:
                 fail("The concealed upstream supply must continue moving before opening: "+str(front), width)
             if (not 0<front["opening"]["rightLength"]<70 or
@@ -380,6 +393,28 @@ with sync_playwright() as p:
             downstream_advance=abs(front["speedEnd"]["downOffset"]-front["speedStart"]["downOffset"])
             if abs(upstream_advance-downstream_advance)>1.0:
                 fail("Left and right moving water have unequal speed: "+str(front), width)
+            # Right-side fill-front speed must match both moving stripe layers:
+            # all three travel 170 units between 31.45% and 100% of playback.
+            synchronization=pipe_sheet.evaluate("""art=>{
+              const target=['.wp-reveal-right','.wp-water-stream','.wp-flow-trace'];
+              const anims=target.map(sel=>{
+                const el=art.querySelector(sel);
+                return {sel,el,a:el.getAnimations().find(a=>
+                  a.animationName===(sel==='.wp-reveal-right'?'wp-propagate-right':'wp-water-move'))};
+              });
+              if(anims.some(x=>!x.a)) return null;
+              const sample=t=>{
+                anims.forEach(x=>x.a.currentTime=t);
+                return anims.map(({el,sel})=>
+                  parseFloat(getComputedStyle(el)[sel==='.wp-reveal-right'?'strokeDasharray':'strokeDashoffset']));
+              };
+              return {start:sample(2200),mid:sample(4500),finish:sample(7050)};
+            }""")
+            if not synchronization:
+                fail("Missing synchronized right-side front and striping", width)
+            for instant,offsets in synchronization.items():
+                if abs(offsets[0]+offsets[1])>1.0 or abs(offsets[1]-offsets[2])>1.0:
+                    fail("Right-side water front, inner and outer lines must move in sync at "+instant+": "+str(synchronization), width)
             if pipe_sheet.locator(".wp-upstream-stream").evaluate(
                     "(el) => getComputedStyle(el).animationIterationCount")!="1":
                 fail("The video must stop after its single cycle", width)
