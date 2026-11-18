@@ -174,6 +174,17 @@ with sync_playwright() as p:
             fail("Old circular end plates must not occlude pipe ends", width)
         if wallpipe.locator(".wp-pipe-assembly").get_attribute("stroke-linecap")!="butt":
             fail("Pipe sections should terminate cleanly without round caps", width)
+        if wallpipe.locator(".wp-mouth-in path").count()!=3 or wallpipe.locator(".wp-mouth-out path").count()!=3:
+            fail("Both pipe mouths must flare without oval end caps", width)
+        if wallpipe.locator(".wp-mouth-in ellipse, .wp-mouth-out ellipse").count():
+            fail("Flared pipe mouths must not be capped by ellipse faces", width)
+        if wallpipe.locator(".wp-mouth-in").evaluate("(el) => el.getBBox().height")<77 or \
+                wallpipe.locator(".wp-mouth-out").evaluate("(el) => el.getBBox().height")<77:
+            fail("Flared mouths must be wider than the 52px nominal tube", width)
+        if wallpipe.locator('.wp-wheel-spin circle[fill="#e2ad5c"], .wp-wheel-spin circle[stroke="#ffe7b4"]').count():
+            fail("Orange wheel position marker must be removed", width)
+        if wallpipe.locator(".wp-wheel-hub").count()!=1 or wallpipe.locator(".wp-wheel-hub circle").count()!=2:
+            fail("Wheel hub must remain stationary outside rotating spokes", width)
         wheel_placement=wallpipe.locator(".wp-wheel-tilt").get_attribute("transform")
         if wheel_placement!="translate(364 173) scale(.70 .70)":
             fail("Handwheel is not centered over the marked valve housing: "+str(wheel_placement), width)
@@ -213,6 +224,25 @@ with sync_playwright() as p:
             if pipe_art.locator(".wp-wheel-spin").evaluate(
                     "(el) => getComputedStyle(el).animationName")!="wp-wheel-open":
                 fail("WallPipe handwheel did not animate on hover", width)
+            pivot_deviation=pipe_art.evaluate("""art => {
+              const wheel=art.querySelector('.wp-wheel-spin');
+              const hub=art.querySelector('.wp-wheel-hub');
+              const spinning=wheel.getAnimations().find(a=>a.animationName==='wp-wheel-open');
+              if(!spinning) return Infinity;
+              const center=node=>{
+                const r=node.getBoundingClientRect();
+                return {x:r.x+r.width/2,y:r.y+r.height/2};
+              };
+              let max=0;
+              for(const time of [0,550,1575,2475,3375,4450]){
+                spinning.currentTime=time;
+                const a=center(wheel),b=center(hub);
+                max=Math.max(max,Math.hypot(a.x-b.x,a.y-b.y));
+              }
+              return max;
+            }""")
+            if pivot_deviation>.75:
+                fail("WallPipe wheel center drifts during rotation: "+str(pivot_deviation), width)
             preview_seconds=pipe_art.locator(".wp-wheel-spin").evaluate(
                 "(el) => parseFloat(getComputedStyle(el).animationDuration)")
             if pipe_art.locator(".wp-wheel-spin").evaluate(
