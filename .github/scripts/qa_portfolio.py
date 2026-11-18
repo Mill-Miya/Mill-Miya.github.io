@@ -193,20 +193,27 @@ with sync_playwright() as p:
         if wallpipe.locator(".wp-scene").evaluate(
                 "(el) => getComputedStyle(el).transform")!="none":
             fail("WallPipe scene must remain rigid without camera sway", width)
-        if wallpipe.locator(".wp-pipe-geometry").get_attribute("mask")!="url(#wp-build-geometry)":
-            fail("Full pipe rendering must be progressively constructed through its assembly mask", width)
-        if wallpipe.locator("mask#wp-build-geometry").count()!=1:
-            fail("Three-stage assembly mask missing", width)
-        for cls in (".wp-build-left",".wp-build-middle",".wp-build-right"):
-            if wallpipe.locator(cls).count()!=1:
-                fail("Missing pipe assembly stage: "+cls, width)
-        if wallpipe.locator(".wp-build-left").get_attribute("d")!= \
-                "M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H335":
-            fail("The inlet must trace both actual pipe elbows before the valve", width)
-        if wallpipe.locator(".wp-build-right").get_attribute("d")!="M393 173H523":
-            fail("The outlet must be drawn independently from the valve to the open right end", width)
-        if wallpipe.locator(".wp-valve").evaluate("(el) => el.parentElement.classList.contains('wp-pipe-geometry')"):
-            fail("The valve must reveal separately from the inlet and outlet masking", width)
+        if wallpipe.locator("#wp-pipe-template").count()!=1:
+            fail("Reusable pipe assembly geometry template is missing", width)
+        if wallpipe.locator("#wp-pipe-template").get_attribute("mask"):
+            fail("Old growing stroke mask must no longer hide the physical parts", width)
+        for name,clip in (("left","wp-part-left-clip"),
+                          ("center","wp-part-center-clip"),
+                          ("right","wp-part-right-clip")):
+            part=wallpipe.locator(".wp-part-"+name)
+            if part.count()!=1 or part.get_attribute("clip-path")!="url(#"+clip+")":
+                fail("Rigid assembled pipe section is missing: "+name, width)
+            if part.locator("use").get_attribute("href")!="#wp-pipe-template":
+                fail("All rigid pipe parts must reuse the same accurate geometry", width)
+        if wallpipe.locator(".wp-coupler-locks .wp-lock-left").count()!=1 or \
+                wallpipe.locator(".wp-coupler-locks .wp-lock-right").count()!=1:
+            fail("Subtle fixed joint collars are missing", width)
+        if wallpipe.locator(".wp-valve").evaluate(
+                "(el) => el.parentElement.classList.contains('wp-pipe-geometry')"):
+            fail("The valve must dock independently, not ride with the moving pipes", width)
+        for old in (".wp-build-left",".wp-build-right",".wp-build-middle"):
+            if wallpipe.locator(old).count():
+                fail("Old stretching reveal construction survived: "+old, width)
 
         if wallpipe.locator("mask#wp-flow-reveal").count()!=1:
             fail("Valve-originated flow mask is missing", width)
@@ -227,7 +234,7 @@ with sync_playwright() as p:
                        '.wp-upstream-window','.wp-upstream-core','.wp-upstream-stream']
             .map(s=>svg.querySelector(s));
           if(nodes.some(x=>!x)) return null;
-          const root=svg.querySelector('.wp-pipe-assembly');
+          const root=svg.querySelector('#wp-pipe-template');
           return nodes.map(el=>{
             const ordered=[...root.querySelectorAll('*')];
             return ordered.indexOf(el);
@@ -374,51 +381,55 @@ with sync_playwright() as p:
             page.wait_for_function("""() =>
                 document.querySelector('#sheet-visual .art-wallpipe')?.classList.contains('is-playing')
             """, timeout=1500)
-            # Validate the actual three-stage masked assembly, not just CSS presence.
-            # During 0–0.8s only the upstream metal tube advances; 0.8–1.4s
-            # introduces the stationary valve, followed by the outlet until 2.1s.
-            assembly_stages=pipe_sheet.evaluate("""art=>{
-              const sels=['.wp-build-left','.wp-build-middle','.wp-valve','.wp-build-right'];
-              const elements=sels.map(sel=>art.querySelector(sel));
-              const names=['wp-build-left-stage','wp-build-valve-stage',
-                           'wp-build-valve-stage','wp-build-right-stage'];
-              const anims=elements.map((el,i)=>el?.getAnimations().find(a=>a.animationName===names[i]));
+            # Rigid module docking at 0–0.7s, 0.7–1.35s, 1.35–2.05s.
+            # Validate translations and joints rather than just opacity:
+            # components must be fully built and physically fixed after seating.
+            modules=pipe_sheet.evaluate("""art=>{
+              const selectors=['.wp-part-left','.wp-part-center','.wp-valve',
+                               '.wp-part-right','.wp-lock-left','.wp-lock-right'];
+              const names=['wp-dock-left','wp-dock-center','wp-dock-center',
+                           'wp-dock-right','wp-coupler-left','wp-coupler-right'];
+              const els=selectors.map(sel=>art.querySelector(sel));
+              const anims=els.map((el,i)=>
+                el?.getAnimations().find(a=>a.animationName===names[i]));
               if(anims.some(a=>!a)) return null;
               const snap=t=>{
                 anims.forEach(a=>a.currentTime=t);
-                return {
-                  inlet:parseFloat(getComputedStyle(elements[0]).strokeDashoffset),
-                  middle:parseFloat(getComputedStyle(elements[1]).opacity),
-                  valve:parseFloat(getComputedStyle(elements[2]).opacity),
-                  outlet:parseFloat(getComputedStyle(elements[3]).strokeDashoffset)
-                };
+                return els.map(el=>{
+                  const cs=getComputedStyle(el);
+                  const m=new DOMMatrix(cs.transform==='none'?undefined:cs.transform);
+                  return {opacity:parseFloat(cs.opacity),x:m.m41,y:m.m42};
+                });
               };
-              return {start:snap(0),inletMid:snap(400),inletDone:snap(820),
-                      valveMid:snap(1150),valveDone:snap(1450),
-                      outletMid:snap(1750),outletDone:snap(2150)};
+              return {start:snap(0),inletMove:snap(350),inletDone:snap(700),
+                valveMove:snap(1050),valveDone:snap(1350),
+                outletMove:snap(1750),outletDone:snap(2150)};
             }""")
-            if not assembly_stages:
-                fail("SVG stages must animate inlet, separate valve and outlet in order", width)
-            if (assembly_stages["start"]["inlet"]<330 or
-                    assembly_stages["start"]["valve"]>.01 or
-                    assembly_stages["start"]["outlet"]<145):
-                fail("No pipe or valve should appear at the start: "+str(assembly_stages), width)
-            if not 20<assembly_stages["inletMid"]["inlet"]<330:
-                fail("Inlet must extend progressively, not pop in: "+str(assembly_stages), width)
-            if (assembly_stages["inletDone"]["inlet"]>1 or
-                    assembly_stages["inletDone"]["outlet"]<145):
-                fail("Left pipe must complete before right pipe starts: "+str(assembly_stages), width)
-            if (not .1<assembly_stages["valveMid"]["valve"]<.9 or
-                    not .1<assembly_stages["valveMid"]["middle"]<.9 or
-                    assembly_stages["valveMid"]["outlet"]<145):
-                fail("Valve must assemble alone between inlet and outlet: "+str(assembly_stages), width)
-            if (assembly_stages["valveDone"]["valve"]<.99 or
-                    assembly_stages["valveDone"]["middle"]<.99):
-                fail("Valve must be complete before the outlet grows: "+str(assembly_stages), width)
-            if not 5<assembly_stages["outletMid"]["outlet"]<145:
-                fail("Right pipe must grow after the valve rather than simply appear: "+str(assembly_stages), width)
-            if assembly_stages["outletDone"]["outlet"]>1:
-                fail("Full pipeline must be assembled by 2.1 seconds: "+str(assembly_stages), width)
+            if not modules:
+                fail("Missing rigid inlet, valve, outlet and coupler animation tracks", width)
+            m=modules
+            if (m["start"][0]["opacity"]>.05 or m["start"][2]["opacity"]>.05 or
+                    m["start"][3]["opacity"]>.05):
+                fail("Pipe modules must enter separately, not pop in together: "+str(m), width)
+            if not -18<m["inletMove"][0]["x"]<-2:
+                fail("Finished inlet should slide a small rigid distance: "+str(m), width)
+            if (abs(m["inletDone"][0]["x"])>.1 or m["inletDone"][0]["opacity"]<.99 or
+                    m["inletDone"][3]["opacity"]>.05):
+                fail("Left inlet must seat before the right pipe enters: "+str(m), width)
+            if not -10<m["valveMove"][2]["y"]<-1:
+                fail("Valve should dock with a restrained axial translation: "+str(m), width)
+            if (abs(m["valveDone"][2]["y"])>.1 or m["valveDone"][2]["opacity"]<.99 or
+                    m["valveDone"][3]["opacity"]>.05):
+                fail("The valve must seat before the right pipe enters: "+str(m), width)
+            if not 3<m["outletMove"][3]["x"]<22:
+                fail("Finished outlet should slide into its fitting, not grow: "+str(m), width)
+            if (abs(m["outletDone"][0]["x"])>.1 or abs(m["outletDone"][2]["y"])>.1 or
+                    abs(m["outletDone"][3]["x"])>.1):
+                fail("All rigid parts must remain perfectly stationary after docking: "+str(m), width)
+            if (m["start"][4]["opacity"]>.01 or m["start"][5]["opacity"]>.01 or
+                    m["valveDone"][4]["opacity"]<.7 or
+                    m["outletDone"][5]["opacity"]<.7):
+                fail("Mechanical locks must close at their respective insertion events: "+str(m), width)
             # Upstream water is physically in motion before the valve opens,
             # but must remain invisible until the front metal becomes translucent.
             # The downstream moving dashes then travel at the same physical SVG
