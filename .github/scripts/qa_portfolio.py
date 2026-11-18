@@ -420,16 +420,25 @@ with sync_playwright() as p:
                 art = page.locator("#sheet-visual .art-eqmount")
                 play_button = page.locator(".sheet-motion-play")
                 page.wait_for_function("""() => document.querySelector('#sheet-visual .art-eqmount')?.classList.contains('is-playing')""", timeout=1500)
-                if play_button.evaluate("(el) => el.parentElement.id")!="sheet-visual":
-                    fail("replay control was not moved into image frame", width)
-                control_center=play_button.evaluate("""node => {
-                  const a=node.getBoundingClientRect(),
-                        b=node.parentElement.getBoundingClientRect();
-                  return {dx:(a.left+a.width/2)-(b.left+b.width/2),
-                          dy:(a.top+a.height/2)-(b.top+b.height/2)};
+                if not play_button.evaluate("(el) => el.parentElement.classList.contains('sheet-visual-bottom')"):
+                    fail("replay control must be in the artwork panel bottom caption", width)
+                replay_position=play_button.evaluate("""node => {
+                  const control=node.getBoundingClientRect();
+                  const caption=node.parentElement.getBoundingClientRect();
+                  const panel=node.closest('.sheet-visual-side').getBoundingClientRect();
+                  const image=document.querySelector('#sheet-visual .project-art').getBoundingClientRect();
+                  return {
+                    rightGap:caption.right-control.right,
+                    bottomGap:panel.bottom-control.bottom,
+                    rightInPanel:control.right<=panel.right+1,
+                    belowImage:control.top>=image.top+image.height-1
+                  };
                 }""")
-                if abs(control_center["dx"])>1.1 or abs(control_center["dy"])>1.1:
-                    fail("replay control is not centered over visual: "+str(control_center), width)
+                if not (abs(replay_position["rightGap"])<3 and
+                        replay_position["bottomGap"]>=-1 and
+                        replay_position["rightInPanel"] and
+                        replay_position["belowImage"]):
+                    fail("replay control not at bottom-right under fixed image: "+str(replay_position), width)
                 if not play_button.is_visible():
                     fail("equatorial motion replay control not visible", width)
                 if art.locator(".eq-large-rotor").count()!=1 or art.locator(".eq-belt-teeth").count()!=2:
