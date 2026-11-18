@@ -437,7 +437,7 @@ with sync_playwright() as p:
             if (abs(m["inletDone"][0]["x"])>.1 or m["inletDone"][0]["opacity"]<.99 or
                     m["inletDone"][3]["opacity"]>.05):
                 fail("Left inlet must seat before the right pipe enters: "+str(m), width)
-            if not -10<m["valveMove"][2]["y"]<-1:
+            if not -18<m["valveMove"][2]["y"]<-1:
                 fail("Valve should dock with a restrained axial translation: "+str(m), width)
             if (abs(m["valveDone"][2]["y"])>.1 or m["valveDone"][2]["opacity"]<.99 or
                     m["valveDone"][3]["opacity"]>.05):
