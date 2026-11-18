@@ -317,6 +317,13 @@ with sync_playwright() as p:
             if (phases["held"]["assembly"]<.9 or phases["held"]["water"]<.9 or
                     phases["held"]["front"]>.4 or phases["held"]["open"]<.95):
                 fail("WallPipe must hold final opened state rather than repeat: "+str(phases), width)
+            # Restart explicitly before sampling more WAAPI timelines:
+            # advancing the earlier final-state assertion may have fired
+            # animationend and removed is-playing in a real browser.
+            page.locator(".sheet-motion-play").click()
+            page.wait_for_function("""() =>
+                document.querySelector('#sheet-visual .art-wallpipe')?.classList.contains('is-playing')
+            """, timeout=1500)
             # The left-side inlet is already supplied with moving water while
             # the wheel is still closed; only the right outlet fills after opening.
             front=pipe_sheet.evaluate("""art => {
