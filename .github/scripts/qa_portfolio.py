@@ -236,13 +236,17 @@ with sync_playwright() as p:
             if "eq-pulley-turn" not in card_art.locator(".eq-large-rotor").evaluate(
                 "(el) => getComputedStyle(el).animationName"):
                 fail("pulley did not animate in listing", width)
+            eq_preview_seconds = card_art.locator(".eq-large-rotor").evaluate(
+                "(el) => parseFloat(getComputedStyle(el).animationDuration)")
+            if abs(eq_preview_seconds - 4.0) > .02:
+                fail("equatorial listing preview must be exactly 1.6x (4s): "+str(eq_preview_seconds), width)
             # At end, the target reaches the reticle and all pulley arrows
             # return to their original orientation after whole turns.
             final = card_art.evaluate("""el => {
               const matrix = selector => {
                 const n=el.querySelector(selector);
                 const a=n.getAnimations().find(x=>x.animationName);
-                a.currentTime=6400;
+                a.currentTime=4000;
                 return getComputedStyle(n).transform;
               };
               return {
@@ -253,9 +257,8 @@ with sync_playwright() as p:
             }""")
             if "-40" not in final["target"] or "36" not in final["target"]:
                 fail("star field never reaches the reticle center: "+str(final), width)
-            # At 6250 ms both are still traveling; only at the same 6400 ms
-            # endpoint does the star field center and the motor arrow finish
-            # its integral turn. A non-linear eased field would fail this check.
+            # The listing plays 1.6x faster than the 6.4s detail sheet. At
+            # 3906 ms both still move; at 4000 ms they finish together.
             sync = card_art.evaluate("""art => {
               const field = art.querySelector('.eq-target-field');
               const pulley = art.querySelector('.eq-large-rotor');
@@ -270,8 +273,8 @@ with sync_playwright() as p:
               };
               return {
                 easing:getComputedStyle(field).animationTimingFunction,
-                before:snapshot(6250),
-                end:snapshot(6400)
+                before:snapshot(3906),
+                end:snapshot(4000)
               };
             }""")
             if sync["easing"] != "linear":
@@ -443,6 +446,10 @@ with sync_playwright() as p:
                     fail("equatorial motion replay control not visible", width)
                 if art.locator(".eq-large-rotor").count()!=1 or art.locator(".eq-belt-teeth").count()!=2:
                     fail("rotor or belt travel elements missing", width)
+                eq_sheet_seconds=art.locator(".eq-large-rotor").evaluate(
+                    "(el) => parseFloat(getComputedStyle(el).animationDuration)")
+                if abs(eq_sheet_seconds - 6.4) > .02:
+                    fail("equatorial detail sheet must keep normal 6.4s playback", width)
                 if page.locator('.project-card[data-project="07"] .eq-belt-teeth').count()!=2:
                     fail("listing lost its static SVG artwork", width)
                 if page.locator('.project-card[data-project="07"] .eq-small-rotor').evaluate(
@@ -558,12 +565,31 @@ with sync_playwright() as p:
                     fail("Stray flying data dot must be completely removed", width)
                 if sorava_card.locator(".sorava-guest-field").count()!=1:
                     fail("The independent guest star field is missing", width)
+                # Guidance arrow sits inside the lower part of the chart,
+                # centered horizontally, just above the LOCAL VIEW caption.
+                arrow_location=sorava_card.evaluate("""art => {
+                  const circle=art.querySelector('.sorava-guest-direction circle').getBoundingClientRect();
+                  const chart=art.querySelector('.sorava-phone-guest .sorava-phone-map').getBoundingClientRect();
+                  return {
+                    x:((circle.left+circle.width/2)-chart.left)/chart.width,
+                    y:((circle.top+circle.height/2)-chart.top)/chart.height,
+                    label:art.querySelector('.sorava-guest-guiding-label')?.textContent
+                  };
+                }""")
+                if (abs(arrow_location["x"] - .5) > .055 or
+                        arrow_location["y"] < .70 or arrow_location["y"] > .94 or
+                        arrow_location["label"] != "FOLLOW ↗"):
+                    fail("Sorava guidance arrow not in marked lower star-map position: "+str(arrow_location), width)
                 sorava_media.hover()
                 if "is-hovering" not in (sorava_card.get_attribute("class") or ""):
                     fail("Sorava listing hover did not start playback", width)
                 if sorava_card.locator(".sorava-guest-received").evaluate(
                     "(el) => getComputedStyle(el).animationName")!="sorava-guest-receive":
                     fail("Sorava guest reception animation is missing on card hover", width)
+                sorava_preview_seconds=sorava_card.locator(".sorava-guest-received").evaluate(
+                    "(el) => parseFloat(getComputedStyle(el).animationDuration)")
+                if abs(sorava_preview_seconds - 4.5) > .02:
+                    fail("Sorava listing preview must be exactly 1.6x (4.5s): "+str(sorava_preview_seconds), width)
                 page.mouse.move(0, 0)
                 if "is-hovering" in (sorava_card.get_attribute("class") or ""):
                     fail("Sorava listing animation did not reset", width)
@@ -574,6 +600,10 @@ with sync_playwright() as p:
                 """, timeout=1500)
                 if sorava_sheet.locator(".sorava-phone-host").count()!=1 or sorava_sheet.locator(".sorava-phone-guest").count()!=1:
                     fail("Sorava clone lost its phones", width)
+                sorava_sheet_seconds=sorava_sheet.locator(".sorava-guest-received").evaluate(
+                    "(el) => parseFloat(getComputedStyle(el).animationDuration)")
+                if abs(sorava_sheet_seconds - 7.2) > .02:
+                    fail("Sorava detail sheet must keep normal 7.2s playback", width)
                 replay = page.locator(".sheet-motion-play")
                 if not replay.is_visible() or "Sorava" not in (replay.get_attribute("aria-label") or ""):
                     fail("Sorava missing replay control", width)
