@@ -448,23 +448,28 @@ with sync_playwright() as p:
                 if page.locator('.project-card[data-project="07"] .eq-small-rotor').evaluate(
                     "(el) => getComputedStyle(el).opacity")!="0":
                     fail("noninteractive listing unexpectedly shows motor animation markers", width)
-                # The sheet auto-plays on opening. Move outside first so a
-                # genuine pointerenter (rather than a hover over the autoplay
-                # overlay) is tested.
-                page.mouse.move(0,0)
-                art.hover(position={"x":15,"y":15})
-                if "is-hovering" not in (art.get_attribute("class") or ""):
-                    fail("desktop hover did not activate sheet SVG", width)
+                # Opening via NEXT from University AI must start exactly one
+                # cycle without hovering, and leaving the artwork must NOT stop it.
+                if "is-playing" not in (art.get_attribute("class") or ""):
+                    fail("NEXT navigation did not autoplay the animated sheet", width)
+                if "is-hovering" in (art.get_attribute("class") or ""):
+                    fail("sheet unexpectedly depends on hover", width)
                 rotating = art.locator(".eq-large-rotor").evaluate(
                     "(el) => getComputedStyle(el).animationName")
                 if "eq-pulley-turn" not in rotating:
-                    fail("large pulley CSS keyframes not active on hover", width)
-                page.mouse.move(0, 0)
+                    fail("autoplay does not animate the large pulley", width)
+                # The artwork is deliberately noninteractive; moving over it or
+                # away must leave the running animation undisturbed.
+                page.mouse.move(0,0)
+                art.hover(position={"x":15,"y":15})
                 if "is-hovering" in (art.get_attribute("class") or ""):
-                    fail("hover animation did not reset on exit", width)
+                    fail("sheet hover activated a second animation", width)
+                page.mouse.move(0,0)
+                if "is-playing" not in (art.get_attribute("class") or ""):
+                    fail("sheet playback stopped when pointer left artwork", width)
                 if art.locator(".eq-large-rotor").evaluate(
-                    "(el) => getComputedStyle(el).animationName")!="none":
-                    fail("rotor animation persists outside sheet hover", width)
+                    "(el) => getComputedStyle(el).animationName")!="eq-pulley-turn":
+                    fail("leaving the sheet artwork interrupted autoplay", width)
                 play_button.click()
                 if "is-playing" not in (art.get_attribute("class") or ""):
                     fail("touch replay button did not start animation", width)
@@ -491,9 +496,22 @@ with sync_playwright() as p:
             page.locator("#sheet-next").click()
             if page.locator("#sheet-title").inner_text().strip() != "Sorava / SkyShare":
                 fail("sheet navigation did not skip locked works", width)
+            # PREV and NEXT should each initiate one autoplay upon entering
+            # the mount sheet, even without moving the pointer over the art.
+            if width in (390,1440):
+                page.emulate_media(reduced_motion="no-preference")
             page.locator("#sheet-prev").click()
             if page.locator("#sheet-title").inner_text().strip() != "DIY Automatic Equatorial Mount":
                 fail("reverse navigation did not reach the hardware sheet", width)
+            if width in (390,1440):
+                page.wait_for_function("""() => document.querySelector('#sheet-visual .art-eqmount')?.classList.contains('is-playing')""", timeout=1500)
+                if page.locator("#sheet-visual .art-eqmount.is-hovering").count():
+                    fail("PREV navigation required hover to start mount animation", width)
+                page.locator("#sheet-next").click()
+                page.locator("#sheet-prev").click()
+                page.wait_for_function("""() => document.querySelector('#sheet-visual .art-eqmount')?.classList.contains('is-playing')""", timeout=1500)
+                if page.locator("#sheet-visual .art-eqmount.is-hovering").count():
+                    fail("second PREV navigation required hover to restart", width)
             page.locator("#sheet-close").click()
             if errors: fail("JavaScript error after sheet controls: "+repr(errors), width)
         print("QA_PASS",width,"cards",len(boxes),"width",metrics["scrollWidth"],flush=True)
