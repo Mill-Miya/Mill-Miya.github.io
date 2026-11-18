@@ -18,7 +18,7 @@
   <link rel="icon" href="assets/favicon-48.png?v=3" sizes="48x48" type="image/png">
   <link rel="icon" href="assets/favicon.svg?v=3" type="image/svg+xml" sizes="any">
   <link rel="apple-touch-icon" href="assets/icon-180.png?v=3">
-  <link rel="stylesheet" href="assets/style.css?v=24">
+  <link rel="stylesheet" href="assets/style.css?v=25">
   <script src="assets/main.js?v=13" defer></script>
   <title>Mill-Miya — Selected Works</title>
 </head>
@@ -234,7 +234,6 @@
   <g fill="none" stroke="#9bd8d1" stroke-width="2" stroke-linecap="round">
     <path class="eq-wifi-outer" d="M269 208Q281 196 293 208" opacity=".73"/>
     <path class="eq-wifi-inner" d="M274 215Q281 208 288 215"/>
-    <path d="M281 223V233" stroke-dasharray="3 4"/>
   </g>
   <circle class="eq-wifi-dot" cx="281" cy="221" r="2.5" fill="#a4f0d4"/>
   </g>
@@ -265,24 +264,25 @@
     <path d="M445 268H479M445 298H479" stroke="#94c4c0" stroke-width="1.7" opacity=".65"/>
     <circle cx="459" cy="283" r="13" fill="#15343f" stroke="#c0e5d9" stroke-width="2"/>
     <g class="eq-small-rotor" stroke="#d7f9ec" stroke-width="2"><path d="M459 274V279M459 287V292M450 283H455M463 283H468"/></g>
-    <!-- Face plate beneath the belt. Both runs attach to the SAME r=41 pulley track. -->
+    <!-- A physically continuous belt: two common external tangents, the long
+         wrap around the 41-unit driven track, and the short return wrap around
+         the 13-unit motor pulley. Both runs share the same pitch-line geometry. -->
     <circle cx="517" cy="217" r="56" fill="#1e434e" stroke="#b2ddcf" stroke-width="5"/>
-    <!-- Common external tangents: motor (459,283), r=13; large track (517,217), r=41. -->
-    <g class="eq-belt-runs" fill="none" stroke="#9ddfd2" stroke-width="5" opacity=".68">
-      <path class="eq-belt-upper-run" d="M447.01 277.98L479.18 201.16"/>
-      <path class="eq-belt-lower-run" d="M465.52 294.25L537.57 252.47"/>
-    </g>
-    <!-- Animated belt travel follows the exact same geometry and remains hidden until driven. -->
-    <g fill="none" stroke="#d5fff0" stroke-width="2" stroke-dasharray="5 7">
-      <path class="eq-belt-teeth eq-belt-upper" d="M447.01 277.98L479.18 201.16"/>
-      <path class="eq-belt-teeth eq-belt-lower" d="M465.52 294.25L537.57 252.47"/>
-    </g>
+    <path class="eq-belt-loop"
+      d="M447.01 277.98L479.18 201.16A41 41 0 1 1 537.57 252.47L465.52 294.25A13 13 0 0 1 447.01 277.98Z"
+      fill="none" stroke="#9ddfd2" stroke-width="5" opacity=".76"/>
+    <!-- Teeth follow the entire closed belt, including BOTH pulley wraps. -->
+    <path class="eq-belt-teeth eq-belt-flow"
+      d="M447.01 277.98L479.18 201.16A41 41 0 1 1 537.57 252.47L465.52 294.25A13 13 0 0 1 447.01 277.98Z"
+      fill="none" stroke="#d5fff0" stroke-width="2" stroke-dasharray="5 7"/>
+    <!-- The rear belt beneath the driven pulley flange is visible but muted.
+         Radius 53 keeps the outer flange outline crisp. -->
+    <circle cx="517" cy="217" r="53" fill="#1e434e" opacity=".42"/>
     <circle cx="517" cy="217" r="41" fill="none" stroke="#80aeb9" stroke-width="2.2" opacity=".8"/>
     <circle cx="517" cy="217" r="17" fill="#102e3a" stroke="#c0e9dc" stroke-width="2.7"/>
     <circle cx="517" cy="217" r="4.8" fill="#a5ecd3"/>
     <g class="eq-large-rotor">
       <path d="M517 184V164M517 249V270" stroke="#d2f0e7" stroke-width="2"/>
-      <path d="M510 172L517 163L524 172M510 262L517 271L524 262" stroke="#d2f0e7" stroke-width="2" fill="none"/>
     </g>
   </g>
   </g>
