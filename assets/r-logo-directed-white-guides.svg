@@ -51,52 +51,52 @@
 }
 </style>
 <g class="white-guides" pointer-events="none"><g class="guides-finish" pointer-events="none">
-<g class="guide-intro" style="--delay:.10s" fill="none" stroke="#b1c1c8" stroke-width="1.7" opacity=".7" stroke-dasharray="9 13">
+<g class="guide-intro" style="--delay:0.043s" fill="none" stroke="#b1c1c8" stroke-width="1.7" opacity=".7" stroke-dasharray="9 13">
 <path d="M627 147 L1107 627 L627 1107 L147 627 Z"/><path d="M627 112V1142 M112 627H1142"/>
 </g>
-<g><ellipse class="guide-draw" style="--delay:0.55s" cx="627" cy="627" rx="280" ry="280" pathLength="100" stroke="#9aaebb"/>
-<ellipse class="guide-draw" style="--delay:0.72s" cx="627" cy="627" rx="274" ry="274" pathLength="100" stroke="#95adbb"/>
-<ellipse class="guide-draw" style="--delay:0.9s" cx="627" cy="370.6" rx="252.2" ry="252.2" pathLength="100" stroke="#95adbb"/>
-<ellipse class="guide-draw" style="--delay:1.08s" cx="580.44" cy="487" rx="143.56" ry="143.56" pathLength="100" stroke="#95adbb"/>
-<ellipse class="guide-draw" style="--delay:1.24s" cx="674.8354554" cy="764.9" rx="149.9354554" ry="149.9354554" pathLength="100" stroke="#95adbb"/>
-<ellipse class="guide-draw" style="--delay:1.4s" cx="627" cy="764.9" rx="202.1" ry="142.1" pathLength="100" stroke="#95adbb"/>
-<ellipse class="guide-draw" style="--delay:1.58s" cx="622.142821" cy="730.762026" rx="203.143796" ry="203.143796" pathLength="100" stroke="#95adbb"/><circle class="guide-draw small" cx="627" cy="206.3969696" r="42" pathLength="100" style="--delay:1.12s"/>
-<circle class="guide-draw small" cx="206.3969696" cy="627" r="42" pathLength="100" style="--delay:1.24s"/>
-<circle class="guide-draw small" cx="627" cy="1047.6030304" r="42" pathLength="100" style="--delay:1.36s"/>
-<circle class="guide-draw small" cx="1047.6030304" cy="627" r="42" pathLength="100" style="--delay:1.48s"/></g>
-<g><path class="guide-helper" style="--delay:1.30s" d="M627 627L627 347"/>
-<path class="guide-helper" style="--delay:1.36s" d="M627 627L855.9209 476.4303"/>
-<path class="guide-helper" style="--delay:1.42s" d="M627 370.6L627 622.8"/>
-<path class="guide-helper" style="--delay:1.48s" d="M627 370.6L855.9209 476.4303"/>
-<path class="guide-helper" style="--delay:1.54s" d="M580.44 487L652.5078 611.16"/>
-<path class="guide-helper" style="--delay:1.60s" d="M674.835 764.9L627 907"/>
-<path class="guide-helper" style="--delay:1.66s" d="M674.835 764.9L627 622.8"/>
-<path class="guide-helper" style="--delay:1.72s" d="M627 764.9L431.162 800"/>
-<path class="guide-helper" style="--delay:1.78s" d="M622.1428 730.762L457.675 850"/><path class="guide-helper" style="--delay:1.28s" d="M619.00 627h16 M627 619.00v16"/>
-<path class="guide-helper" style="--delay:1.34s" d="M619.00 627h16 M627 619.00v16"/>
-<path class="guide-helper" style="--delay:1.40s" d="M619.00 370.6h16 M627 362.60v16"/>
-<path class="guide-helper" style="--delay:1.46s" d="M572.44 487h16 M580.44 479.00v16"/>
-<path class="guide-helper" style="--delay:1.52s" d="M666.84 764.9h16 M674.8354554 756.90v16"/>
-<path class="guide-helper" style="--delay:1.58s" d="M619.00 764.9h16 M627 756.90v16"/>
-<path class="guide-helper" style="--delay:1.64s" d="M614.14 730.762026h16 M622.142821 722.76v16"/></g>
-<g><path class="arc-draw" style="--delay:1.00s" pathLength="100" d="M 722.902930377269,906.9216837300232 A 149.93545543584725,149.93545543584725 0 0,1 627.0,907.0"/>
-<path class="arc-draw" style="--delay:1.11s" pathLength="100" d="M 627.0,907.0 A 149.93545543584725,149.93545543584725 0 0,1 627.0,622.8"/>
-<path class="arc-draw" style="--delay:1.23s" pathLength="100" d="M 627.0,622.8 A 252.2,252.2 0 0,0 855.9208988050817,476.4303364106464"/>
-<path class="arc-draw" style="--delay:1.34s" pathLength="100" d="M 855.9208988050817,476.4303364106464 A 274.0,274.0 0 0,0 632.0739322814651,353.0469835089975"/>
-<path class="arc-draw" style="--delay:1.46s" pathLength="100" d="M 632.0739322814651,353.0469835089975 A 143.56,143.56 0 0,1 652.5078,611.16"/>
-<path class="arc-draw" style="--delay:1.58s" pathLength="100" d="M 572.8278578948604,628.0 A 202.10000000000002,142.10000000000002 0 0,0 431.1624428343677,800.0"/>
-<path class="arc-draw" style="--delay:1.69s" pathLength="100" d="M 431.1624428343677,800.0 A 203.14379616335947,203.14379616335947 0 0,0 457.67486846618317,850.0"/>
-<path class="arc-draw" style="--delay:1.81s" pathLength="100" d="M 457.67486846618317,850.0 A 280.0,280.0 0 0,1 627.0,347.0"/>
-<path class="arc-draw" style="--delay:1.92s" pathLength="100" d="M 627.0,347.0 A 280.0,280.0 0 0,1 858.8075879650387,469.94827704248837"/></g>
+<g><ellipse class="guide-draw" style="--delay:0.237s" cx="627" cy="627" rx="280" ry="280" pathLength="100" stroke="#9aaebb"/>
+<ellipse class="guide-draw" style="--delay:0.310s" cx="627" cy="627" rx="274" ry="274" pathLength="100" stroke="#95adbb"/>
+<ellipse class="guide-draw" style="--delay:0.387s" cx="627" cy="370.6" rx="252.2" ry="252.2" pathLength="100" stroke="#95adbb"/>
+<ellipse class="guide-draw" style="--delay:0.464s" cx="580.44" cy="487" rx="143.56" ry="143.56" pathLength="100" stroke="#95adbb"/>
+<ellipse class="guide-draw" style="--delay:0.533s" cx="674.8354554" cy="764.9" rx="149.9354554" ry="149.9354554" pathLength="100" stroke="#95adbb"/>
+<ellipse class="guide-draw" style="--delay:0.602s" cx="627" cy="764.9" rx="202.1" ry="142.1" pathLength="100" stroke="#95adbb"/>
+<ellipse class="guide-draw" style="--delay:0.679s" cx="622.142821" cy="730.762026" rx="203.143796" ry="203.143796" pathLength="100" stroke="#95adbb"/><circle class="guide-draw small" cx="627" cy="206.3969696" r="42" pathLength="100" style="--delay:0.482s"/>
+<circle class="guide-draw small" cx="206.3969696" cy="627" r="42" pathLength="100" style="--delay:0.533s"/>
+<circle class="guide-draw small" cx="627" cy="1047.6030304" r="42" pathLength="100" style="--delay:0.585s"/>
+<circle class="guide-draw small" cx="1047.6030304" cy="627" r="42" pathLength="100" style="--delay:0.636s"/></g>
+<g><path class="guide-helper" style="--delay:0.559s" d="M627 627L627 347"/>
+<path class="guide-helper" style="--delay:0.585s" d="M627 627L855.9209 476.4303"/>
+<path class="guide-helper" style="--delay:0.611s" d="M627 370.6L627 622.8"/>
+<path class="guide-helper" style="--delay:0.636s" d="M627 370.6L855.9209 476.4303"/>
+<path class="guide-helper" style="--delay:0.662s" d="M580.44 487L652.5078 611.16"/>
+<path class="guide-helper" style="--delay:0.688s" d="M674.835 764.9L627 907"/>
+<path class="guide-helper" style="--delay:0.714s" d="M674.835 764.9L627 622.8"/>
+<path class="guide-helper" style="--delay:0.740s" d="M627 764.9L431.162 800"/>
+<path class="guide-helper" style="--delay:0.765s" d="M622.1428 730.762L457.675 850"/><path class="guide-helper" style="--delay:0.550s" d="M619.00 627h16 M627 619.00v16"/>
+<path class="guide-helper" style="--delay:0.576s" d="M619.00 627h16 M627 619.00v16"/>
+<path class="guide-helper" style="--delay:0.602s" d="M619.00 370.6h16 M627 362.60v16"/>
+<path class="guide-helper" style="--delay:0.628s" d="M572.44 487h16 M580.44 479.00v16"/>
+<path class="guide-helper" style="--delay:0.654s" d="M666.84 764.9h16 M674.8354554 756.90v16"/>
+<path class="guide-helper" style="--delay:0.679s" d="M619.00 764.9h16 M627 756.90v16"/>
+<path class="guide-helper" style="--delay:0.705s" d="M614.14 730.762026h16 M622.142821 722.76v16"/></g>
+<g><path class="arc-draw" style="--delay:0.430s" pathLength="100" d="M 722.902930377269,906.9216837300232 A 149.93545543584725,149.93545543584725 0 0,1 627.0,907.0"/>
+<path class="arc-draw" style="--delay:0.477s" pathLength="100" d="M 627.0,907.0 A 149.93545543584725,149.93545543584725 0 0,1 627.0,622.8"/>
+<path class="arc-draw" style="--delay:0.529s" pathLength="100" d="M 627.0,622.8 A 252.2,252.2 0 0,0 855.9208988050817,476.4303364106464"/>
+<path class="arc-draw" style="--delay:0.576s" pathLength="100" d="M 855.9208988050817,476.4303364106464 A 274.0,274.0 0 0,0 632.0739322814651,353.0469835089975"/>
+<path class="arc-draw" style="--delay:0.628s" pathLength="100" d="M 632.0739322814651,353.0469835089975 A 143.56,143.56 0 0,1 652.5078,611.16"/>
+<path class="arc-draw" style="--delay:0.679s" pathLength="100" d="M 572.8278578948604,628.0 A 202.10000000000002,142.10000000000002 0 0,0 431.1624428343677,800.0"/>
+<path class="arc-draw" style="--delay:0.727s" pathLength="100" d="M 431.1624428343677,800.0 A 203.14379616335947,203.14379616335947 0 0,0 457.67486846618317,850.0"/>
+<path class="arc-draw" style="--delay:0.778s" pathLength="100" d="M 457.67486846618317,850.0 A 280.0,280.0 0 0,1 627.0,347.0"/>
+<path class="arc-draw" style="--delay:0.826s" pathLength="100" d="M 627.0,347.0 A 280.0,280.0 0 0,1 858.8075879650387,469.94827704248837"/></g>
 
 
 <!-- Small P2 curl, sourced from original R64/R51 arc endpoints and arc centers. -->
 <g class="curl-guides" pointer-events="none">
-  <circle class="curl-circle" cx="677.104253109943" cy="741.335717094516" r="64" pathLength="100" style="--delay:1.72s"/>
-  <circle class="curl-circle" cx="677.105282758511" cy="767.853494972527" r="51" pathLength="100" style="--delay:1.87s"/>
-  <path class="curl-arc" pathLength="100" style="--delay:2.14s" d="M614.4477138429185 728.2912513300691 A64 64 0 0 0 626.5258272576347 780.5508014155092"/>
-  <path class="curl-arc inner" pathLength="100" style="--delay:2.29s" d="M627.5826195669595 780.0397918020061 A51 51 0 0 1 644.3639642626957 728.7509878514275"/>
-  <g class="curl-center" style="--delay:2.42s">
+  <circle class="curl-circle" cx="677.104253109943" cy="741.335717094516" r="64" pathLength="100" style="--delay:0.740s"/>
+  <circle class="curl-circle" cx="677.105282758511" cy="767.853494972527" r="51" pathLength="100" style="--delay:0.804s"/>
+  <path class="curl-arc" pathLength="100" style="--delay:0.920s" d="M614.4477138429185 728.2912513300691 A64 64 0 0 0 626.5258272576347 780.5508014155092"/>
+  <path class="curl-arc inner" pathLength="100" style="--delay:0.985s" d="M627.5826195669595 780.0397918020061 A51 51 0 0 1 644.3639642626957 728.7509878514275"/>
+  <g class="curl-center" style="--delay:1.041s">
     <circle cx="677.104253109943" cy="741.335717094516" r="3.3"/>
     <circle cx="677.105282758511" cy="767.853494972527" r="3.3"/>
     <path d="M671 741.34h12 M677.10 735.34v12 M671 767.85h12 M677.10 761.85v12"/>
@@ -106,54 +106,54 @@
 <!-- P2: actual long-leg outline and original Bezier/arc constructions. -->
 <g class="leg-guides" pointer-events="none">
 <g>
-  <path class="leg-contour" style="--delay:1.62s" pathLength="100" d="M730.93679 664.73753 C628.1909007585219 670.4051661174622 616.1611539819643 720.0610768413272 614.4477138429185 728.2912513300691 A64 64 0 0 0 626.5258272576347 780.5508014155092"/>
-  <path class="leg-contour secondary" style="--delay:1.81s" pathLength="100" d="M644.3639642626957 728.7509878514275 C657.2022050904571 718.0012696667102 673.9360973010882 714.7451001519297 700 714.7451001519297 A312.94148883285516 312.94148883285516 0 0 1 745 717.9974296121586 C776.6295883041212 722.5934299260505 825.2849473210729 734.6113587294444 830 735.7710078550373 A709.5027564752111 709.5027564752111 0 0 0 895 748.5724134095996"/>
-  <path class="leg-contour" style="--delay:2.02s" pathLength="100" d="M895 748.5724134095996 C896.2615651228084 748.7601811018825 912.515145372656 751.1758396213418 930 752.8956053990611 C942.5586446797965 754.1308417104385 955.1172893595931 754.9445927947128 967.6759340393896 753.4519424129464 A18 18 0 0 0 983.4702470825283 737.2861860803645 A570.4520265052622 570.4520265052622 0 0 0 985.4314733231299 656.6815612400471"/>
-  <path class="leg-contour secondary" style="--delay:2.18s" pathLength="100" d="M985.4314733231299 656.6815612400471 C984.3114172418129 666.0153619176886 974.2759746056636 678.1441102997983 950 685.1387828697292 A107.8593553584303 107.8593553584303 0 0 1 920 689.3551329594382 C888.9811611738791 689.3156725895058 835.6023038008613 675.8668596952393 825 673.3078961196654 A324.6917715870368 324.6917715870368 0 0 0 730.93679 664.73753"/>
+  <path class="leg-contour" style="--delay:0.697s" pathLength="100" d="M730.93679 664.73753 C628.1909007585219 670.4051661174622 616.1611539819643 720.0610768413272 614.4477138429185 728.2912513300691 A64 64 0 0 0 626.5258272576347 780.5508014155092"/>
+  <path class="leg-contour secondary" style="--delay:0.778s" pathLength="100" d="M644.3639642626957 728.7509878514275 C657.2022050904571 718.0012696667102 673.9360973010882 714.7451001519297 700 714.7451001519297 A312.94148883285516 312.94148883285516 0 0 1 745 717.9974296121586 C776.6295883041212 722.5934299260505 825.2849473210729 734.6113587294444 830 735.7710078550373 A709.5027564752111 709.5027564752111 0 0 0 895 748.5724134095996"/>
+  <path class="leg-contour" style="--delay:0.869s" pathLength="100" d="M895 748.5724134095996 C896.2615651228084 748.7601811018825 912.515145372656 751.1758396213418 930 752.8956053990611 C942.5586446797965 754.1308417104385 955.1172893595931 754.9445927947128 967.6759340393896 753.4519424129464 A18 18 0 0 0 983.4702470825283 737.2861860803645 A570.4520265052622 570.4520265052622 0 0 0 985.4314733231299 656.6815612400471"/>
+  <path class="leg-contour secondary" style="--delay:0.937s" pathLength="100" d="M985.4314733231299 656.6815612400471 C984.3114172418129 666.0153619176886 974.2759746056636 678.1441102997983 950 685.1387828697292 A107.8593553584303 107.8593553584303 0 0 1 920 689.3551329594382 C888.9811611738791 689.3156725895058 835.6023038008613 675.8668596952393 825 673.3078961196654 A324.6917715870368 324.6917715870368 0 0 0 730.93679 664.73753"/>
   <!-- P3: the long right-hand wedge is bounded by this exact original arc. -->
-  <path class="leg-contour" style="--delay:2.30s" pathLength="100" d="M951.975 471.975 A576.4520265052622 576.4520265052622 0 0 1 988.9223461045462 743.0674539088453"/>
-  <path class="leg-contour secondary" style="--delay:2.46s" pathLength="100" d="M990.283697185027 743.716302814973 L1077.30152 656.69848 A42 42 0 0 0 1077.30152 597.30152 L951.975 471.975"/>
+  <path class="leg-contour" style="--delay:0.989s" pathLength="100" d="M951.975 471.975 A576.4520265052622 576.4520265052622 0 0 1 988.9223461045462 743.0674539088453"/>
+  <path class="leg-contour secondary" style="--delay:1.058s" pathLength="100" d="M990.283697185027 743.716302814973 L1077.30152 656.69848 A42 42 0 0 0 1077.30152 597.30152 L951.975 471.975"/>
 </g>
 <!-- True control polygon of P2's first cubic, instead of a fabricated circle. -->
 <g>
-  <path class="leg-construction" style="--delay:2.29s" d="M730.93679 664.73753 L628.1909007585219 670.4051661174622 L616.1611539819643 720.0610768413272 L614.4477138429185 728.2912513300691"/>
-  <path class="leg-construction" style="--delay:2.42s" d="M644.3639642626957 728.7509878514275 L657.2022050904571 718.0012696667102 L673.9360973010882 714.7451001519297 L700 714.7451001519297"/>
-  <path class="leg-construction" style="--delay:2.53s" d="M745 717.9974296121586 L776.6295883041212 722.5934299260505 L825.2849473210729 734.6113587294444 L830 735.7710078550373"/>
-  <path class="leg-construction" style="--delay:2.64s" d="M985.4314733231299 656.6815612400471 L984.3114172418129 666.0153619176886 L974.2759746056636 678.1441102997983 L950 685.1387828697292"/>
+  <path class="leg-construction" style="--delay:0.985s" d="M730.93679 664.73753 L628.1909007585219 670.4051661174622 L616.1611539819643 720.0610768413272 L614.4477138429185 728.2912513300691"/>
+  <path class="leg-construction" style="--delay:1.041s" d="M644.3639642626957 728.7509878514275 L657.2022050904571 718.0012696667102 L673.9360973010882 714.7451001519297 L700 714.7451001519297"/>
+  <path class="leg-construction" style="--delay:1.088s" d="M745 717.9974296121586 L776.6295883041212 722.5934299260505 L825.2849473210729 734.6113587294444 L830 735.7710078550373"/>
+  <path class="leg-construction" style="--delay:1.135s" d="M985.4314733231299 656.6815612400471 L984.3114172418129 666.0153619176886 L974.2759746056636 678.1441102997983 L950 685.1387828697292"/>
 </g>
 <g>
-  <circle class="leg-point" style="--delay:2.40s" cx="628.1909007585219" cy="670.4051661174622" r="4"/>
-  <circle class="leg-point" style="--delay:2.50s" cx="616.1611539819643" cy="720.0610768413272" r="4"/>
-  <circle class="leg-point" style="--delay:2.62s" cx="673.9360973010882" cy="714.7451001519297" r="4"/>
-  <circle class="leg-point" style="--delay:2.74s" cx="825.2849473210729" cy="734.6113587294444" r="4"/>
-  <circle class="leg-point" style="--delay:2.81s" cx="985.4314733231299" cy="656.6815612400471" r="4"/>
-  <circle class="leg-point" style="--delay:2.88s" cx="951.975" cy="471.975" r="4"/>
-  <text class="leg-label" style="--delay:2.70s" x="790" y="615">P2 / BEZIER</text>
-  <text class="leg-label" style="--delay:2.80s" x="1010" y="525">P3</text>
-  <text class="leg-label" style="--delay:2.90s" x="992" y="783">R576.45</text>
+  <circle class="leg-point" style="--delay:1.032s" cx="628.1909007585219" cy="670.4051661174622" r="4"/>
+  <circle class="leg-point" style="--delay:1.075s" cx="616.1611539819643" cy="720.0610768413272" r="4"/>
+  <circle class="leg-point" style="--delay:1.127s" cx="673.9360973010882" cy="714.7451001519297" r="4"/>
+  <circle class="leg-point" style="--delay:1.178s" cx="825.2849473210729" cy="734.6113587294444" r="4"/>
+  <circle class="leg-point" style="--delay:1.208s" cx="985.4314733231299" cy="656.6815612400471" r="4"/>
+  <circle class="leg-point" style="--delay:1.238s" cx="951.975" cy="471.975" r="4"/>
+  <text class="leg-label" style="--delay:1.161s" x="790" y="615">P2 / BEZIER</text>
+  <text class="leg-label" style="--delay:1.204s" x="1010" y="525">P3</text>
+  <text class="leg-label" style="--delay:1.247s" x="992" y="783">R576.45</text>
 </g>
 </g>
 <g class="detail-line"><path d="M652.5078 611.16L623.5309148 627.97943 M572.82786 628L614.01086 619.9435 M730.93679 664.73753 L628.1909 670.40517 M614.44771 728.29125 L616.16115 720.06107"/></g>
-<g><g class="node" style="--delay:1.60s"><circle cx="627" cy="627" r="4"/><path d="M619 627h16 M627 619v16"/></g>
-<g class="node" style="--delay:1.65s"><circle cx="627" cy="347" r="4"/><path d="M619 347h16 M627 339v16"/></g>
-<g class="node" style="--delay:1.69s"><circle cx="632.074" cy="353.047" r="4"/><path d="M624.074 353.047h16 M632.074 345.047v16"/></g>
-<g class="node" style="--delay:1.74s"><circle cx="855.921" cy="476.4303" r="4"/><path d="M847.921 476.4303h16 M855.921 468.4303v16"/></g>
-<g class="node" style="--delay:1.78s"><circle cx="652.5078" cy="611.16" r="4"/><path d="M644.5078 611.16h16 M652.5078 603.16v16"/></g>
-<g class="node" style="--delay:1.83s"><circle cx="627" cy="622.8" r="4"/><path d="M619 622.8h16 M627 614.8v16"/></g>
-<g class="node" style="--delay:1.87s"><circle cx="431.1624" cy="800" r="4"/><path d="M423.1624 800h16 M431.1624 792v16"/></g>
-<g class="node" style="--delay:1.92s"><circle cx="457.675" cy="850" r="4"/><path d="M449.675 850h16 M457.675 842v16"/></g>
-<g class="node" style="--delay:1.96s"><circle cx="627" cy="907" r="4"/><path d="M619 907h16 M627 899v16"/></g>
-<g class="node" style="--delay:2.00s"><circle cx="722.903" cy="906.922" r="4"/><path d="M714.903 906.922h16 M722.903 898.922v16"/></g>
-<g class="node" style="--delay:2.05s"><circle cx="951.975" cy="471.975" r="4"/><path d="M943.975 471.975h16 M951.975 463.975v16"/></g>
-<g class="node" style="--delay:2.10s"><circle cx="988.922" cy="743.067" r="4"/><path d="M980.922 743.067h16 M988.922 735.067v16"/></g></g>
-<g><text class="callout" style="--delay:1.44s" x="665" y="475">C0 <tspan>R280</tspan></text>
-<text class="callout" style="--delay:1.56s" x="934" y="635">C1 <tspan>R274</tspan></text>
-<text class="callout" style="--delay:1.68s" x="775" y="253">C2 <tspan>R252.20</tspan></text>
-<text class="callout" style="--delay:1.80s" x="548" y="455">C3 <tspan>R143.56</tspan></text>
-<text class="callout" style="--delay:1.92s" x="728" y="927">C4 <tspan>R149.94</tspan></text>
-<text class="callout" style="--delay:2.04s" x="480" y="712">E <tspan>202×142</tspan></text>
-<text class="callout" style="--delay:2.16s" x="410" y="898">C5 <tspan>R203.14</tspan></text></g>
-<g class="guide-intro" style="--delay:2.4s" fill="#8baab7" font-family="monospace" font-size="19" letter-spacing="2">
+<g><g class="node" style="--delay:0.688s"><circle cx="627" cy="627" r="4"/><path d="M619 627h16 M627 619v16"/></g>
+<g class="node" style="--delay:0.709s"><circle cx="627" cy="347" r="4"/><path d="M619 347h16 M627 339v16"/></g>
+<g class="node" style="--delay:0.727s"><circle cx="632.074" cy="353.047" r="4"/><path d="M624.074 353.047h16 M632.074 345.047v16"/></g>
+<g class="node" style="--delay:0.748s"><circle cx="855.921" cy="476.4303" r="4"/><path d="M847.921 476.4303h16 M855.921 468.4303v16"/></g>
+<g class="node" style="--delay:0.765s"><circle cx="652.5078" cy="611.16" r="4"/><path d="M644.5078 611.16h16 M652.5078 603.16v16"/></g>
+<g class="node" style="--delay:0.787s"><circle cx="627" cy="622.8" r="4"/><path d="M619 622.8h16 M627 614.8v16"/></g>
+<g class="node" style="--delay:0.804s"><circle cx="431.1624" cy="800" r="4"/><path d="M423.1624 800h16 M431.1624 792v16"/></g>
+<g class="node" style="--delay:0.826s"><circle cx="457.675" cy="850" r="4"/><path d="M449.675 850h16 M457.675 842v16"/></g>
+<g class="node" style="--delay:0.843s"><circle cx="627" cy="907" r="4"/><path d="M619 907h16 M627 899v16"/></g>
+<g class="node" style="--delay:0.860s"><circle cx="722.903" cy="906.922" r="4"/><path d="M714.903 906.922h16 M722.903 898.922v16"/></g>
+<g class="node" style="--delay:0.882s"><circle cx="951.975" cy="471.975" r="4"/><path d="M943.975 471.975h16 M951.975 463.975v16"/></g>
+<g class="node" style="--delay:0.903s"><circle cx="988.922" cy="743.067" r="4"/><path d="M980.922 743.067h16 M988.922 735.067v16"/></g></g>
+<g><text class="callout" style="--delay:0.619s" x="665" y="475">C0 <tspan>R280</tspan></text>
+<text class="callout" style="--delay:0.671s" x="934" y="635">C1 <tspan>R274</tspan></text>
+<text class="callout" style="--delay:0.722s" x="775" y="253">C2 <tspan>R252.20</tspan></text>
+<text class="callout" style="--delay:0.774s" x="548" y="455">C3 <tspan>R143.56</tspan></text>
+<text class="callout" style="--delay:0.826s" x="728" y="927">C4 <tspan>R149.94</tspan></text>
+<text class="callout" style="--delay:0.877s" x="480" y="712">E <tspan>202×142</tspan></text>
+<text class="callout" style="--delay:0.929s" x="410" y="898">C5 <tspan>R203.14</tspan></text></g>
+<g class="guide-intro" style="--delay:1.032s" fill="#8baab7" font-family="monospace" font-size="19" letter-spacing="2">
 <path d="M168 1165H1085" stroke="#7895a2" stroke-dasharray="5 13" fill="none"/>
 <text x="168" y="1196">R / CONSTRUCTION STUDY</text><text x="870" y="1196">SVG UNITS</text>
 <text x="901" y="500" font-size="18">Δ6</text>
