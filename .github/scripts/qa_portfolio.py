@@ -193,6 +193,11 @@ with sync_playwright() as p:
         if wallpipe.locator(".wp-scene").evaluate(
                 "(el) => getComputedStyle(el).transform")!="none":
             fail("WallPipe scene must remain rigid without camera sway", width)
+        if wallpipe.locator("mask#wp-flow-reveal").count()!=1:
+            fail("Valve-originated flow mask is missing", width)
+        for cls in (".wp-water-core", ".wp-water-stream", ".wp-flow-cutaway", ".wp-flow-trace"):
+            if wallpipe.locator(cls).get_attribute("mask")!="url(#wp-flow-reveal)":
+                fail("Every water or water-window layer must use the flow-front mask: "+cls, width)
         if wallpipe.locator(".wp-valve-housing").count()!=1:
             fail("Cast mechanical valve housing is missing", width)
         if wallpipe.locator('.wp-valve rect[x="329"][width="65"]').count():
@@ -246,8 +251,8 @@ with sync_playwright() as p:
             preview_seconds=pipe_art.locator(".wp-wheel-spin").evaluate(
                 "(el) => parseFloat(getComputedStyle(el).animationDuration)")
             if pipe_art.locator(".wp-wheel-spin").evaluate(
-                    "(el) => getComputedStyle(el).animationIterationCount")!="infinite":
-                fail("WallPipe hover wheel must loop while card is hovered", width)
+                    "(el) => getComputedStyle(el).animationIterationCount")!="1":
+                fail("WallPipe hover wheel must play only once", width)
             if abs(preview_seconds-4.5)>.02:
                 fail("WallPipe hover must run exactly 1.6x (4.5s)", width)
             page.mouse.move(0,0)
@@ -265,13 +270,13 @@ with sync_playwright() as p:
             if abs(duration-7.2)>.02:
                 fail("WallPipe sheet must play at normal 7.2s", width)
             if pipe_sheet.locator(".wp-wheel-spin").evaluate(
-                    "(el) => getComputedStyle(el).animationIterationCount")!="infinite":
-                fail("WallPipe sheet motion must keep looping", width)
+                    "(el) => getComputedStyle(el).animationIterationCount")!="1":
+                fail("WallPipe sheet motion must play only once", width)
             if pipe_sheet.locator(".wp-flow-trace").evaluate(
-                    "(el) => getComputedStyle(el).animationIterationCount")!="infinite, infinite":
-                fail("WallPipe internal water travel must repeat", width)
-            if page.locator(".sheet-motion-play").inner_text().strip()!="RESTART":
-                fail("WallPipe looping replay button should be labelled RESTART", width)
+                    "(el) => getComputedStyle(el).animationIterationCount")!="1, 1":
+                fail("WallPipe water travel must play only once", width)
+            if page.locator(".sheet-motion-play").inner_text().strip()!="REPLAY":
+                fail("WallPipe one-shot replay button should be labelled REPLAY", width)
             phases=pipe_sheet.evaluate("""art => {
               const find=sel=>art.querySelector(sel);
               const els=['.wp-pipe-assembly','.wp-wheel-spin','.wp-pipe-front',
@@ -291,7 +296,7 @@ with sync_playwright() as p:
                 };
               };
               return {begin:frame(0),closed:frame(2800),
-                      ending:frame(7050),repeated:frame(7550)};
+                      ending:frame(7050),held:frame(7550)};
             }""")
             if phases["begin"]["assembly"]>.1 or phases["begin"]["water"]>.05:
                 fail("WallPipe must begin with an unplaced, dry pipe: "+str(phases), width)
@@ -301,8 +306,34 @@ with sync_playwright() as p:
                     phases["ending"]["front"]>.4 or phases["ending"]["open"]<.95 or
                     phases["ending"]["closed"]>.05):
                 fail("WallPipe final cutaway must reveal water inside after valve opens: "+str(phases), width)
-            if phases["repeated"]["assembly"]>.1 or phases["repeated"]["water"]>.05:
-                fail("WallPipe must restart from the scan phase after 7.2s: "+str(phases), width)
+            if (phases["held"]["assembly"]<.9 or phases["held"]["water"]<.9 or
+                    phases["held"]["front"]>.4 or phases["held"]["open"]<.95):
+                fail("WallPipe must hold final opened state rather than repeat: "+str(phases), width)
+            # A white SVG mask is progressively traced out from the center valve.
+            # Verify that neither pipe end is flooded at initial opening.
+            front=pipe_sheet.evaluate("""art => {
+              const l=art.querySelector('.wp-reveal-left');
+              const r=art.querySelector('.wp-reveal-right');
+              const la=l.getAnimations().find(a=>a.animationName==='wp-propagate-left');
+              const ra=r.getAnimations().find(a=>a.animationName==='wp-propagate-right');
+              if(!la || !ra) return null;
+              const snap=t=>{
+                la.currentTime=t; ra.currentTime=t;
+                return [parseFloat(getComputedStyle(l).strokeDasharray),
+                        parseFloat(getComputedStyle(r).strokeDasharray)];
+              };
+              return {initial:snap(0),opening:snap(3450),
+                      halfway:snap(4200),finished:snap(7050)};
+            }""")
+            if not front:
+                fail("Valve-originated water front masking is missing", width)
+            if any(v>1 for v in front["initial"]):
+                fail("Flow should not reach any pipe until valve starts opening: "+str(front), width)
+            if (not 0<front["opening"][0]<70 or not 0<front["opening"][1]<70 or
+                    front["halfway"][0]>=150 or front["halfway"][1]>=100):
+                fail("Water is reaching open pipe ends too early: "+str(front), width)
+            if front["finished"][0]<340 or front["finished"][1]<160:
+                fail("Water must reach both pipe ends by the final open state: "+str(front), width)
             page.locator(".sheet-motion-play").click()
             if "is-playing" not in (pipe_sheet.get_attribute("class") or ""):
                 fail("WallPipe replay did not restart", width)
