@@ -181,7 +181,8 @@ with sync_playwright() as p:
         arrow_shapes = concept.locator("path.eq-flow-arrow").evaluate_all("""nodes =>
           nodes.map(node => {
             const nums = node.getAttribute('d').match(/[-+]?\d+(?:\.\d+)?/g).map(Number);
-            return nums.map((value,index)=>value - (index%2 ? nums[1] : nums[0]));
+            return nums.map((value,index)=>
+              value - ([0,2,3,5,7].includes(index) ? nums[0] : nums[1]));
           })""")
         if len(arrow_shapes)!=3 or any(shape != arrow_shapes[0] for shape in arrow_shapes[1:]):
             fail("stage arrows differ in dimensions or stroke layout", width)
@@ -250,9 +251,10 @@ with sync_playwright() as p:
               const frames = selector => el.querySelector(selector).getAnimations()[0].effect.getKeyframes();
               const beforeMovement = frames('.eq-target-field').find(f => Math.abs(f.offset-0.58)<0.0001);
               const motorStart = frames('.eq-large-rotor').find(f => Math.abs(f.offset-0.58)<0.0001);
-              return {field:beforeMovement?.transform,motor:motorStart?.transform};
+              const clean = str => (str || '').replace(/\\s+/g,'');
+              return {field:clean(beforeMovement?.transform),motor:clean(motorStart?.transform)};
             }""")
-            if timing != {"field":"translate(0px, 0px)", "motor":"rotate(0deg)"}:
+            if timing != {"field":"translate(0px,0px)", "motor":"rotate(0deg)"}:
                 fail("field movement is not synchronized with motor start: "+str(timing), width)
             if "1800" not in page.locator(".eq-small-rotor").first.evaluate(
                 "(el) => el.getAnimations().find(x=>x.animationName==='eq-motor-turn')?.effect.getKeyframes().at(-1).transform || ''"):
