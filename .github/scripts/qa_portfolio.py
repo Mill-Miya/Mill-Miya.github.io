@@ -177,15 +177,19 @@ with sync_playwright() as p:
             fail("lower belt does not meet the common pulley radius", width)
         if concept.locator(".eq-target-object").count()!=1:
             fail("offset target marker absent from final reticle", width)
-        # Three identical arrow glyphs, with the same shaft and head vectors.
-        arrow_shapes = concept.locator("path.eq-flow-arrow").evaluate_all("""nodes =>
-          nodes.map(node => {
-            const nums = node.getAttribute('d').match(/[-+]?\d+(?:\.\d+)?/g).map(Number);
-            return nums.map((value,index)=>
-              value - ([0,2,3,5,7].includes(index) ? nums[0] : nums[1]));
-          })""")
-        if len(arrow_shapes)!=3 or any(shape != arrow_shapes[0] for shape in arrow_shapes[1:]):
-            fail("stage arrows differ in dimensions or stroke layout", width)
+        # No separator arrows, and the Wi-Fi point lies at the exact midpoint
+        # of the visible gap between phone (x=139) and ESP32 (x=193).
+        if concept.locator(".eq-flow-arrows, .eq-flow-arrow").count()!=0:
+            fail("old stage separator arrows still visible", width)
+        wifi = concept.locator(".eq-wifi-node")
+        if wifi.count()!=1:
+            fail("Wi-Fi symbol wrapper missing", width)
+        wifi_center = wifi.evaluate("""node => {
+            const transform = node.transform.baseVal.consolidate().matrix;
+            return {x:281 + transform.e, y:221 + transform.f};
+        }""")
+        if abs(wifi_center["x"] - 166) > 0.01 or abs(wifi_center["y"] - 219) > 0.01:
+            fail("Wi-Fi symbol is not centered between phone and ESP32: "+str(wifi_center), width)
         if concept.locator(".eq-control-wire path").count()!=2:
             fail("two control wires are not drawn", width)
         # The ESP's rightmost contacts are x=286, and the motor housing starts at x=320.
@@ -247,6 +251,35 @@ with sync_playwright() as p:
             }""")
             if "-40" not in final["target"] or "36" not in final["target"]:
                 fail("star field never reaches the reticle center: "+str(final), width)
+            # At 6250 ms both are still traveling; only at the same 6400 ms
+            # endpoint does the star field center and the motor arrow finish
+            # its integral turn. A non-linear eased field would fail this check.
+            sync = card_art.evaluate("""art => {
+              const field = art.querySelector('.eq-target-field');
+              const pulley = art.querySelector('.eq-large-rotor');
+              const fieldAnim = field.getAnimations().find(a => a.animationName === 'eq-target-acquire');
+              const pulleyAnim = pulley.getAnimations().find(a => a.animationName === 'eq-pulley-turn');
+              const snapshot = time => {
+                fieldAnim.currentTime = time;
+                pulleyAnim.currentTime = time;
+                const f = new DOMMatrix(getComputedStyle(field).transform);
+                const m = new DOMMatrix(getComputedStyle(pulley).transform);
+                return {x:f.m41, y:f.m42, angle:Math.atan2(m.b,m.a)};
+              };
+              return {
+                easing:getComputedStyle(field).animationTimingFunction,
+                before:snapshot(6250),
+                end:snapshot(6400)
+              };
+            }""")
+            if sync["easing"] != "linear":
+                fail("star field must move linearly until the motor finishes: "+str(sync), width)
+            if abs(sync["before"]["x"] + 40) < 1 or abs(sync["before"]["y"] - 36) < 1:
+                fail("target was centered before motor stopped: "+str(sync), width)
+            if abs(sync["before"]["angle"]) < .05:
+                fail("motor arrow returned to initial angle before target arrival: "+str(sync), width)
+            if abs(sync["end"]["x"] + 40) > .01 or abs(sync["end"]["y"] - 36) > .01 or abs(sync["end"]["angle"]) > .001:
+                fail("target and motor final pose did not coincide: "+str(sync), width)
             timing = card_art.evaluate("""el => {
               const frames = selector => el.querySelector(selector).getAnimations()[0].effect.getKeyframes();
               const beforeMovement = frames('.eq-target-field').find(f => Math.abs(f.offset-0.58)<0.0001);

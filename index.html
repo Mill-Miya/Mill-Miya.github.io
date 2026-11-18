@@ -18,8 +18,8 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="assets/favicon-48.png" sizes="48x48" type="image/png">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/style.css?v=14">
-  <script src="assets/main.js?v=7" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=15">
+  <script src="assets/main.js?v=8" defer></script>
   <title>Mill-Miya — Selected Works</title>
 </head>
 <body>
@@ -136,15 +136,9 @@
     <path d="M188 263H233" stroke="#8bbec0" stroke-width="1.3" opacity=".45"/>
   </g>
   </g>
-  <!-- Operational order: SkySafari -> Wi-Fi -> ESP32 -> drive -> acquired target. -->
-  <!-- Equal-sized arrows mark transitions between the four stages. -->
-  <g class="eq-flow-arrows" fill="none" stroke="#a6e3d5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-    <path class="eq-flow-arrow" d="M142 219H160M154 213L161 219L154 225"/>
-    <path class="eq-flow-arrow" d="M291 222H309M303 216L310 222L303 228"/>
-    <path class="eq-flow-arrow" d="M459 219H477M471 213L478 219L471 225"/>
-  </g>
-  <g transform="translate(-121 -25)">
-  <!-- Wi-Fi bridge, not an additional hardware box. -->
+  <!-- The four stages are identified by their symbols and captions, without separator arrows. -->
+  <g class="eq-wifi-node" transform="translate(-115 -2)">
+  <!-- Centered between phone (right x=139) and ESP32 (left x=193): Wi-Fi at x=166. -->
   <g fill="none" stroke="#9bd8d1" stroke-width="2" stroke-linecap="round">
     <path class="eq-wifi-outer" d="M269 208Q281 196 293 208" opacity=".73"/>
     <path class="eq-wifi-inner" d="M274 215Q281 208 288 215"/>
@@ -167,7 +161,7 @@
   </g>
   </g>
   <!-- Two actual signal-wire runs from ESP32 right-side pins to motor enclosure.
-       Route around the command arrow; positions are in global SVG coordinates. -->
+       Two direct connections; positions are in global SVG coordinates. -->
   <g class="eq-control-wire" fill="none" stroke="#7fbfc8" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" opacity=".9">
     <path d="M286 233H292C307 233 304 258 314 268L320 269"/>
     <path d="M286 252H288C306 252 301 283 313 285H320"/>

@@ -373,7 +373,8 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 /* Each 6.4 s cycle: phone > radio > ESP32 > motor and starfield slewing together. */
 @media(prefers-reduced-motion:no-preference){
   .art-eqmount:is(.is-hovering,.is-playing) .eq-target-field{
-    animation:eq-target-acquire 6.4s cubic-bezier(.2,.68,.25,1) 1 both;
+    /* Linear travel shares the motor timeline; neither finishes early. */
+    animation:eq-target-acquire 6.4s linear 1 both;
   }
   .art-eqmount:is(.is-hovering,.is-playing) .eq-target-ring{
     animation:eq-target-select 6.4s ease-in-out 1 both;
@@ -392,9 +393,6 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   }
   .art-eqmount:is(.is-hovering,.is-playing) .eq-esp-led{
     animation:eq-controller-led 6.4s ease-in-out 1 both;
-  }
-  .art-eqmount:is(.is-hovering,.is-playing) .eq-command-path{
-    animation:eq-controller-output 6.4s linear 1 both;
   }
   .art-eqmount:is(.is-hovering,.is-playing) .eq-small-rotor{
     animation:eq-motor-turn 6.4s linear 1 both,eq-drive-visibility 6.4s linear 1 both;
@@ -439,10 +437,6 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 @keyframes eq-controller-led{
   0%,43%,64%,100%{opacity:.85;filter:none}
   49%,57%{opacity:1;filter:drop-shadow(0 0 6px #b2fff0)}
-}
-@keyframes eq-controller-output{
-  0%,45%,61%,100%{stroke-dasharray:none;opacity:1}
-  49%,57%{stroke-dasharray:4 5;stroke-dashoffset:-18;opacity:.9}
 }
 @keyframes eq-motor-turn{
   0%,58%{transform:rotate(0deg)}
