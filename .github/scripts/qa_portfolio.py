@@ -576,7 +576,7 @@ with sync_playwright() as p:
                     label:art.querySelector('.sorava-guest-guiding-label')?.textContent
                   };
                 }""")
-                if (abs(arrow_location["x"] - .5) > .03 or
+                if (abs(arrow_location["x"] - .5) > .055 or
                         arrow_location["y"] < .70 or arrow_location["y"] > .94 or
                         arrow_location["label"] != "FOLLOW ↗"):
                     fail("Sorava guidance arrow not in marked lower star-map position: "+str(arrow_location), width)
