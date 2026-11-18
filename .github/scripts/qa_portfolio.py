@@ -177,6 +177,25 @@ with sync_playwright() as p:
             fail("lower belt does not meet the common pulley radius", width)
         if concept.locator(".eq-target-object").count()!=1:
             fail("offset target marker absent from final reticle", width)
+        # Three identical arrow glyphs, with the same shaft and head vectors.
+        arrow_shapes = concept.locator("path.eq-flow-arrow").evaluate_all("""nodes =>
+          nodes.map(node => {
+            const nums = node.getAttribute('d').match(/[-+]?\d+(?:\.\d+)?/g).map(Number);
+            return nums.map((value,index)=>value - (index%2 ? nums[1] : nums[0]));
+          })""")
+        if len(arrow_shapes)!=3 or any(shape != arrow_shapes[0] for shape in arrow_shapes[1:]):
+            fail("stage arrows differ in dimensions or stroke layout", width)
+        if concept.locator(".eq-control-wire path").count()!=2:
+            fail("two control wires are not drawn", width)
+        # The ESP's rightmost contacts are x=286, and the motor housing starts at x=320.
+        wires = concept.locator(".eq-control-wire path").evaluate_all("""nodes =>
+          nodes.map(n => n.getAttribute('d'))""")
+        if not all(wire.startswith(("M286 233", "M286 252")) and wire.endswith(("320 269", "320")) for wire in wires):
+            fail("wires do not connect the ESP32 terminals to the motor enclosure", width)
+        if concept.locator(".eq-target-field > circle").count()!=5:
+            fail("target field does not include all five stars", width)
+        if concept.locator(".eq-target-ring").evaluate("(el) => !!el.closest('.eq-target-field')"):
+            fail("target reticle must remain stationary", width)
         # Both contact points must be on the same 41-unit pitch circle, with
         # the line normal perpendicular to each run (external tangents).
         tangent_error = concept.evaluate("""svg => {
@@ -220,13 +239,21 @@ with sync_playwright() as p:
                 return getComputedStyle(n).transform;
               };
               return {
-                target:matrix('.eq-target-object'),
+                target:matrix('.eq-target-field'),
                 motor:matrix('.eq-small-rotor'),
                 pulley:matrix('.eq-large-rotor')
               };
             }""")
             if "-40" not in final["target"] or "36" not in final["target"]:
-                fail("target never arrives at reticle center: "+str(final), width)
+                fail("star field never reaches the reticle center: "+str(final), width)
+            timing = card_art.evaluate("""el => {
+              const frames = selector => el.querySelector(selector).getAnimations()[0].effect.getKeyframes();
+              const beforeMovement = frames('.eq-target-field').find(f => Math.abs(f.offset-0.58)<0.0001);
+              const motorStart = frames('.eq-large-rotor').find(f => Math.abs(f.offset-0.58)<0.0001);
+              return {field:beforeMovement?.transform,motor:motorStart?.transform};
+            }""")
+            if timing != {"field":"translate(0px, 0px)", "motor":"rotate(0deg)"}:
+                fail("field movement is not synchronized with motor start: "+str(timing), width)
             if "1800" not in page.locator(".eq-small-rotor").first.evaluate(
                 "(el) => el.getAnimations().find(x=>x.animationName==='eq-motor-turn')?.effect.getKeyframes().at(-1).transform || ''"):
                 fail("motor does not complete five full turns", width)
