@@ -583,7 +583,10 @@ with sync_playwright() as p:
                   const get = sel => art.querySelector(sel);
                   const host=get('.sorava-host-picked'),guest=get('.sorava-guest-received');
                   const waiting=get('.sorava-guest-waiting'),wifi=get('.sorava-wifi-node');
-                  const nodes=[host,guest,waiting,wifi];
+                  const hostReticle=get('.sorava-host-reticle');
+                  const guestReticle=get('.sorava-guest-reticle');
+                  const guestArrow=get('.sorava-guest-direction');
+                  const nodes=[host,guest,waiting,wifi,hostReticle,guestReticle,guestArrow];
                   const animations=nodes.map(node=>node.getAnimations()[0]);
                   const state=t=>{
                     animations.forEach(animation=>animation.currentTime=t);
@@ -599,14 +602,22 @@ with sync_playwright() as p:
                     fail("Sorava M42 synchronization target or finish animation missing", width)
                 if phases["start"][0]>.05 or phases["start"][1]>.05 or phases["start"][2]<.95:
                     fail("Sorava initial screen state incorrect: "+str(phases), width)
+                if any(phases["start"][index] > .05 for index in (4,5,6)):
+                    fail("Neither phone may show a reticle/arrow before selecting M42: "+str(phases), width)
                 if phases["host"][0]<.95 or phases["host"][1]>.05:
                     fail("Sorava host must select M42 before guest: "+str(phases), width)
+                if phases["host"][4]<.95 or phases["host"][5]>.05 or phases["host"][6]>.05:
+                    fail("Host reticle should appear only after M42 selection; guest stays blank: "+str(phases), width)
                 if phases["transfer"][3]<.8 or phases["transfer"][1]>.05:
                     fail("Sorava Wi-Fi phase is not between host and guest: "+str(phases), width)
+                if phases["transfer"][6]<.95 or phases["transfer"][5]>.05:
+                    fail("Guest must see directional arrow instead of reticle while pointing: "+str(phases), width)
                 if phases["guest"][1]<.95 or phases["guest"][2]>.05:
                     fail("Sorava guest did not receive M42: "+str(phases), width)
                 if phases["end"][1]<.95 or phases["end"][2]>.05:
                     fail("Sorava did not finish showing both M42 screens: "+str(phases), width)
+                if phases["end"][4]<.95 or phases["end"][5]<.95 or phases["end"][6]>.05:
+                    fail("After guest acquisition, both reticles must show and arrow must disappear: "+str(phases), width)
                 if width in (390,1440):
                     sorava_sheet.screenshot(path=str(OUT/f"sorava_two_phones_{width}.png"),animations="disabled")
                 # Screenshot testing may finish/cancel finite animations. Explicitly

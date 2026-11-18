@@ -28,6 +28,9 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .sorava-device-label{font-size:13px;letter-spacing:.22em;fill:#acc9d9;font-weight:700}
 .sorava-host-picked,.sorava-guest-received,.sorava-guest-synced-label{opacity:0}
 .sorava-guest-waiting,.sorava-guest-local-label{opacity:1}
+/* Reticles are selection/acquisition indicators, never pre-drawn decoration. */
+.sorava-host-reticle,.sorava-guest-reticle,.sorava-guest-direction{opacity:0}
+.sorava-direction-label{fill:#d1f7ed;font-size:9px;font-weight:700;letter-spacing:.06em;stroke:none}
 /* The guest starts aimed 32 SVG units to the right and 34 up, a visibly different field of view. */
 .sorava-guest-field{transform:translate(32px,-34px)}
 .sorava-wifi-node{opacity:.28}
@@ -36,8 +39,14 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .art-sorava.is-complete .sorava-guest-waiting,.art-sorava.is-complete .sorava-guest-local-label{opacity:0}
 .art-sorava.is-complete .sorava-guest-field{transform:translate(0,0)}
 .art-sorava.is-complete .sorava-wifi-node{opacity:.9}
+.art-sorava.is-complete .sorava-host-reticle,
+.art-sorava.is-complete .sorava-guest-reticle{opacity:1}
+.art-sorava.is-complete .sorava-guest-direction{opacity:0}
 @media(prefers-reduced-motion:no-preference){
   .art-sorava:is(.is-hovering,.is-playing) .sorava-host-picked{animation:sorava-host-pick 7.2s ease-in-out 1 both}
+  .art-sorava:is(.is-hovering,.is-playing) .sorava-host-reticle{animation:sorava-host-reticle-reveal 7.2s ease-in-out 1 both}
+  .art-sorava:is(.is-hovering,.is-playing) .sorava-guest-reticle{animation:sorava-guest-reticle-acquired 7.2s ease-in-out 1 both}
+  .art-sorava:is(.is-hovering,.is-playing) .sorava-guest-direction{animation:sorava-guest-arrow-guidance 7.2s ease-in-out 1 both}
   .art-sorava:is(.is-hovering,.is-playing) .sorava-wifi-node{animation:sorava-wifi-blink 7.2s linear 1 both}
   .art-sorava:is(.is-hovering,.is-playing) .sorava-guest-field{animation:sorava-guest-pointing 7.2s ease-in-out 1 both}
   .art-sorava:is(.is-hovering,.is-playing) .sorava-guest-local-label{animation:sorava-guest-wait 7.2s linear 1 both}
@@ -46,6 +55,9 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   .art-sorava:is(.is-hovering,.is-playing) .sorava-guest-received{animation:sorava-guest-receive 7.2s ease-in-out 1 both}
 }
 @keyframes sorava-host-pick{0%,10%{opacity:0}22%,100%{opacity:1}}
+@keyframes sorava-host-reticle-reveal{0%,10%{opacity:0}22%,100%{opacity:1}}
+@keyframes sorava-guest-arrow-guidance{0%,32%{opacity:0}43%,69%{opacity:1}78%,100%{opacity:0}}
+@keyframes sorava-guest-reticle-acquired{0%,73%{opacity:0}85%,100%{opacity:1}}
 /* The Wi-Fi symbol ITSELF blinks three times; no wandering signal dot. */
 @keyframes sorava-wifi-blink{
   0%,25%{opacity:.28}
