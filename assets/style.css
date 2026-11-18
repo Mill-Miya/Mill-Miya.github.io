@@ -680,7 +680,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 }
 @media (hover:hover) and (prefers-reduced-motion:no-preference) {
   .project-media--locked[data-lock-motion="swing"]:hover .project-lock-mark svg{
-    animation:mm-lock-damped-swing 1.55s linear 1 both;
+    animation:mm-lock-damped-swing 1.9s linear 1 both;
   }
   .project-media--locked[data-lock-motion="shake"]:hover .project-lock-mark svg{
     animation:mm-lock-damped-shake 1.35s linear 1 both;
@@ -699,14 +699,14 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 }
 @keyframes mm-lock-damped-shake {
   0%{transform:translateX(0)}
-  9%{transform:translateX(24px)}
-  20%{transform:translateX(-19px)}
-  32%{transform:translateX(14px)}
-  44%{transform:translateX(-10px)}
-  56%{transform:translateX(6.5px)}
-  68%{transform:translateX(-3.6px)}
-  80%{transform:translateX(1.6px)}
-  91%{transform:translateX(-.45px)}
+  9%{transform:translateX(12px)}
+  20%{transform:translateX(-9.5px)}
+  32%{transform:translateX(7px)}
+  44%{transform:translateX(-5px)}
+  56%{transform:translateX(3.25px)}
+  68%{transform:translateX(-1.8px)}
+  80%{transform:translateX(.8px)}
+  91%{transform:translateX(-.225px)}
   100%{transform:translateX(0)}
 }
 #lock-preview-a,#lock-preview-b{scroll-margin-top:110px}
