@@ -550,3 +550,21 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 @media(max-width:380px){
   .filter{font-size:10px;letter-spacing:-.015em}
 }
+
+/* Fit the complete desktop hero artwork into the opening viewport.
+   Match the compact top spacing of the reference without changing mobile layouts. */
+@media (min-width:821px) {
+  .hero-content { padding-top:clamp(12px,1.2vw,20px); }
+  .hero-visual {
+    width:min(100%,max(280px,calc(100svh - 210px)));
+    justify-self:end;
+  }
+}
+/* Short desktop windows get a proportionally smaller first fold, not clipping. */
+@media (min-width:821px) and (max-height:760px) {
+  .hero-main { margin-top:clamp(18px,3svh,30px); }
+  .hero h1 { font-size:clamp(64px,min(9.1vw,15svh),150px); }
+  .hero-disciplines { margin-top:22px; }
+  .hero-links { margin-top:20px; }
+  .hero-visual { width:min(100%,max(280px,calc(100svh - 170px))); }
+}
