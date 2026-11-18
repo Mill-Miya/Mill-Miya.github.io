@@ -170,16 +170,18 @@ with sync_playwright() as p:
                     ".wp-pipe-front", ".wp-flow-cutaway", ".wp-flow-trace"):
             if wallpipe.locator(cls).get_attribute("d")!=route:
                 fail("WallPipe water and metal layers must follow identical rounded pipe centerline: "+cls, width)
-        for side, x, y in (("in", 98, 290), ("out", 523, 173)):
-            mouth=wallpipe.locator(".wp-pipe-mouth-"+side)
-            if mouth.count()!=1 or mouth.locator("ellipse").count()!=2:
-                fail("Hollow annular pipe mouth missing: "+side, width)
-            outer,inner=mouth.locator("ellipse").all()
-            for el in (outer,inner):
-                if el.get_attribute("cx")!=str(x) or el.get_attribute("cy")!=str(y):
-                    fail("Pipe opening is not concentric with the horizontal tube: "+side, width)
-            if outer.get_attribute("rx")<=inner.get_attribute("rx") or outer.get_attribute("ry")<=inner.get_attribute("ry"):
-                fail("Pipe opening lacks annular wall thickness: "+side, width)
+        if wallpipe.locator(".wp-pipe-ends, .wp-pipe-mouth").count():
+            fail("Old circular end plates must not occlude pipe ends", width)
+        if wallpipe.locator(".wp-pipe-assembly").get_attribute("stroke-linecap")!="butt":
+            fail("Pipe sections should terminate cleanly without round caps", width)
+        wheel_placement=wallpipe.locator(".wp-wheel-tilt").get_attribute("transform")
+        if wheel_placement!="translate(364 173) scale(.70 .70)":
+            fail("Handwheel is not centered over the marked valve housing: "+str(wheel_placement), width)
+        if wallpipe.locator('.wp-valve path[d="M360 132V94"]').count():
+            fail("Obsolete elevated handwheel stem remains", width)
+        if wallpipe.locator(".wp-scene").evaluate(
+                "(el) => getComputedStyle(el).transform")!="none":
+            fail("WallPipe scene must remain rigid without camera sway", width)
         if wallpipe.locator(".wp-valve-housing").count()!=1:
             fail("Cast mechanical valve housing is missing", width)
         if wallpipe.locator('.wp-valve rect[x="329"][width="65"]').count():
@@ -198,9 +200,6 @@ with sync_playwright() as p:
         if wallpipe.locator(".wp-water-core").evaluate(
                 "(el) => parseFloat(getComputedStyle(el).opacity)")<.9:
             fail("WallPipe static water flow must be visible", width)
-        if wallpipe.locator(".wp-pipe-mouth-in").evaluate(
-                "(el) => getComputedStyle(el).visibility")!="visible":
-            fail("Hollow pipe opening must remain visible without motion", width)
         if width in (390,1440):
             page.emulate_media(reduced_motion="no-preference")
             pipe_media=page.locator('.project-card[data-project="02"] .project-media')
@@ -208,6 +207,9 @@ with sync_playwright() as p:
             pipe_media.hover()
             if "is-hovering" not in (pipe_art.get_attribute("class") or ""):
                 fail("WallPipe listing did not start playback on hover", width)
+            if pipe_art.locator(".wp-scene").evaluate(
+                    "(el) => getComputedStyle(el).animationName")!="none":
+                fail("WallPipe no longer allows perspective wobbling", width)
             if pipe_art.locator(".wp-wheel-spin").evaluate(
                     "(el) => getComputedStyle(el).animationName")!="wp-wheel-open":
                 fail("WallPipe handwheel did not animate on hover", width)
