@@ -109,21 +109,42 @@ with sync_playwright() as p:
                 fail("All filter does not restore all six projects", width)
             if page.locator('#visible-count').inner_text().strip()!="06":
                 fail("filter counter incorrect", width)
-        # One L3 work is visibly preview-locked while remaining in the list.
-        locked = page.locator('.project-card[data-project="06"]')
-        if locked.count()!=1 or locked.locator('.project-art.art-messe').count()!=1:
-            fail("Suwa Messe work disappeared", width)
-        if locked.locator(".project-lock-mark svg").count()!=1:
-            fail("Suwa Messe lock visual missing", width)
-        if locked.locator("[data-open-sheet], a[href]").count()!=0:
-            fail("locked work has active sheet or demo controls", width)
-        if page.locator('a[href*="suwa-messe-2026"]').count()!=0:
-            fail("locked public demo URL leaked into site", width)
-        if page.locator('.project-card [data-open-sheet]').count()!=15:
-            fail("expected five sheet-enabled works", width)
-        if page.locator(".project-card .project-links a[href]").count()!=4:
-            fail("expected four public live site links", width)
-        # Five eligible projects open sheets without replacing public demo links.
+        # Two works remain visible but may not open a sheet or a live demo.
+        for project_number, art_class, url_fragment in (
+            ("05", "art-assignment", "assignment-checker/"),
+            ("06", "art-messe", "suwa-messe-2026/"),
+        ):
+            locked = page.locator(f'.project-card[data-project="{project_number}"]')
+            if locked.count()!=1 or locked.locator(f'.project-art.{art_class}').count()!=1:
+                fail("locked work missing artwork", width)
+            if locked.locator(".project-lock-mark svg").count()!=1:
+                fail("locked work missing lock visual", width)
+            if locked.locator("[data-open-sheet], a[href]").count()!=0:
+                fail("locked work still has actionable controls", width)
+            if locked.locator(".project-locked-note").inner_text().strip()!="PREVIEW UNAVAILABLE":
+                fail("locked work availability note missing", width)
+            if page.locator(f'a[href*="{url_fragment}"]').count()!=0:
+                fail("locked work demo link leaked", width)
+            bounds = locked.locator(".project-art").bounding_box()
+            mark = locked.locator(".project-lock-mark").bounding_box()
+            icon = locked.locator(".project-lock-mark svg").bounding_box()
+            if not bounds or not mark or not icon:
+                fail("lock markup invisible", width)
+            if icon["width"] < 40 or icon["height"] < 40:
+                fail("lock icon unexpectedly small", width)
+            if abs(mark["x"] + mark["width"] / 2 - (bounds["x"] + bounds["width"] / 2)) > 5:
+                fail("lock mark not horizontally centered", width)
+            if abs(mark["y"] + mark["height"] / 2 - (bounds["y"] + bounds["height"] / 2)) > 5:
+                fail("lock mark not vertically centered", width)
+            if mark["width"] > bounds["width"] + 1 or mark["height"] > bounds["height"] + 1:
+                fail("lock mark overflows artwork", width)
+        if page.locator('.project-card [data-open-sheet]').count()!=12:
+            fail("expected four sheet-enabled works", width)
+        if page.locator(".project-card .project-links a[href]").count()!=3:
+            fail("expected three public live site links", width)
+        if page.locator("a[href*='assignment-checker/'], a[href*='suwa-messe-2026/']").count()!=0:
+            fail("locked public demo URLs leaked into the page", width)
+        # Four eligible projects open sheets without replacing public demo links.
         if width in (320, 390, 820, 1440):
             trigger = page.locator('.project-card[data-project="01"] .project-media-hit')
             trigger.click()
@@ -155,10 +176,13 @@ with sync_playwright() as p:
             if page.locator("#sheet-actions a").count():
                 fail("private demo link unexpectedly appeared", width)
             page.locator("#sheet-close").click()
-            page.locator('.project-card[data-project="05"] .project-title-button').click()
+            page.locator('.project-card[data-project="04"] .project-title-button').click()
             page.locator("#sheet-next").click()
             if page.locator("#sheet-title").inner_text().strip() != "Sorava / SkyShare":
-                fail("sheet navigation did not skip locked Suwa Messe", width)
+                fail("sheet navigation did not skip both locked projects", width)
+            page.locator("#sheet-prev").click()
+            if page.locator("#sheet-title").inner_text().strip() != "University AI":
+                fail("reverse navigation did not skip locked projects", width)
             page.locator("#sheet-close").click()
             if errors: fail("JavaScript error after sheet controls: "+repr(errors), width)
         print("QA_PASS",width,"cards",len(boxes),"width",metrics["scrollWidth"],flush=True)

@@ -269,28 +269,33 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 }
 
 
-/* Portfolio registry preview lock: visible card, disabled work sheet and demo. */
+/* Portfolio registry preview lock: visible artwork, unavailable controls. */
 .project-media--locked{cursor:default}
 .project-media--locked .project-art{
-  filter:grayscale(.65) saturate(.65) brightness(.87);
+  filter:grayscale(.56) saturate(.75) brightness(.91);
   transition:none;
 }
 .project-media--locked:hover .project-art,
 .project-media--locked:focus-within .project-art{transform:none}
 .project-lock-veil{
   position:absolute;inset:0;z-index:11;display:grid;place-items:center;
-  background:linear-gradient(0deg,rgba(226,233,229,.32),rgba(217,227,222,.19));
+  background:linear-gradient(0deg,rgba(227,234,229,.27),rgba(218,226,221,.17));
   pointer-events:none;
 }
 .project-lock-mark{
-  display:flex;align-items:center;justify-content:center;gap:12px;
-  padding:13px 18px;border:1px solid rgba(37,52,46,.24);
-  background:rgba(245,247,243,.91);box-shadow:0 10px 32px #182c2624;
-  color:#384a42;font:600 10px var(--font-mono);letter-spacing:.08em;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;
+  min-width:min(55%,240px);min-height:144px;padding:22px 26px;
+  border:1px solid rgba(48,62,55,.27);border-radius:2px;
+  background:rgba(248,250,246,.94);box-shadow:0 14px 34px #182c262d;
+  color:#34463d;font:650 11px/1.4 var(--font-mono);letter-spacing:.08em;
+  text-align:center;
 }
-.project-lock-mark svg{width:19px;height:19px;flex:none}
-.project-locked-note{font:600 10px var(--font-mono);letter-spacing:.09em;color:#777f78;cursor:default}
+.project-lock-mark svg{width:58px;height:58px;flex:none;stroke-width:1.5}
+.project-locked-note{
+  display:inline-flex;align-items:center;min-height:28px;
+  font:600 10px var(--font-mono);letter-spacing:.08em;color:#777f78;cursor:default
+}
 @media(max-width:400px){
-  .project-lock-mark{gap:8px;padding:10px 12px;font-size:9px}
-  .project-lock-mark svg{width:16px;height:16px}
+  .project-lock-mark{min-width:56%;min-height:122px;gap:9px;padding:16px 19px;font-size:10px}
+  .project-lock-mark svg{width:46px;height:46px}
 }
