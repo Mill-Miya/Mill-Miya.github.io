@@ -18,7 +18,7 @@
   <link rel="icon" href="assets/favicon-48.png?v=3" sizes="48x48" type="image/png">
   <link rel="icon" href="assets/favicon.svg?v=3" type="image/svg+xml" sizes="any">
   <link rel="apple-touch-icon" href="assets/icon-180.png?v=3">
-  <link rel="stylesheet" href="assets/style.css?v=35">
+  <link rel="stylesheet" href="assets/style.css?v=36">
   <script src="assets/main.js?v=14" defer></script>
   <title>Mill-Miya — Selected Works</title>
 </head>
@@ -190,7 +190,7 @@
                 <path d="M301 91V105M294 98H308M301 337V351M294 344H308" stroke-opacity=".48"/>
               </g>
               <g class="wp-scene">
-                <g class="wp-pipe-assembly" stroke-linecap="round" stroke-linejoin="round">
+                <g class="wp-pipe-assembly" stroke-linecap="butt" stroke-linejoin="round">
                   <!-- Exactly two 90-degree elbows: right, up, right. -->
                   <path class="wp-pipe-shadow" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" transform="translate(2 10)" stroke="#102d2d" stroke-opacity=".45" stroke-width="55"/>
                   <path class="wp-pipe-outline" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="#234841" stroke-width="52"/>
@@ -209,19 +209,6 @@
                     <rect x="322" y="142" width="14" height="62" rx="3" fill="url(#wp-valve)"/>
                     <rect x="387" y="142" width="14" height="62" rx="3" fill="url(#wp-valve)"/>
                   </g>
-                  <!-- Two hollow pipe mouths oriented perpendicular to the cylinder axis. -->
-                  <g class="wp-pipe-ends">
-                    <g class="wp-pipe-mouth wp-pipe-mouth-in">
-                      <ellipse cx="98" cy="290" rx="9.5" ry="25" fill="#587f75" stroke="#c7e3d6" stroke-width="3.8"/>
-                      <ellipse cx="98" cy="290" rx="5.4" ry="16.1" fill="#0b3539" stroke="#224f4a" stroke-width="1.8"/>
-                      <path d="M96 275Q92 290 96 305" stroke="#8bd2d0" stroke-opacity=".58" stroke-width="1.7" fill="none"/>
-                    </g>
-                    <g class="wp-pipe-mouth wp-pipe-mouth-out">
-                      <ellipse cx="523" cy="173" rx="9.5" ry="25" fill="#587f75" stroke="#c7e3d6" stroke-width="3.8"/>
-                      <ellipse cx="523" cy="173" rx="5.4" ry="16.1" fill="#0b3539" stroke="#224f4a" stroke-width="1.8"/>
-                      <path d="M525 158Q529 173 525 188" stroke="#8bd2d0" stroke-opacity=".58" stroke-width="1.7" fill="none"/>
-                    </g>
-                  </g>
                   <g class="wp-valve">
                     <!-- Cast housing with chamfered shoulders, bonnet and circular cover. -->
                     <path class="wp-valve-housing" d="M335 153L346 145H378L392 155V190L380 200H346L335 191Z" fill="url(#wp-valve)" stroke="#d1e9da" stroke-width="3.2"/>
@@ -232,12 +219,8 @@
                       <circle cx="342" cy="154" r="3"/><circle cx="384" cy="154" r="3"/>
                       <circle cx="342" cy="193" r="3"/><circle cx="384" cy="193" r="3"/>
                     </g>
-                    <path d="M345 148V140Q345 132 353 132H373Q381 132 381 140V148Z" fill="url(#wp-valve)" stroke="#d7e9df" stroke-width="2.5"/>
-                    <path d="M360 132V94" stroke="#244a43" stroke-width="12" stroke-linecap="round"/>
-                    <path d="M360 132V94" stroke="#d4e7dc" stroke-width="5.5" stroke-linecap="round"/>
-                    <rect x="349" y="123" width="23" height="11" rx="3" fill="#688f82" stroke="#dcefe3" stroke-width="2"/>
-                    <!-- Four open spokes; the wall is visible through the wheel. -->
-                    <g class="wp-wheel-tilt" transform="translate(360 88) scale(1 .76)">
+                    <!-- Handwheel mounted on the visible valve face at the pipe centerline. -->
+                    <g class="wp-wheel-tilt" transform="translate(364 173) scale(.70 .70)">
                       <g class="wp-wheel-spin">
                         <circle r="46" fill="none" stroke="#284f45" stroke-width="14"/>
                         <circle r="46" fill="none" stroke="#c7e0d2" stroke-width="7"/>
