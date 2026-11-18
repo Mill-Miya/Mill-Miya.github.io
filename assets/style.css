@@ -405,7 +405,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .sheet-visual-side{display:flex;min-width:0;min-height:0;overflow:hidden;flex-direction:column;justify-content:space-between;gap:18px;padding:clamp(20px,3.3vw,48px);background:var(--sheet-panel,#e4e8e1);border-right:1px solid #d1d8d1}
 .sheet-visual-top,.sheet-visual-bottom{display:flex;justify-content:space-between;gap:16px;color:var(--sheet-muted,#64716c);font:9px var(--font-mono);letter-spacing:.09em}
 .sheet-visual{position:relative;min-width:0;min-height:0;display:grid;place-items:center;flex:1 1 auto;overflow:hidden}
-.sheet-visual .project-art{width:100%;max-height:100%;aspect-ratio:1.17/1;box-shadow:14px 15px 0 #111a211a}
+.sheet-visual .project-art{width:calc(100% - 28px);max-height:calc(100% - 28px);aspect-ratio:1.17/1;box-shadow:0 10px 24px rgba(20,30,30,.12),0 2px 6px rgba(20,30,30,.07)}
 .sheet-copy-side{min-width:0;min-height:0;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-gutter:stable;padding:clamp(32px,4.5vw,70px) clamp(26px,4vw,64px)}
 .sheet-eyebrow{font:10px var(--font-mono);letter-spacing:.1em;color:var(--sheet-accent,var(--electric));margin:0 0 29px}
 .sheet-copy-side h2{font-size:clamp(35px,4.3vw,65px);line-height:1.04;font-weight:730;letter-spacing:-.07em;overflow-wrap:anywhere;margin:0 0 34px}
@@ -441,7 +441,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   .sheet-header-center{display:none}
   .sheet-body{display:flex;flex-direction:column;min-height:0}
   .sheet-visual-side{flex:0 0 clamp(170px,37dvh,305px);min-height:0;gap:10px;padding:13px 20px}
-  .sheet-visual .project-art{width:100%;max-width:335px;max-height:100%;aspect-ratio:1.48/1;box-shadow:none}
+  .sheet-visual .project-art{width:calc(100% - 18px);max-width:335px;max-height:calc(100% - 14px);aspect-ratio:1.48/1;box-shadow:0 5px 13px rgba(20,30,30,.10),0 1px 4px rgba(20,30,30,.06)}
   .project-sheet[data-theme="nova"] .sheet-visual .project-art,.project-sheet[data-theme="university-ai"] .sheet-visual .project-art,.project-sheet[data-theme="assignment-checker"] .sheet-visual .project-art{aspect-ratio:1.48/1}
   .sheet-visual-top,.sheet-visual-bottom{font-size:8px}
   .sheet-copy-side{flex:1 1 auto;min-height:0;scrollbar-gutter:auto;padding:33px 24px 40px}
