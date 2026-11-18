@@ -182,22 +182,22 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
    inlet 0–0.7s, valve 0.7–1.35s, outlet 1.35–2.05s.
    Each holds perfectly still after its seating click. */
 @keyframes wp-dock-left{
-  0%,1%{opacity:0;transform:translateX(-38px)}
-  1.01%{opacity:1;transform:translateX(-38px)}
-  7.7%{opacity:1;transform:translateX(-9px)}
-  9.72%,100%{opacity:1;transform:translateX(0)}
+  0%,1%{visibility:hidden;opacity:0;transform:translateX(-38px)}
+  1.01%{visibility:visible;opacity:1;transform:translateX(-38px)}
+  7.7%{visibility:visible;opacity:1;transform:translateX(-9px)}
+  9.72%,100%{visibility:visible;opacity:1;transform:translateX(0)}
 }
 @keyframes wp-dock-center{
-  0%,9.72%{opacity:0;transform:translateY(-18px)}
-  10.4%{opacity:1;transform:translateY(-18px)}
-  16.7%{opacity:1;transform:translateY(-6px)}
-  18.75%,100%{opacity:1;transform:translateY(0)}
+  0%,9.72%{visibility:hidden;opacity:0;transform:translateY(-18px)}
+  10.4%{visibility:visible;opacity:1;transform:translateY(-18px)}
+  16.7%{visibility:visible;opacity:1;transform:translateY(-6px)}
+  18.75%,100%{visibility:visible;opacity:1;transform:translateY(0)}
 }
 @keyframes wp-dock-right{
-  0%,18.75%{opacity:0;transform:translateX(42px)}
-  19.4%{opacity:1;transform:translateX(42px)}
-  26.2%{opacity:1;transform:translateX(10px)}
-  28.47%,100%{opacity:1;transform:translateX(0)}
+  0%,18.75%{visibility:hidden;opacity:0;transform:translateX(42px)}
+  19.4%{visibility:visible;opacity:1;transform:translateX(42px)}
+  26.2%{visibility:visible;opacity:1;transform:translateX(10px)}
+  28.47%,100%{visibility:visible;opacity:1;transform:translateX(0)}
 }
 @keyframes wp-coupler-left{
   0%,18.75%{opacity:0}
