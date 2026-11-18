@@ -211,9 +211,9 @@ with sync_playwright() as p:
               const els=['.wp-pipe-assembly','.wp-wheel-spin','.wp-pipe-front',
                          '.wp-water-core','.wp-water-stream','.wp-status-open',
                          '.wp-status-closed'].map(find);
-              const animations=els.map(el=>el.getAnimations().find(a=>a.animationName));
+              const animations=els.map(el=>el.getAnimations().filter(a=>a.animationName));
               const frame=t=>{
-                animations.forEach(a=>{if(a)a.currentTime=t});
+                animations.forEach(items=>items.forEach(a=>{a.currentTime=t}));
                 return {
                   assembly:parseFloat(getComputedStyle(els[0]).opacity),
                   wheel:getComputedStyle(els[1]).transform,
@@ -797,8 +797,10 @@ with sync_playwright() as p:
                     "(el) => getComputedStyle(el).animationName")!="sorava-guest-receive":
                     fail("Sorava sheet playback interrupted by mouse position", width)
                 page.locator("#sheet-next").click()
-                if page.locator("#sheet-visual .art-sorava").count()!=0 or replay.is_visible():
-                    fail("Sorava sheet failed to stop and clear on NEXT", width)
+                if (page.locator("#sheet-visual .art-sorava").count()!=0 or
+                        page.locator("#sheet-visual .art-wallpipe").count()!=1 or
+                        not replay.is_visible()):
+                    fail("Sorava NEXT must hand playback over to WallPipe", width)
                 page.locator("#sheet-prev").click()
                 page.wait_for_function("""() =>
                   document.querySelector('#sheet-visual .art-sorava')?.classList.contains('is-playing')
