@@ -316,6 +316,34 @@ with sync_playwright() as p:
                 fail("wrong first sheet content", width)
             if page.locator("#sheet-description").is_visible():
                 fail("card summary incorrectly duplicated in detailed sheet", width)
+            # Only the information column scrolls; all artwork, header, and
+            # navigation stay stationary at both desktop and mobile widths.
+            pane = sheet.evaluate("""el => {
+              const visual=el.querySelector('.sheet-visual-side'),
+                art=el.querySelector('.sheet-visual .project-art'),
+                copy=el.querySelector('.sheet-copy-side'),
+                header=el.querySelector('.sheet-header'),
+                footer=el.querySelector('.sheet-footer');
+              const r=node => {const b=node.getBoundingClientRect();return {x:b.x,y:b.y,h:b.height,b:b.bottom}};
+              const before={image:r(visual),art:r(art),header:r(header),footer:r(footer)};
+              const overflow=getComputedStyle(copy).overflowY;
+              const outerOverflow=getComputedStyle(el).overflowY;
+              const available=copy.scrollHeight-copy.clientHeight;
+              copy.scrollTop=copy.scrollHeight;
+              const after={image:r(visual),header:r(header),footer:r(footer)};
+              const actual=copy.scrollTop;
+              copy.scrollTop=0;
+              return {before,after,actual,available,overflow,outerOverflow};
+            }""")
+            if pane["overflow"] not in ("auto","scroll") or pane["outerOverflow"]!="hidden":
+                fail("sheet scroll owner is not the right description pane", width)
+            if pane["available"] > 2 and pane["actual"] < 1:
+                fail("description did not scroll independently", width)
+            for region in ("image","header","footer"):
+                if abs(pane["before"][region]["y"] - pane["after"][region]["y"]) > .2:
+                    fail("fixed sheet region moved during description scroll: "+region, width)
+            if pane["before"]["art"]["h"] < 65:
+                fail("sheet illustration is clipped too small", width)
             if not page.locator("#sheet-extra").is_visible():
                 fail("approved sheet content not visible", width)
             if page.locator("#sheet-extra .sheet-feature").count()!=3:
@@ -391,6 +419,17 @@ with sync_playwright() as p:
                 page.locator('.project-card[data-project="07"] .project-title-button').click()
                 art = page.locator("#sheet-visual .art-eqmount")
                 play_button = page.locator(".sheet-motion-play")
+                page.wait_for_function("""() => document.querySelector('#sheet-visual .art-eqmount')?.classList.contains('is-playing')""", timeout=1500)
+                if play_button.evaluate("(el) => el.parentElement.id")!="sheet-visual":
+                    fail("replay control was not moved into image frame", width)
+                control_center=play_button.evaluate("""node => {
+                  const a=node.getBoundingClientRect(),
+                        b=node.parentElement.getBoundingClientRect();
+                  return {dx:(a.left+a.width/2)-(b.left+b.width/2),
+                          dy:(a.top+a.height/2)-(b.top+b.height/2)};
+                }""")
+                if abs(control_center["dx"])>1.1 or abs(control_center["dy"])>1.1:
+                    fail("replay control is not centered over visual: "+str(control_center), width)
                 if not play_button.is_visible():
                     fail("equatorial motion replay control not visible", width)
                 if art.locator(".eq-large-rotor").count()!=1 or art.locator(".eq-belt-teeth").count()!=2:
@@ -400,7 +439,11 @@ with sync_playwright() as p:
                 if page.locator('.project-card[data-project="07"] .eq-small-rotor').evaluate(
                     "(el) => getComputedStyle(el).opacity")!="0":
                     fail("noninteractive listing unexpectedly shows motor animation markers", width)
-                art.hover()
+                # The sheet auto-plays on opening. Move outside first so a
+                # genuine pointerenter (rather than a hover over the autoplay
+                # overlay) is tested.
+                page.mouse.move(0,0)
+                art.hover(position={"x":15,"y":15})
                 if "is-hovering" not in (art.get_attribute("class") or ""):
                     fail("desktop hover did not activate sheet SVG", width)
                 rotating = art.locator(".eq-large-rotor").evaluate(
@@ -424,8 +467,9 @@ with sync_playwright() as p:
                 if page.locator("#sheet-visual .art-eqmount").count()!=0 or play_button.is_visible():
                     fail("sheet switching did not clear equatorial motion", width)
                 page.locator("#sheet-prev").click()
-                if page.locator("#sheet-visual .art-eqmount.is-playing").count()!=0:
-                    fail("animation was not reset when reopening sheet", width)
+                page.wait_for_function("""() => document.querySelector('#sheet-visual .art-eqmount')?.classList.contains('is-playing')""", timeout=1500)
+                # Old animation is discarded on navigation; reopening starts
+                # a fresh, single autoplay cycle rather than staying paused.
                 page.emulate_media(reduced_motion="reduce")
                 if art.locator(".eq-large-rotor").count()!=1:
                     # After re-opening, the previous locator should still resolve to this clone.
