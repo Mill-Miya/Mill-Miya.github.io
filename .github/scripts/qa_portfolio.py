@@ -170,7 +170,7 @@ with sync_playwright() as p:
             fail("duplicated outdated art labels remain", width)
         if concept.locator('path[d="M192 178L214 191L236 190"][fill="none"]').count()!=1:
             fail("smartphone star path lost no-fill correction", width)
-        if concept.locator('path[d="M463.3 295.3L535.6 269.8"][fill="none"]').count()!=1:
+        if concept.locator('path:not(.eq-belt-teeth)[d="M463.3 295.3L535.6 269.8"][fill="none"]').count()!=1:
             fail("tangent-aligned bottom belt path missing", width)
         if concept.evaluate("(el) => getComputedStyle(el).filter")!="none":
             fail("old artwork drop shadow remains", width)
