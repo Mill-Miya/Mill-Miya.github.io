@@ -75,7 +75,8 @@
         finishAnimation: "sorava-guest-receive", finishTarget: "sorava-guest-received"
       },
       "wallpipe-ar": {
-        selector: ".art-wallpipe", duration: 7200, loop: true
+        selector: ".art-wallpipe", duration: 7200,
+        finishAnimation: "wp-open-status", finishTarget: "wp-status-open"
       }
     };
     const activeMotion = () => motions[activeCard?.dataset.sheetId] || null;
