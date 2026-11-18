@@ -18,8 +18,8 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="assets/favicon-48.png" sizes="48x48" type="image/png">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/style.css?v=18">
-  <script src="assets/main.js?v=11" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=19">
+  <script src="assets/main.js?v=12" defer></script>
   <title>Mill-Miya — Selected Works</title>
 </head>
 <body>
@@ -74,9 +74,19 @@
 <div class="project-group-label" id="featured-group-label"><span>FEATURED WORK / 02</span><span>Featured</span></div>
         <article class="project-card featured" data-tags="web astronomy" data-project="01" data-sheet-id="sorava"><div class="project-media"><div class="project-art art-sorava" aria-label="星図をモチーフにしたSoravaのイメージビジュアル">
             <div class="art-cap"><span>01 / ASTRONOMY</span><span>SOFTWARE</span></div>
-            <div class="sky-grid" aria-hidden="true"></div>
-            <div class="star s1" aria-hidden="true"></div><div class="star s2" aria-hidden="true"></div><div class="star s3" aria-hidden="true"></div><div class="star s4" aria-hidden="true"></div><div class="star s5" aria-hidden="true"></div><div class="star s6" aria-hidden="true"></div>
+            <!-- The complete sky field pans; the observation reticle stays fixed. -->
+            <div class="sorava-skyfield" aria-hidden="true">
+              <div class="sky-grid"></div>
+              <div class="star s1"></div><div class="star s2"></div><div class="star s3"></div><div class="star s4"></div><div class="star s5"></div><div class="star s6"></div>
+              <div class="star sorava-target-star"></div>
+            </div>
             <div class="sky-reticle" aria-hidden="true"><span></span><span></span><span></span></div>
+            <!-- Three small connected observers suggest position sharing after acquisition. -->
+            <svg class="sorava-share-symbol" viewBox="0 0 90 48" fill="none" aria-hidden="true">
+              <path d="M17 24L45 9L73 24L45 39Z" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="17" cy="24" r="4" fill="#b9dcef"/><circle cx="45" cy="9" r="4" fill="#b9dcef"/>
+              <circle cx="73" cy="24" r="4" fill="#b9dcef"/><circle cx="45" cy="39" r="4" fill="#b9dcef"/>
+            </svg>
             <div class="sorava-art-caption"><small>OBSERVATION SUPPORT SYSTEM</small><strong>So<span>rava</span></strong><span>Find. Point. Share.</span></div>
             <div class="art-bottom"><span>AZ / ALT / SKY</span><span>LIVE POSITION CALCULATION</span></div>
           </div><button type="button" class="project-media-hit" data-open-sheet aria-label="Sorava / SkyShare の紹介シートを開く"></button></div><div class="project-info"><div class="project-topline"><span class="project-number">PROJECT / 001</span><span class="project-year">WEB APP</span></div><h3><button type="button" class="project-title-button" data-open-sheet>Sorava / SkyShare</button></h3><p>天体の位置計算、観望対象の案内、ホストとゲスト間のリアルタイム共有をまとめた観望会支援アプリ。</p><div class="tag-row"><span>TypeScript</span><span>React</span><span>Astronomy</span></div><div class="project-links"><button type="button" class="sheet-link" data-open-sheet>View sheet ↗</button><a href="https://mill-miya.github.io/SkyShare/" target="_blank" rel="noopener noreferrer">Live site ↗</a></div></div><template class="project-sheet-detail"><section class="sheet-detail-section" aria-label="Project concept"><div class="sheet-detail-heading">01 / CONCEPT</div><p class="sheet-purpose">観望会で、今見ている天体や場所を参加者同士でリアルタイムに共有できるWebアプリ。</p></section><section class="sheet-detail-section" aria-label="Key features"><div class="sheet-detail-heading">02 / KEY FEATURES</div><div class="sheet-feature-list"><div class="sheet-feature"><span class="sheet-feature-index">01</span><div><h3>観測情報の共有</h3><p>見ている天体や場所・方向を共有</p></div></div><div class="sheet-feature"><span class="sheet-feature-index">02</span><div><h3>天体案内</h3><p>月や惑星の位置を計算して表示</p></div></div><div class="sheet-feature"><span class="sheet-feature-index">03</span><div><h3>ホスト・ゲスト連携</h3><p>観望会の案内役と参加者をつなぐ</p></div></div></div></section><section class="sheet-note" aria-label="Development notes"><div class="sheet-detail-heading">DEVELOPMENT NOTES</div><p>開発中。リアルタイム共有には別途サーバーを使用。</p></section></template></article>
