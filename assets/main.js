@@ -77,6 +77,10 @@
       "wallpipe-ar": {
         selector: ".art-wallpipe", duration: 7200,
         finishAnimation: "wp-open-status", finishTarget: "wp-status-open"
+      },
+      nova: {
+        selector: ".art-nova", duration: 6000,
+        finishAnimation: "nova-panel-memory-in", finishTarget: "nova-panel-memory"
       }
     };
     const activeMotion = () => motions[activeCard?.dataset.sheetId] || null;
@@ -86,7 +90,7 @@
         window.clearTimeout(motionTimer);
         motionTimer = null;
       }
-      for (const art of sheetVisual.querySelectorAll(".art-eqmount, .art-sorava, .art-wallpipe")) {
+      for (const art of sheetVisual.querySelectorAll(".art-eqmount, .art-sorava, .art-wallpipe, .art-nova")) {
         art.classList.remove("is-playing", "is-hovering", "is-complete");
       }
     }
