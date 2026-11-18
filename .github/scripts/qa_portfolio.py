@@ -439,6 +439,10 @@ with sync_playwright() as p:
                 if page.locator('.project-card[data-project="07"] .eq-small-rotor').evaluate(
                     "(el) => getComputedStyle(el).opacity")!="0":
                     fail("noninteractive listing unexpectedly shows motor animation markers", width)
+                # The sheet auto-plays on opening. Move outside first so a
+                # genuine pointerenter (rather than a hover over the autoplay
+                # overlay) is tested.
+                page.mouse.move(0,0)
                 art.hover(position={"x":15,"y":15})
                 if "is-hovering" not in (art.get_attribute("class") or ""):
                     fail("desktop hover did not activate sheet SVG", width)
