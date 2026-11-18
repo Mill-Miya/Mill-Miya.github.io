@@ -175,6 +175,8 @@ with sync_playwright() as p:
             fail("upper belt does not meet the common pulley radius", width)
         if concept.locator('path.eq-belt-lower-run[d="M465.52 294.25L537.57 252.47"]').count()!=1:
             fail("lower belt does not meet the common pulley radius", width)
+        if concept.locator('path[d="M551 217H570"]').count()!=0:
+            fail("stray dashed stroke still protrudes right of pulley", width)
         if concept.locator(".eq-target-object").count()!=1:
             fail("offset target marker absent from final reticle", width)
         # No separator arrows, and the Wi-Fi point lies at the exact midpoint
