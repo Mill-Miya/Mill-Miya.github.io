@@ -303,11 +303,11 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   font:clamp(7px,1.85cqi,11px) "Segoe UI",sans-serif;letter-spacing:.08em;
   opacity:0}
 @container (max-width:365px){
-  .nova-panel{padding:6px 5px 6px 7px;min-height:34px}
-  .nova-panel dl,.nova-panel small{display:none!important}
-  .nova-panel strong{white-space:normal;font-size:clamp(6.5px,2.45cqi,9px);
+  .art-nova .nova-panel{padding:6px 5px 6px 7px;min-height:34px}
+  .art-nova .nova-panel dl,.art-nova .nova-panel small{display:none}
+  .art-nova .nova-panel strong{white-space:normal;font-size:clamp(6.5px,2.45cqi,9px);
     overflow-wrap:normal;line-height:1.13;margin-top:6px}
-  .nova-panel-head{font-size:7px}
+  .art-nova .nova-panel-head{font-size:7px}
 }
 
 .art-nova .art-cap,.art-nova .art-bottom{color:#628593b8}
