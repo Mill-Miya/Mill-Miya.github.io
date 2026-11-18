@@ -345,6 +345,116 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   position:absolute;inset:0;width:100%;height:100%;
   display:block;filter:none;
 }
+
+/* Project sheet / equatorial-mount proof of concept.
+   The project listing stays static; only the cloned, expanded artwork moves. */
+.eq-small-rotor,.eq-belt-teeth{opacity:0}
+.sheet-motion-play{
+  border:1px solid currentColor;border-radius:2px;padding:8px 10px;
+  background:transparent;color:inherit;font:inherit;letter-spacing:inherit;
+  cursor:pointer;white-space:nowrap;transition:color .2s,background .2s;
+}
+.sheet-motion-play:hover,.sheet-motion-play:focus-visible{
+  background:#ffffff77;color:#214d5c;outline-offset:3px;
+}
+.sheet-motion-play[hidden]{display:none!important}
+.sheet-visual .art-eqmount{cursor:default}
+@media(hover:hover) and (pointer:fine){
+  .sheet-visual .art-eqmount{cursor:crosshair}
+}
+.sheet-visual .eq-target-ring{transform-box:view-box;transform-origin:87px 219px}
+.sheet-visual .eq-phone-target{transform-box:view-box;transform-origin:212px 219px}
+.sheet-visual .eq-small-rotor{transform-box:view-box;transform-origin:459px 283px}
+.sheet-visual .eq-large-rotor{transform-box:view-box;transform-origin:517px 217px}
+
+/* Each 6.4 s cycle: target > phone > radio > ESP32 > coupled belt drive. */
+@media(prefers-reduced-motion:no-preference){
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-target-ring{
+    animation:eq-target-select 6.4s ease-in-out 1 both;
+  }
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-phone-target{
+    animation:eq-phone-accept 6.4s ease-in-out 1 both;
+  }
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-wifi-inner{
+    animation:eq-radio-inner 6.4s linear 1 both;
+  }
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-wifi-outer{
+    animation:eq-radio-outer 6.4s linear 1 both;
+  }
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-wifi-dot{
+    animation:eq-radio-dot 6.4s linear 1 both;
+  }
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-esp-led{
+    animation:eq-controller-led 6.4s ease-in-out 1 both;
+  }
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-command-path{
+    animation:eq-controller-output 6.4s linear 1 both;
+  }
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-small-rotor{
+    animation:eq-motor-turn 6.4s linear 1 both,eq-drive-visibility 6.4s linear 1 both;
+  }
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-large-rotor{
+    animation:eq-pulley-turn 6.4s linear 1 both;
+  }
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-belt-upper{
+    animation:eq-belt-forward 6.4s linear 1 both,eq-drive-visibility 6.4s linear 1 both;
+  }
+  .sheet-visual .art-eqmount:is(.is-hovering,.is-playing) .eq-belt-lower{
+    animation:eq-belt-return 6.4s linear 1 both,eq-drive-visibility 6.4s linear 1 both;
+  }
+}
+@keyframes eq-target-select{
+  0%,4%,16%,100%{transform:scale(1);stroke:#bce5df}
+  8%,12%{transform:scale(1.11);stroke:#e0fff3}
+}
+@keyframes eq-phone-accept{
+  0%,13%,29%,100%{transform:scale(1);stroke:#c2e9e3}
+  19%,24%{transform:scale(1.1);stroke:#f2fff9}
+}
+@keyframes eq-radio-inner{
+  0%,25%,44%,100%{opacity:.85}
+  29%,37%{opacity:.08}
+  33%,41%{opacity:1}
+}
+@keyframes eq-radio-outer{
+  0%,29%,47%,100%{opacity:.73}
+  33%,41%{opacity:.09}
+  37%,45%{opacity:1}
+}
+@keyframes eq-radio-dot{
+  0%,25%,47%,100%{opacity:1}
+  32%,40%{opacity:.16}
+  36%,44%{opacity:1}
+}
+@keyframes eq-controller-led{
+  0%,43%,64%,100%{opacity:.85;filter:none}
+  49%,57%{opacity:1;filter:drop-shadow(0 0 6px #b2fff0)}
+}
+@keyframes eq-controller-output{
+  0%,45%,61%,100%{stroke-dasharray:none;opacity:1}
+  49%,57%{stroke-dasharray:4 5;stroke-dashoffset:-18;opacity:.9}
+}
+@keyframes eq-motor-turn{
+  0%,60%{transform:rotate(0deg)}
+  100%{transform:rotate(360deg)}
+}
+@keyframes eq-pulley-turn{
+  0%,60%{transform:rotate(0deg)}
+  100%{transform:rotate(72deg)}
+}
+@keyframes eq-belt-forward{
+  0%,60%{stroke-dashoffset:0}
+  100%{stroke-dashoffset:-72}
+}
+@keyframes eq-belt-return{
+  0%,60%{stroke-dashoffset:0}
+  100%{stroke-dashoffset:72}
+}
+@keyframes eq-drive-visibility{
+  0%,58%,100%{opacity:0}
+  62%,97%{opacity:.85}
+}
+
 #physical-group-label{margin-top:40px;border-top:2px solid #2e525e}
 .project-sheet[data-theme="diy-equatorial-mount"]{
   --sheet-accent:#32677b;--sheet-panel:#dce9e6;--sheet-muted:#49777b;

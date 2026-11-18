@@ -170,7 +170,7 @@ with sync_playwright() as p:
             fail("duplicated outdated art labels remain", width)
         if concept.locator('path[d="M192 178L214 191L236 190"][fill="none"]').count()!=1:
             fail("smartphone star path lost no-fill correction", width)
-        if concept.locator('path[d="M463.3 295.3L535.6 269.8"][fill="none"]').count()!=1:
+        if concept.locator('path:not(.eq-belt-teeth)[d="M463.3 295.3L535.6 269.8"][fill="none"]').count()!=1:
             fail("tangent-aligned bottom belt path missing", width)
         if concept.evaluate("(el) => getComputedStyle(el).filter")!="none":
             fail("old artwork drop shadow remains", width)
@@ -255,6 +255,57 @@ with sync_playwright() as p:
                 fail("hardware sheet contains an invented demo link", width)
             if page.locator('#sheet-visual .art-eqmount').count()!=1:
                 fail("original equatorial mount illustration missing in sheet", width)
+            if page.locator(".sheet-motion-play").is_visible():
+                fail("reduced-motion preference unexpectedly exposes playback", width)
+            if width in (390, 1440):
+                # Exercise the actual mouse-hover and mobile replay paths with motion enabled.
+                page.emulate_media(reduced_motion="no-preference")
+                page.locator("#sheet-close").click()
+                page.locator('.project-card[data-project="07"] .project-title-button').click()
+                art = page.locator("#sheet-visual .art-eqmount")
+                play_button = page.locator(".sheet-motion-play")
+                if not play_button.is_visible():
+                    fail("equatorial motion replay control not visible", width)
+                if art.locator(".eq-large-rotor").count()!=1 or art.locator(".eq-belt-teeth").count()!=2:
+                    fail("rotor or belt travel elements missing", width)
+                if page.locator('.project-card[data-project="07"] .eq-belt-teeth').count()!=2:
+                    fail("listing lost its static SVG artwork", width)
+                if page.locator('.project-card[data-project="07"] .eq-small-rotor').evaluate(
+                    "(el) => getComputedStyle(el).opacity")!="0":
+                    fail("noninteractive listing unexpectedly shows motor animation markers", width)
+                art.hover()
+                if "is-hovering" not in (art.get_attribute("class") or ""):
+                    fail("desktop hover did not activate sheet SVG", width)
+                rotating = art.locator(".eq-large-rotor").evaluate(
+                    "(el) => getComputedStyle(el).animationName")
+                if "eq-pulley-turn" not in rotating:
+                    fail("large pulley CSS keyframes not active on hover", width)
+                page.mouse.move(0, 0)
+                if "is-hovering" in (art.get_attribute("class") or ""):
+                    fail("hover animation did not reset on exit", width)
+                if art.locator(".eq-large-rotor").evaluate(
+                    "(el) => getComputedStyle(el).animationName")!="none":
+                    fail("rotor animation persists outside sheet hover", width)
+                play_button.click()
+                if "is-playing" not in (art.get_attribute("class") or ""):
+                    fail("touch replay button did not start animation", width)
+                if "eq-belt-forward" not in art.locator(".eq-belt-upper").evaluate(
+                    "(el) => getComputedStyle(el).animationName"):
+                    fail("belt-motion animation not active on replay", width)
+                # Record an early state without allowing a screenshot to complete the cycle.
+                page.locator("#sheet-next").click()
+                if page.locator("#sheet-visual .art-eqmount").count()!=0 or play_button.is_visible():
+                    fail("sheet switching did not clear equatorial motion", width)
+                page.locator("#sheet-prev").click()
+                if page.locator("#sheet-visual .art-eqmount.is-playing").count()!=0:
+                    fail("animation was not reset when reopening sheet", width)
+                page.emulate_media(reduced_motion="reduce")
+                if art.locator(".eq-large-rotor").count()!=1:
+                    # After re-opening, the previous locator should still resolve to this clone.
+                    fail("equatorial SVG disappeared during reduced-motion check", width)
+                if art.locator(".eq-large-rotor").evaluate(
+                    "(el) => getComputedStyle(el).animationName")!="none":
+                    fail("prefers-reduced-motion does not stop CSS animation", width)
             if width in (390,1440):
                 page.screenshot(path=str(OUT/f"equatorial_sheet_{width}.png"), animations="disabled")
             page.locator("#sheet-next").click()
