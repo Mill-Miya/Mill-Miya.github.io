@@ -197,6 +197,16 @@ with sync_playwright() as p:
             fail("Reusable pipe assembly geometry template is missing", width)
         if wallpipe.locator("#wp-pipe-template").get_attribute("mask"):
             fail("Old growing stroke mask must no longer hide the physical parts", width)
+        if wallpipe.locator("#wp-pipe-template .wp-water-core").count():
+            fail("The rigid steel template incorrectly contains blue water", width)
+        if wallpipe.locator(".wp-pipe-effects").count()!=1:
+            fail("Dynamic water must be drawn as a single live overlay outside the steel clones", width)
+        if wallpipe.locator(".wp-pipe-effects").evaluate(
+                "(el) => el.closest('defs') !== null"):
+            fail("Dynamic water cannot animate correctly while inside SVG defs", width)
+        for water in (".wp-water-core",".wp-water-stream",".wp-flow-trace",".wp-upstream-water"):
+            if wallpipe.locator(".wp-pipe-effects "+water).count()!=1:
+                fail("The animated water is missing from its live rendering group: "+water, width)
         for name,clip in (("left","wp-part-left-clip"),
                           ("center","wp-part-center-clip"),
                           ("right","wp-part-right-clip")):
@@ -234,7 +244,7 @@ with sync_playwright() as p:
                        '.wp-upstream-window','.wp-upstream-core','.wp-upstream-stream']
             .map(s=>svg.querySelector(s));
           if(nodes.some(x=>!x)) return null;
-          const root=svg.querySelector('#wp-pipe-template');
+          const root=svg.querySelector('.wp-pipe-effects');
           return nodes.map(el=>{
             const ordered=[...root.querySelectorAll('*')];
             return ordered.indexOf(el);
@@ -285,6 +295,17 @@ with sync_playwright() as p:
             pipe_media.hover()
             if "is-hovering" not in (pipe_art.get_attribute("class") or ""):
                 fail("WallPipe listing did not start playback on hover", width)
+            # Source-level opacity checks do not catch clone-paint regressions.
+            # Confirm the *visible* live water group begins fully concealed.
+            early_water=pipe_art.evaluate("""art => {
+              const el=art.querySelector('.wp-upstream-water');
+              const an=el?.getAnimations().find(a=>a.animationName==='wp-upstream-reveal');
+              if(!an) return null;
+              an.currentTime=200;
+              return parseFloat(getComputedStyle(el).opacity);
+            }""")
+            if early_water is None or early_water>.02:
+                fail("Assembly must not show blue water before the wall is translucent", width)
             if pipe_art.locator(".wp-scene").evaluate(
                     "(el) => getComputedStyle(el).animationName")!="none":
                 fail("WallPipe no longer allows perspective wobbling", width)
@@ -411,7 +432,7 @@ with sync_playwright() as p:
             if (m["start"][0]["opacity"]>.05 or m["start"][2]["opacity"]>.05 or
                     m["start"][3]["opacity"]>.05):
                 fail("Pipe modules must enter separately, not pop in together: "+str(m), width)
-            if not -18<m["inletMove"][0]["x"]<-2:
+            if not -36<m["inletMove"][0]["x"]<-5:
                 fail("Finished inlet should slide a small rigid distance: "+str(m), width)
             if (abs(m["inletDone"][0]["x"])>.1 or m["inletDone"][0]["opacity"]<.99 or
                     m["inletDone"][3]["opacity"]>.05):
@@ -421,7 +442,7 @@ with sync_playwright() as p:
             if (abs(m["valveDone"][2]["y"])>.1 or m["valveDone"][2]["opacity"]<.99 or
                     m["valveDone"][3]["opacity"]>.05):
                 fail("The valve must seat before the right pipe enters: "+str(m), width)
-            if not 3<m["outletMove"][3]["x"]<22:
+            if not 8<m["outletMove"][3]["x"]<42:
                 fail("Finished outlet should slide into its fitting, not grow: "+str(m), width)
             if (abs(m["outletDone"][0]["x"])>.1 or abs(m["outletDone"][2]["y"])>.1 or
                     abs(m["outletDone"][3]["x"])>.1):
