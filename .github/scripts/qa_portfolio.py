@@ -193,6 +193,21 @@ with sync_playwright() as p:
         if wallpipe.locator(".wp-scene").evaluate(
                 "(el) => getComputedStyle(el).transform")!="none":
             fail("WallPipe scene must remain rigid without camera sway", width)
+        if wallpipe.locator(".wp-pipe-geometry").get_attribute("mask")!="url(#wp-build-geometry)":
+            fail("Full pipe rendering must be progressively constructed through its assembly mask", width)
+        if wallpipe.locator("mask#wp-build-geometry").count()!=1:
+            fail("Three-stage assembly mask missing", width)
+        for cls in (".wp-build-left",".wp-build-middle",".wp-build-right"):
+            if wallpipe.locator(cls).count()!=1:
+                fail("Missing pipe assembly stage: "+cls, width)
+        if wallpipe.locator(".wp-build-left").get_attribute("d")!= \
+                "M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H335":
+            fail("The inlet must trace both actual pipe elbows before the valve", width)
+        if wallpipe.locator(".wp-build-right").get_attribute("d")!="M393 173H523":
+            fail("The outlet must be drawn independently from the valve to the open right end", width)
+        if wallpipe.locator(".wp-valve").evaluate("(el) => el.parentElement.classList.contains('wp-pipe-geometry')"):
+            fail("The valve must reveal separately from the inlet and outlet masking", width)
+
         if wallpipe.locator("mask#wp-flow-reveal").count()!=1:
             fail("Valve-originated flow mask is missing", width)
         for cls in (".wp-water-core", ".wp-water-stream", ".wp-flow-cutaway", ".wp-flow-trace"):
@@ -341,8 +356,8 @@ with sync_playwright() as p:
               return {begin:frame(0),closed:frame(2800),
                       ending:frame(7050),held:frame(7550)};
             }""")
-            if phases["begin"]["assembly"]>.1 or phases["begin"]["water"]>.05:
-                fail("WallPipe must begin with an unplaced, dry pipe: "+str(phases), width)
+            if phases["begin"]["water"]>.05:
+                fail("WallPipe water must remain hidden at the start of the assembly sequence: "+str(phases), width)
             if phases["closed"]["closed"]<.95 or phases["closed"]["front"]<.9:
                 fail("WallPipe must keep pipe opaque before valve opens: "+str(phases), width)
             if (phases["ending"]["water"]<.9 or phases["ending"]["stream"]<.9 or
@@ -359,6 +374,51 @@ with sync_playwright() as p:
             page.wait_for_function("""() =>
                 document.querySelector('#sheet-visual .art-wallpipe')?.classList.contains('is-playing')
             """, timeout=1500)
+            # Validate the actual three-stage masked assembly, not just CSS presence.
+            # During 0–0.8s only the upstream metal tube advances; 0.8–1.4s
+            # introduces the stationary valve, followed by the outlet until 2.1s.
+            assembly_stages=pipe_sheet.evaluate("""art=>{
+              const sels=['.wp-build-left','.wp-build-middle','.wp-valve','.wp-build-right'];
+              const elements=sels.map(sel=>art.querySelector(sel));
+              const names=['wp-build-left-stage','wp-build-valve-stage',
+                           'wp-build-valve-stage','wp-build-right-stage'];
+              const anims=elements.map((el,i)=>el?.getAnimations().find(a=>a.animationName===names[i]));
+              if(anims.some(a=>!a)) return null;
+              const snap=t=>{
+                anims.forEach(a=>a.currentTime=t);
+                return {
+                  inlet:parseFloat(getComputedStyle(elements[0]).strokeDashoffset),
+                  middle:parseFloat(getComputedStyle(elements[1]).opacity),
+                  valve:parseFloat(getComputedStyle(elements[2]).opacity),
+                  outlet:parseFloat(getComputedStyle(elements[3]).strokeDashoffset)
+                };
+              };
+              return {start:snap(0),inletMid:snap(400),inletDone:snap(820),
+                      valveMid:snap(1150),valveDone:snap(1450),
+                      outletMid:snap(1750),outletDone:snap(2150)};
+            }""")
+            if not assembly_stages:
+                fail("SVG stages must animate inlet, separate valve and outlet in order", width)
+            if (assembly_stages["start"]["inlet"]<330 or
+                    assembly_stages["start"]["valve"]>.01 or
+                    assembly_stages["start"]["outlet"]<145):
+                fail("No pipe or valve should appear at the start: "+str(assembly_stages), width)
+            if not 20<assembly_stages["inletMid"]["inlet"]<330:
+                fail("Inlet must extend progressively, not pop in: "+str(assembly_stages), width)
+            if (assembly_stages["inletDone"]["inlet"]>1 or
+                    assembly_stages["inletDone"]["outlet"]<145):
+                fail("Left pipe must complete before right pipe starts: "+str(assembly_stages), width)
+            if (not .1<assembly_stages["valveMid"]["valve"]<.9 or
+                    not .1<assembly_stages["valveMid"]["middle"]<.9 or
+                    assembly_stages["valveMid"]["outlet"]<145):
+                fail("Valve must assemble alone between inlet and outlet: "+str(assembly_stages), width)
+            if (assembly_stages["valveDone"]["valve"]<.99 or
+                    assembly_stages["valveDone"]["middle"]<.99):
+                fail("Valve must be complete before the outlet grows: "+str(assembly_stages), width)
+            if not 5<assembly_stages["outletMid"]["outlet"]<145:
+                fail("Right pipe must grow after the valve rather than simply appear: "+str(assembly_stages), width)
+            if assembly_stages["outletDone"]["outlet"]>1:
+                fail("Full pipeline must be assembled by 2.1 seconds: "+str(assembly_stages), width)
             # Upstream water is physically in motion before the valve opens,
             # but must remain invisible until the front metal becomes translucent.
             # The downstream moving dashes then travel at the same physical SVG
