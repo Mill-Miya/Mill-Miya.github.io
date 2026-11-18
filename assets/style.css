@@ -534,7 +534,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 
 /* DIY automatic equatorial mount — photographed hardware translated into site-native vector art. */
 .art-eqmount{
-  background:#f1f2ef;
+  background:#e4e9e6;
   color:#1e292c;
   aspect-ratio:620 / 430;
 }
@@ -716,3 +716,16 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 /* Sorava uses neutral graphite for a night-observation interface;
    the equatorial-mount schematic uses a pale paper ground.
    Artwork is recolored per SVG role; no blanket filter or backdrop gradient. */
+
+/* A perceptible paper edge for the pale engineering diagram.
+   Uses an outline (no box-size change) and a restrained shadow on the list card.
+   The SVG geometry, animation, and concept-stage positions are unchanged. */
+.project-card[data-sheet-id="diy-equatorial-mount"] .project-media{
+  outline:1px solid #bec9c4;
+  outline-offset:-1px;
+  box-shadow:0 9px 22px rgba(25,39,39,.11);
+}
+.project-sheet[data-theme="diy-equatorial-mount"] .sheet-visual .art-eqmount{
+  outline:1px solid #bec9c4;
+  outline-offset:-1px;
+}
