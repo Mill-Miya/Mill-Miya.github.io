@@ -18,7 +18,7 @@
   <link rel="icon" href="assets/favicon-48.png?v=3" sizes="48x48" type="image/png">
   <link rel="icon" href="assets/favicon.svg?v=3" type="image/svg+xml" sizes="any">
   <link rel="apple-touch-icon" href="assets/icon-180.png?v=3">
-  <link rel="stylesheet" href="assets/style.css?v=50">
+  <link rel="stylesheet" href="assets/style.css?v=51">
   <script src="assets/main.js?v=15" defer></script>
   <title>Mill-Miya — Selected Works</title>
 </head>
@@ -180,36 +180,18 @@
                 <linearGradient id="wp-metal" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f1f8f2"/><stop offset=".23" stop-color="#c2d8d1"/><stop offset=".53" stop-color="#7faaa0"/><stop offset=".85" stop-color="#477a72"/><stop offset="1" stop-color="#31554f"/></linearGradient>
                 <linearGradient id="wp-bore" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#0b444b"/><stop offset=".5" stop-color="#125d67"/><stop offset="1" stop-color="#082f37"/></linearGradient>
                 <linearGradient id="wp-valve" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c3d9ce"/><stop offset=".4" stop-color="#61877b"/><stop offset="1" stop-color="#284e48"/></linearGradient>
-                <!-- Construction mask: upstream grows to the valve, the center
-                     arrives with the valve, then the outlet grows to the right. -->
-                <clipPath id="wp-build-left-limit"><rect x="55" y="105" width="280" height="285"/></clipPath>
-                <clipPath id="wp-build-right-limit"><rect x="393" y="105" width="190" height="285"/></clipPath>
-                <mask id="wp-build-geometry" x="55" y="105" width="530" height="285" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
-                  <g clip-path="url(#wp-build-left-limit)">
-                    <path class="wp-build-left" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H335" fill="none" stroke="#fff" stroke-width="94" stroke-linecap="butt"/>
-                  </g>
-                  <rect class="wp-build-middle" x="335" y="120" width="58" height="112" fill="#fff"/>
-                  <g clip-path="url(#wp-build-right-limit)">
-                    <path class="wp-build-right" d="M393 173H523" fill="none" stroke="#fff" stroke-width="94" stroke-linecap="butt"/>
-                  </g>
-                </mask>
+                <!-- Three contiguous pipe modules; the entire finished metal pipe is
+                     clipped into rigid units, not drawn by growing strokes. -->
+                <clipPath id="wp-part-left-clip"><rect x="55" y="105" width="280" height="285"/></clipPath>
+                <clipPath id="wp-part-center-clip"><rect x="335" y="105" width="58" height="285"/></clipPath>
+                <clipPath id="wp-part-right-clip"><rect x="393" y="105" width="190" height="285"/></clipPath>
                 <mask id="wp-flow-reveal" x="57" y="119" width="525" height="240" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
                   <!-- Upstream flows continuously; only downstream water advances after the valve opens. -->
                   <path class="wp-reveal-left" d="M364 173H240A35 35 0 0 0 205 208V255A35 35 0 0 1 170 290H98" fill="none" stroke="#fff" stroke-width="37" stroke-linecap="butt"/>
                   <path class="wp-reveal-right" d="M364 173H523" fill="none" stroke="#fff" stroke-width="37" stroke-linecap="butt"/>
                 </mask>
-              </defs>
-              <!-- A simplified wall plane provides depth cues, not actual pipe detection. -->
-              <path class="wp-wall-plane" d="M56 70L539 45L574 360L80 388Z" fill="url(#wp-wall)" opacity=".9"/>
-              <path d="M92 117L549 96M87 188L557 166M82 259L564 237M77 329L572 309M168 65L192 382M289 58L305 376M412 52L419 369" stroke="#365d55" stroke-opacity=".14" stroke-width="1"/>
-              <path d="M56 70L539 45L574 360L80 388Z" stroke="#c9e9da" stroke-width="1.7" opacity=".75"/>
-              <g class="wp-tracking-frame" stroke="#d6fff0" stroke-width="2" opacity=".85">
-                <path d="M85 116V91H111M520 91H545V116M85 323V347H111M520 323V347H494"/>
-                <path d="M301 91V105M294 98H308M301 337V351M294 344H308" stroke-opacity=".48"/>
-              </g>
-              <g class="wp-scene">
-                <g class="wp-pipe-assembly" stroke-linecap="butt" stroke-linejoin="round">
-                  <g class="wp-pipe-geometry" mask="url(#wp-build-geometry)">
+                <!-- One source geometry keeps all three modules identical at the seams. -->
+                <g id="wp-pipe-template" class="wp-pipe-geometry" stroke-linecap="butt" stroke-linejoin="round">
                   <!-- Exactly two 90-degree elbows: right, up, right. -->
                   <path class="wp-pipe-shadow" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" transform="translate(2 10)" stroke="#102d2d" stroke-opacity=".45" stroke-width="55"/>
                   <path class="wp-pipe-outline" d="M98 290H170A35 35 0 0 0 205 255V208A35 35 0 0 1 240 173H523" stroke="#234841" stroke-width="52"/>
@@ -250,7 +232,35 @@
                       <path d="M478 147L499 143Q509 137 513 134H523M478 199L499 203Q509 209 513 212H523" fill="none" stroke="#e0f4e7" stroke-width="2.5"/>
                     </g>
                   </g>
-                  </g><!-- /wp-pipe-geometry -->
+
+                </g>
+              </defs>
+              <!-- A simplified wall plane provides depth cues, not actual pipe detection. -->
+              <path class="wp-wall-plane" d="M56 70L539 45L574 360L80 388Z" fill="url(#wp-wall)" opacity=".9"/>
+              <path d="M92 117L549 96M87 188L557 166M82 259L564 237M77 329L572 309M168 65L192 382M289 58L305 376M412 52L419 369" stroke="#365d55" stroke-opacity=".14" stroke-width="1"/>
+              <path d="M56 70L539 45L574 360L80 388Z" stroke="#c9e9da" stroke-width="1.7" opacity=".75"/>
+              <g class="wp-tracking-frame" stroke="#d6fff0" stroke-width="2" opacity=".85">
+                <path d="M85 116V91H111M520 91H545V116M85 323V347H111M520 323V347H494"/>
+                <path d="M301 91V105M294 98H308M301 337V351M294 344H308" stroke-opacity=".48"/>
+              </g>
+              <g class="wp-scene">
+                <g class="wp-pipe-assembly" stroke-linecap="butt" stroke-linejoin="round">
+                  <!-- Assembled steel parts translate only a short distance, then stop.
+                       No scale spring, camera shake, flashes, or growing tube geometry. -->
+                  <g class="wp-part-left" clip-path="url(#wp-part-left-clip)">
+                    <use href="#wp-pipe-template"/>
+                  </g>
+                  <g class="wp-part-center" clip-path="url(#wp-part-center-clip)">
+                    <use href="#wp-pipe-template"/>
+                  </g>
+                  <g class="wp-part-right" clip-path="url(#wp-part-right-clip)">
+                    <use href="#wp-pipe-template"/>
+                  </g>
+                  <g class="wp-coupler-locks" fill="none" stroke="#cce4d7" stroke-linecap="round">
+                    <path class="wp-lock-left" d="M335 151V195" stroke-width="3" opacity=".78"/>
+                    <path class="wp-lock-right" d="M393 151V195" stroke-width="3" opacity=".78"/>
+                  </g>
+
                   <g class="wp-valve">
                     <!-- Cast housing with chamfered shoulders, bonnet and circular cover. -->
                     <path class="wp-valve-housing" d="M335 153L346 145H378L392 155V190L380 200H346L335 191Z" fill="url(#wp-valve)" stroke="#d1e9da" stroke-width="3.2"/>
