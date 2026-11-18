@@ -109,7 +109,21 @@ with sync_playwright() as p:
                 fail("All filter does not restore all six projects", width)
             if page.locator('#visible-count').inner_text().strip()!="06":
                 fail("filter counter incorrect", width)
-        # All six existing projects must open sheets without replacing public demo links.
+        # One L3 work is visibly preview-locked while remaining in the list.
+        locked = page.locator('.project-card[data-project="06"]')
+        if locked.count()!=1 or locked.locator('.project-art.art-messe').count()!=1:
+            fail("Suwa Messe work disappeared", width)
+        if locked.locator(".project-lock-mark svg").count()!=1:
+            fail("Suwa Messe lock visual missing", width)
+        if locked.locator("[data-open-sheet], a[href]").count()!=0:
+            fail("locked work has active sheet or demo controls", width)
+        if page.locator('a[href*="suwa-messe-2026"]').count()!=0:
+            fail("locked public demo URL leaked into site", width)
+        if page.locator('.project-card [data-open-sheet]').count()!=15:
+            fail("expected five sheet-enabled works", width)
+        if page.locator(".project-card .project-links a[href]").count()!=4:
+            fail("expected four public live site links", width)
+        # Five eligible projects open sheets without replacing public demo links.
         if width in (320, 390, 820, 1440):
             trigger = page.locator('.project-card[data-project="01"] .project-media-hit')
             trigger.click()
@@ -140,6 +154,11 @@ with sync_playwright() as p:
                 fail("non-demo project sheet missing", width)
             if page.locator("#sheet-actions a").count():
                 fail("private demo link unexpectedly appeared", width)
+            page.locator("#sheet-close").click()
+            page.locator('.project-card[data-project="05"] .project-title-button').click()
+            page.locator("#sheet-next").click()
+            if page.locator("#sheet-title").inner_text().strip() != "Sorava / SkyShare":
+                fail("sheet navigation did not skip locked Suwa Messe", width)
             page.locator("#sheet-close").click()
             if errors: fail("JavaScript error after sheet controls: "+repr(errors), width)
         print("QA_PASS",width,"cards",len(boxes),"width",metrics["scrollWidth"],flush=True)

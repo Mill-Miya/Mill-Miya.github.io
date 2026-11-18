@@ -267,3 +267,30 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   .project-media:hover .project-art,.project-media:focus-within .project-art{transform:none}
   .sheet-actions a{transition:none}
 }
+
+
+/* Portfolio registry preview lock: visible card, disabled work sheet and demo. */
+.project-media--locked{cursor:default}
+.project-media--locked .project-art{
+  filter:grayscale(.65) saturate(.65) brightness(.87);
+  transition:none;
+}
+.project-media--locked:hover .project-art,
+.project-media--locked:focus-within .project-art{transform:none}
+.project-lock-veil{
+  position:absolute;inset:0;z-index:11;display:grid;place-items:center;
+  background:linear-gradient(0deg,rgba(226,233,229,.32),rgba(217,227,222,.19));
+  pointer-events:none;
+}
+.project-lock-mark{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  padding:13px 18px;border:1px solid rgba(37,52,46,.24);
+  background:rgba(245,247,243,.91);box-shadow:0 10px 32px #182c2624;
+  color:#384a42;font:600 10px var(--font-mono);letter-spacing:.08em;
+}
+.project-lock-mark svg{width:19px;height:19px;flex:none}
+.project-locked-note{font:600 10px var(--font-mono);letter-spacing:.09em;color:#777f78;cursor:default}
+@media(max-width:400px){
+  .project-lock-mark{gap:8px;padding:10px 12px;font-size:9px}
+  .project-lock-mark svg{width:16px;height:16px}
+}
