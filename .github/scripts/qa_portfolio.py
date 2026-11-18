@@ -542,6 +542,7 @@ with sync_playwright() as p:
                     screenFraction:hostScreen.width/hostBody.width,
                     guestFraction:guestScreen.width/guestBody.width,
                     phoneWidths:[hostBody.width,guestBody.width],
+                    phoneAspects:[hostBody.width/hostBody.height,guestBody.width/guestBody.height],
                     centered: Math.abs((point.left + point.right)/2-(hostBody.right+guestBody.left)/2),
                     space: guestBody.left - hostBody.right,
                     screenInside: hostScreen.left>hostBody.left && hostScreen.right<hostBody.right &&
@@ -550,8 +551,13 @@ with sync_playwright() as p:
                 }""")
                 if (phone_geometry["screenFraction"] < .89 or phone_geometry["guestFraction"] < .89 or
                         phone_geometry["space"] < 14 or not phone_geometry["screenInside"] or
-                        phone_geometry["centered"] > 2):
-                    fail("Sorava phones/wifi are not large and centered: "+str(phone_geometry), width)
+                        phone_geometry["centered"] > 2 or
+                        any(a < .47 or a > .56 for a in phone_geometry["phoneAspects"])):
+                    fail("Sorava devices must be tall phones with large screens and central Wi-Fi: "+str(phone_geometry), width)
+                if sorava_card.locator(".sorava-data-packet").count()!=0:
+                    fail("Stray flying data dot must be completely removed", width)
+                if sorava_card.locator(".sorava-guest-field").count()!=1:
+                    fail("The independent guest star field is missing", width)
                 sorava_media.hover()
                 if "is-hovering" not in (sorava_card.get_attribute("class") or ""):
                     fail("Sorava listing hover did not start playback", width)
@@ -603,6 +609,48 @@ with sync_playwright() as p:
                     fail("Sorava did not finish showing both M42 screens: "+str(phases), width)
                 if width in (390,1440):
                     sorava_sheet.screenshot(path=str(OUT/f"sorava_two_phones_{width}.png"),animations="disabled")
+                # Screenshot testing may finish/cancel finite animations. Explicitly
+                # restart the motion before measuring intermediate CSS frames.
+                replay.click()
+                # At the start the guest points elsewhere (its target is
+                # away from the fixed reticle); it aligns only after Wi-Fi sync.
+                # Sample the actual rendered SVG coordinates, not just keyframes.
+                synced_views=sorava_sheet.evaluate("""art => {
+                  const get=s => art.querySelector(s);
+                  const guest=get('.sorava-guest-field');
+                  const wifi=get('.sorava-wifi-node');
+                  const guestAnim=guest.getAnimations().find(a=>a.animationName==='sorava-guest-pointing');
+                  const wifiAnim=wifi.getAnimations().find(a=>a.animationName==='sorava-wifi-blink');
+                  const point=s => {const r=get(s).getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}};
+                  const distance=()=>{
+                    const star=point('.sorava-phone-guest .sorava-m42-star');
+                    const sight=point('.sorava-phone-guest .sorava-map-reticle circle');
+                    return Math.hypot(star.x-sight.x,star.y-sight.y);
+                  };
+                  const alignAt=time=>{guestAnim.currentTime=time;return distance()};
+                  const opacityAt=time=>{wifiAnim.currentTime=time;return Number(getComputedStyle(wifi).opacity)};
+                  return {
+                    initial:alignAt(0),
+                    beforeSync:alignAt(3600),
+                    end:alignAt(7200),
+                    blinkBright1:opacityAt(2400),
+                    blinkDim1:opacityAt(2880),
+                    blinkBright2:opacityAt(3600),
+                    blinkDim2:opacityAt(4032),
+                    blinkBright3:opacityAt(4464),
+                    terminal:opacityAt(7200),
+                    blinkingName:wifiAnim.animationName,
+                    pointingName:guestAnim.animationName
+                  };
+                }""")
+                if synced_views["initial"] < 8 or synced_views["beforeSync"] < 8 or synced_views["end"] > 1.2:
+                    fail("Guest starts aligned, or does not move into host pointing: "+str(synced_views), width)
+                if (synced_views["blinkingName"]!="sorava-wifi-blink" or
+                        synced_views["pointingName"]!="sorava-guest-pointing" or
+                        min(synced_views[k] for k in ("blinkBright1","blinkBright2","blinkBright3")) < .82 or
+                        max(synced_views[k] for k in ("blinkDim1","blinkDim2")) > .24 or
+                        synced_views["terminal"] < .8):
+                    fail("The Wi-Fi mark itself must flash clearly three times: "+str(synced_views), width)
                 replay.click()
                 if "is-playing" not in (sorava_sheet.get_attribute("class") or ""):
                     fail("Sorava REPLAY failed to restart animation", width)
