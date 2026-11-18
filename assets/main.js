@@ -43,15 +43,16 @@
     const sheetKind = document.getElementById("sheet-kind");
     const sheetTags = document.getElementById("sheet-tags");
     const sheetVisual = document.getElementById("sheet-visual");
+    const sheetVisualBottom = dialog.querySelector(".sheet-visual-bottom");
+    const sheetVisualBrand = sheetVisualBottom?.lastElementChild;
     const motionButton = document.createElement("button");
     motionButton.type = "button";
     motionButton.className = "sheet-motion-play";
     motionButton.textContent = "REPLAY";
     motionButton.setAttribute("aria-label", "自動赤道儀の動作アニメーションを再生");
     motionButton.hidden = true;
-    // A compact replay control stays centered inside the visual frame,
-    // never in the footer or the scrolling text column.
-    sheetVisual.appendChild(motionButton);
+    // Keep replay in the image panel's bottom-right caption row, not over the art.
+    sheetVisualBottom?.appendChild(motionButton);
     const sheetCopySide = dialog.querySelector(".sheet-copy-side");
     const sheetActions = document.getElementById("sheet-actions");
     const sheetCounter = document.getElementById("sheet-counter");
@@ -169,12 +170,13 @@
           }
           node.id = replacement;
         }
-        sheetVisual.replaceChildren(art, motionButton);
+        sheetVisual.replaceChildren(art);
       } else {
-        sheetVisual.replaceChildren(motionButton);
+        sheetVisual.replaceChildren();
       }
       const showMotion = card.dataset.sheetId === "diy-equatorial-mount" && motionAllowed();
       motionButton.hidden = !showMotion;
+      if (sheetVisualBrand) sheetVisualBrand.hidden = showMotion;
       // Each sheet starts at the beginning of its own right-side content.
       if (sheetCopySide) sheetCopySide.scrollTop = 0;
       sheetTags.replaceChildren(...[...card.querySelectorAll(".tag-row span")].map(tag => tag.cloneNode(true)));
