@@ -98,6 +98,8 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .wp-pipe-highlight{opacity:.48}
 .wp-water-core{opacity:.95}
 .wp-water-stream{opacity:1}
+.wp-flow-cutaway{opacity:.55}
+.wp-flow-trace{opacity:1}
 .wp-status-closed{opacity:0}
 .wp-status-open{opacity:1}
 .wp-tracking-frame{opacity:.68}
@@ -109,76 +111,86 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .art-wallpipe.is-complete .wp-status-open{opacity:1}
 @media(prefers-reduced-motion:no-preference){
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-scene{
-    animation:wp-perspective var(--wp-motion-duration) ease-in-out 1 both;
+    animation:wp-perspective var(--wp-motion-duration) ease-in-out infinite both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-pipe-assembly{
-    animation:wp-pipe-appear var(--wp-motion-duration) ease-out 1 both;
+    animation:wp-pipe-appear var(--wp-motion-duration) ease-out infinite both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-wheel-spin{
-    animation:wp-wheel-open var(--wp-motion-duration) ease-in-out 1 both;
+    animation:wp-wheel-open var(--wp-motion-duration) ease-in-out infinite both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-pipe-front{
-    animation:wp-front-cutaway var(--wp-motion-duration) ease-in-out 1 both;
+    animation:wp-front-cutaway var(--wp-motion-duration) ease-in-out infinite both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-pipe-highlight{
-    animation:wp-highlight-fade var(--wp-motion-duration) ease-in-out 1 both;
+    animation:wp-highlight-fade var(--wp-motion-duration) ease-in-out infinite both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-water-core{
-    animation:wp-water-appear var(--wp-motion-duration) ease-in 1 both;
+    animation:wp-water-appear var(--wp-motion-duration) ease-in infinite both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-water-stream{
-    animation:wp-water-move var(--wp-motion-duration) linear 1 both,wp-water-bars-appear var(--wp-motion-duration) ease-in 1 both;
+    animation:wp-water-move var(--wp-motion-duration) linear infinite both,wp-water-bars-appear var(--wp-motion-duration) ease-in infinite both;
+  }
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-flow-cutaway{
+    animation:wp-flow-channel-appear var(--wp-motion-duration) ease-in infinite both;
+  }
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-flow-trace{
+    animation:wp-water-move var(--wp-motion-duration) linear infinite both,wp-water-bars-appear var(--wp-motion-duration) ease-in infinite both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-tracking-frame{
-    animation:wp-tracking-lock var(--wp-motion-duration) ease-out 1 both;
+    animation:wp-tracking-lock var(--wp-motion-duration) ease-out infinite both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-status-closed{
-    animation:wp-closed-status var(--wp-motion-duration) linear 1 both;
+    animation:wp-closed-status var(--wp-motion-duration) linear infinite both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-status-open{
-    animation:wp-open-status var(--wp-motion-duration) linear 1 both;
+    animation:wp-open-status var(--wp-motion-duration) linear infinite both;
   }
 }
 @keyframes wp-pipe-appear{
-  0%,13%{opacity:0;transform:translateY(10px)}
-  34%,100%{opacity:1;transform:translateY(0)}
+  0%,8%{opacity:0;transform:translateY(10px)}
+  26%,100%{opacity:1;transform:translateY(0)}
 }
 @keyframes wp-perspective{
   0%,77%{transform:translate(0,0) skewX(0deg)}
   100%{transform:translate(7px,-3px) skewX(-3deg)}
 }
 @keyframes wp-wheel-open{
-  0%,37%{transform:rotate(0deg)}
-  73%,100%{transform:rotate(900deg)}
+  0%,28%{transform:rotate(0deg)}
+  63%,100%{transform:rotate(900deg)}
 }
 @keyframes wp-front-cutaway{
-  0%,48%{opacity:.98}
-  73%,100%{opacity:.27}
+  0%,40%{opacity:.98}
+  62%,100%{opacity:.27}
 }
 @keyframes wp-highlight-fade{
   0%,48%{opacity:.66}
   73%,100%{opacity:.28}
 }
 @keyframes wp-water-appear{
-  0%,49%{opacity:0}
-  73%,100%{opacity:.95}
+  0%,39%{opacity:0}
+  62%,100%{opacity:.95}
 }
 @keyframes wp-water-move{
-  0%,49%{stroke-dashoffset:0}
-  100%{stroke-dashoffset:-215}
+  0%,39%{stroke-dashoffset:0}
+  100%{stroke-dashoffset:-224}
+}
+@keyframes wp-flow-channel-appear{
+  0%,40%{opacity:0}
+  62%,100%{opacity:.55}
 }
 @keyframes wp-water-bars-appear{
-  0%,53%{opacity:0}
-  73%,100%{opacity:1}
+  0%,40%{opacity:0}
+  62%,100%{opacity:1}
 }
 @keyframes wp-tracking-lock{
   0%{opacity:.18}14%{opacity:1}28%,100%{opacity:.68}
 }
 @keyframes wp-closed-status{
-  0%,48%{opacity:1}65%,100%{opacity:0}
+  0%,42%{opacity:1}60%,100%{opacity:0}
 }
 @keyframes wp-open-status{
-  0%,48%{opacity:0}65%,100%{opacity:1}
+  0%,42%{opacity:0}60%,100%{opacity:1}
 }
 
 .art-nova{background:radial-gradient(circle at 50% 45%,#102b35,#040d14 67%,#02060b);color:#d1faff}.art-nova::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#87b8b411 1px,transparent 1px),linear-gradient(#87b8b411 1px,transparent 1px);background-size:40px 40px;mask-image:linear-gradient(90deg,transparent,#000 40%,transparent)}.nova-orbits{position:absolute;left:50%;top:43%;height:220px;width:220px;transform:translate(-50%,-50%);border:1px solid #8eddf04d;border-radius:50%;box-shadow:0 0 70px #4de8fa22,inset 0 0 45px #38cfec15}.nova-orbits::before,.nova-orbits::after{content:"";position:absolute;border-radius:50%;inset:21px;border:1px solid #8fd7ec75}.nova-orbits::after{inset:47px;border-color:#d4fbff90;box-shadow:0 0 24px #7de4ff55}.nova-core{position:absolute;inset:75px;border-radius:50%;background:radial-gradient(circle at 32% 33%,#d8fdff,#77dce2 25%,#225d76 53%,#061627 74%);box-shadow:0 0 20px #60d8f6,0 0 70px #0ec3ff77;z-index:1}.nova-dot{position:absolute;right:8px;top:60px;width:9px;height:9px;background:#ecc78c;border-radius:50%;box-shadow:0 0 19px #f9c16a}.nova-ui-caption{position:absolute;z-index:3;bottom:18%;left:8%;display:grid;gap:5px}.nova-ui-caption span{font:9px var(--font-mono);letter-spacing:.09em;color:#83a8b7}.nova-ui-caption strong{font-size:30px;font-weight:620;letter-spacing:.2em}
