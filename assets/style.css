@@ -93,6 +93,10 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .art-wallpipe .art-bottom{color:#ddf2e5b5}
 .wp-scene{transform:none}
 .wp-pipe-assembly{opacity:1}
+.wp-build-left{stroke-dasharray:340 1000;stroke-dashoffset:0}
+.wp-build-middle{opacity:1}
+.wp-build-right{stroke-dasharray:150 1000;stroke-dashoffset:0}
+.wp-valve{opacity:1}
 /* Rim and spokes are exactly symmetric about the stationary SVG hub. */
 .wp-wheel-spin{transform-box:fill-box;transform-origin:50% 50%;transform:rotate(900deg)}
 .wp-wheel-hub{transform:none}
@@ -118,8 +122,19 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .art-wallpipe.is-complete .wp-status-closed{opacity:0}
 .art-wallpipe.is-complete .wp-status-open{opacity:1}
 @media(prefers-reduced-motion:no-preference){
-  .art-wallpipe:is(.is-hovering,.is-playing) .wp-pipe-assembly{
-    animation:wp-pipe-appear var(--wp-motion-duration) ease-out 1 both;
+  /* Full-size stroke reveal forms the actual metal pipe, shadow, and highlights.
+     SVG clips prevent the early inlet mask from leaking into the outlet. */
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-build-left{
+    animation:wp-build-left-stage var(--wp-motion-duration) ease-out 1 both;
+  }
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-build-middle{
+    animation:wp-build-valve-stage var(--wp-motion-duration) ease-in-out 1 both;
+  }
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-valve{
+    animation:wp-build-valve-stage var(--wp-motion-duration) ease-in-out 1 both;
+  }
+  .art-wallpipe:is(.is-hovering,.is-playing) .wp-build-right{
+    animation:wp-build-right-stage var(--wp-motion-duration) ease-out 1 both;
   }
   .art-wallpipe:is(.is-hovering,.is-playing) .wp-wheel-spin{
     animation:wp-wheel-open var(--wp-motion-duration) ease-in-out 1 both;
@@ -162,12 +177,22 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
     animation:wp-open-status var(--wp-motion-duration) linear 1 both;
   }
 }
-@keyframes wp-pipe-appear{
-  0%,8%{opacity:0}
-  26%,100%{opacity:1}
+/* First 2.1 seconds of the 7.2-second one-shot cycle:
+   0–0.8s inlet, 0.8–1.4s valve, 1.4–2.1s outlet. */
+@keyframes wp-build-left-stage{
+  0%{stroke-dashoffset:340}
+  11.11%,100%{stroke-dashoffset:0}
+}
+@keyframes wp-build-valve-stage{
+  0%,11.11%{opacity:0}
+  19.44%,100%{opacity:1}
+}
+@keyframes wp-build-right-stage{
+  0%,19.44%{stroke-dashoffset:150}
+  29.17%,100%{stroke-dashoffset:0}
 }
 @keyframes wp-wheel-open{
-  0%,28%{transform:rotate(0deg)}
+  0%,32%{transform:rotate(0deg)}
   63%,100%{transform:rotate(900deg)}
 }
 @keyframes wp-front-cutaway{
@@ -214,7 +239,9 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   0%{opacity:.18}14%{opacity:1}28%,100%{opacity:.68}
 }
 @keyframes wp-closed-status{
-  0%,42%{opacity:1}60%,100%{opacity:0}
+  0%,11.11%{opacity:0}
+  19.44%,42%{opacity:1}
+  60%,100%{opacity:0}
 }
 @keyframes wp-open-status{
   0%,42%{opacity:0}60%,100%{opacity:1}
