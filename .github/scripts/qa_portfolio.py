@@ -521,6 +521,118 @@ with sync_playwright() as p:
             page.locator("#sheet-close").click()
             page.emulate_media(reduced_motion="reduce")
 
+        # N.O.V.A.: concise Floating -> Active -> Full HUD motion.
+        # The original core remains and three informational panels appear once.
+        nova=page.locator('.project-card[data-sheet-id="nova"] .art-nova')
+        if nova.count()!=1:
+            fail("N.O.V.A. portfolio artwork missing", width)
+        if nova.locator(".nova-orbits .nova-core").count()!=1 or nova.locator(".nova-dot").count()!=1:
+            fail("N.O.V.A. original concentric core or amber node missing", width)
+        for cls,label in ((".nova-panel-core","CORE"),(".nova-panel-system","SYSTEM"),
+                          (".nova-panel-memory","MEMORY")):
+            part=nova.locator(cls)
+            if part.count()!=1 or label not in part.inner_text():
+                fail("N.O.V.A. compact HUD panel missing: "+label, width)
+            if part.evaluate("(el) => parseFloat(getComputedStyle(el).opacity)")<.98:
+                fail("N.O.V.A. reduced-motion presentation must show finished HUD", width)
+        if nova.locator(".nova-wire").count()!=3:
+            fail("N.O.V.A. three restrained HUD connectors missing", width)
+        if width in (390,1440):
+            page.emulate_media(reduced_motion="no-preference")
+            nova_media=page.locator('.project-card[data-sheet-id="nova"] .project-media')
+            nova_media.hover()
+            if "is-hovering" not in (nova.get_attribute("class") or ""):
+                fail("N.O.V.A. card hover did not start motion", width)
+            preview=nova.locator(".nova-orbits").evaluate("""el=>({
+              name:getComputedStyle(el).animationName,
+              seconds:parseFloat(getComputedStyle(el).animationDuration),
+              loops:getComputedStyle(el).animationIterationCount
+            })""")
+            if (preview["name"]!="nova-orbit-activate" or
+                    abs(preview["seconds"]-3.75)>.02 or preview["loops"]!="1"):
+                fail("N.O.V.A. card preview must be 1.6x one-shot: "+str(preview), width)
+            page.mouse.move(0,0)
+            if "is-hovering" in (nova.get_attribute("class") or ""):
+                fail("N.O.V.A. hover playback was not cleared", width)
+            page.locator('.project-card[data-sheet-id="nova"] .project-title-button').click()
+            nova_sheet=page.locator("#sheet-visual .art-nova")
+            page.wait_for_function("""()=>
+              document.querySelector('#sheet-visual .art-nova')?.classList.contains('is-playing')
+            """, timeout=1500)
+            replay=page.locator(".sheet-motion-play")
+            if not replay.is_visible() or replay.inner_text().strip()!="REPLAY":
+                fail("N.O.V.A. sheet must have one-shot replay control", width)
+            phases=nova_sheet.evaluate("""art=>{
+              const orbit=art.querySelector('.nova-orbits');
+              const selectors=['.nova-panel-core','.nova-panel-system','.nova-panel-memory',
+                               '.nova-wire-core','.nova-wire-system','.nova-wire-memory'];
+              const els=selectors.map(sel=>art.querySelector(sel));
+              const animations=[orbit,...els].map((el,i)=>{
+                const names=['nova-orbit-activate','nova-panel-core-in',
+                  'nova-panel-system-in','nova-panel-memory-in','nova-wire-core-in',
+                  'nova-wire-system-in','nova-wire-memory-in'];
+                return el.getAnimations().find(a=>a.animationName===names[i]);
+              });
+              if(animations.some(a=>!a))return null;
+              const sample=t=>{
+                animations.forEach(a=>a.currentTime=t);
+                const matrix=new DOMMatrix(getComputedStyle(orbit).transform);
+                return {scale:matrix.a,panels:els.slice(0,3).map(el=>
+                  parseFloat(getComputedStyle(el).opacity)),
+                  wires:els.slice(3).map(el=>
+                  parseFloat(getComputedStyle(el).opacity))};
+              };
+              return {start:sample(0),float:sample(1500),active:sample(2800),
+                      core:sample(3550),system:sample(4100),
+                      full:sample(5500),end:sample(6000),
+                      duration:parseFloat(getComputedStyle(orbit).animationDuration),
+                      loops:getComputedStyle(orbit).animationIterationCount};
+            }""")
+            if not phases or abs(phases["duration"]-6)>.02 or phases["loops"]!="1":
+                fail("N.O.V.A. full-size sheet must be a six-second one-shot", width)
+            if (not .56<phases["start"]["scale"]<.7 or
+                    any(p>.05 for p in phases["start"]["panels"])):
+                fail("N.O.V.A. must begin small and without HUD panels: "+str(phases), width)
+            if (phases["float"]["scale"]>.75 or
+                    any(p>.05 for p in phases["float"]["panels"])):
+                fail("Floating stage must last until 1.5s: "+str(phases), width)
+            if (phases["active"]["scale"]<.96 or
+                    any(p>.05 for p in phases["active"]["panels"])):
+                fail("Active core must finish before the HUD appears: "+str(phases), width)
+            if (phases["core"]["panels"][0]<.7 or
+                    phases["core"]["panels"][1]>.15 or
+                    phases["core"]["panels"][2]>.05):
+                fail("CORE must appear first, ahead of SYSTEM and MEMORY: "+str(phases), width)
+            if (phases["system"]["panels"][1]<.7 or
+                    phases["system"]["panels"][2]>.05):
+                fail("SYSTEM must appear second, before MEMORY: "+str(phases), width)
+            if min(phases["full"]["panels"])<.98 or min(phases["full"]["wires"])<.98:
+                fail("Full HUD must finish with all panels and connections: "+str(phases), width)
+            if min(phases["end"]["panels"])<.98:
+                fail("N.O.V.A. must remain visually complete at six seconds", width)
+            # Check the sheet actually returns to a stable complete state.
+            replay.click()
+            if "is-playing" not in (nova_sheet.get_attribute("class") or ""):
+                fail("N.O.V.A. replay did not restart the timeline", width)
+            nova_sheet.locator(".nova-panel-memory").evaluate("""el=>
+              el.dispatchEvent(new AnimationEvent('animationend',{
+                bubbles:true,animationName:'nova-panel-memory-in'}))
+            """)
+            if ("is-complete" not in (nova_sheet.get_attribute("class") or "") or
+                    "is-playing" in (nova_sheet.get_attribute("class") or "")):
+                fail("N.O.V.A. does not hold final UI after one-shot playback", width)
+            if width==1440:
+                nova_sheet.screenshot(path=str(OUT/"nova_complete_1440.png"),animations="disabled")
+            page.locator("#sheet-close").click()
+            page.emulate_media(reduced_motion="reduce")
+            page.locator('.project-card[data-sheet-id="nova"] .project-title-button').click()
+            if page.locator(".sheet-motion-play").is_visible():
+                fail("N.O.V.A. reduced-motion mode must hide REPLAY", width)
+            if nova_sheet.count()!=1 or nova_sheet.locator(".nova-panel-memory").evaluate(
+                    "(el)=>getComputedStyle(el).animationName")!="none":
+                fail("N.O.V.A. reduced-motion must not animate", width)
+            page.locator("#sheet-close").click()
+
         # Corrected sparse four-stage SVG replaces the former dense mechanical poster.
         concept = page.locator('.project-card[data-project="07"] .eqmount-drawing')
         if concept.count()!=1:
