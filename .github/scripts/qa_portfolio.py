@@ -1161,32 +1161,40 @@ with sync_playwright() as p:
                 fail("wrong first sheet content", width)
             if page.locator("#sheet-description").is_visible():
                 fail("card summary incorrectly duplicated in detailed sheet", width)
-            # Only the information column scrolls; all artwork, header, and
-            # navigation stay stationary at both desktop and mobile widths.
+            # Mobile scrolls artwork and copy together. Desktop scrolls only
+            # the copy column. Header and navigation remain in the viewport.
             pane = sheet.evaluate("""el => {
               const visual=el.querySelector('.sheet-visual-side'),
                 art=el.querySelector('.sheet-visual .project-art'),
                 copy=el.querySelector('.sheet-copy-side'),
+                body=el.querySelector('.sheet-body'),
                 header=el.querySelector('.sheet-header'),
                 footer=el.querySelector('.sheet-footer');
               const r=node => {const b=node.getBoundingClientRect();return {x:b.x,y:b.y,h:b.height,b:b.bottom}};
               const before={image:r(visual),art:r(art),header:r(header),footer:r(footer)};
-              const overflow=getComputedStyle(copy).overflowY;
+              const owner=matchMedia('(max-width:760px)').matches ? body : copy;
+              const overflow=getComputedStyle(owner).overflowY;
               const outerOverflow=getComputedStyle(el).overflowY;
-              const available=copy.scrollHeight-copy.clientHeight;
-              copy.scrollTop=copy.scrollHeight;
+              const available=owner.scrollHeight-owner.clientHeight;
+              owner.scrollTop=owner.scrollHeight;
               const after={image:r(visual),header:r(header),footer:r(footer)};
-              const actual=copy.scrollTop;
-              copy.scrollTop=0;
+              const actual=owner.scrollTop;
+              owner.scrollTop=0;
               return {before,after,actual,available,overflow,outerOverflow};
             }""")
             if pane["overflow"] not in ("auto","scroll") or pane["outerOverflow"]!="hidden":
-                fail("sheet scroll owner is not the right description pane", width)
+                fail("sheet scroll owner does not match the responsive layout", width)
             if pane["available"] > 2 and pane["actual"] < 1:
-                fail("description did not scroll independently", width)
-            for region in ("image","header","footer"):
+                fail("sheet content did not scroll", width)
+            fixed_regions=("header","footer") if width <= 760 else ("image","header","footer")
+            for region in fixed_regions:
                 if abs(pane["before"][region]["y"] - pane["after"][region]["y"]) > .2:
-                    fail("fixed sheet region moved during description scroll: "+region, width)
+                    fail("fixed sheet region moved during content scroll: "+region, width)
+            if width <= 760 and pane["actual"] > 2 and pane["before"]["image"]["y"] - pane["after"]["image"]["y"] < 1:
+                fail("mobile artwork must scroll with the description", width)
+            for region in ("header", "footer"):
+                if pane["after"][region]["y"] < -1 or pane["after"][region]["b"] > page.viewport_size["height"] + 1:
+                    fail("sheet controls escaped the viewport: "+region, width)
             if pane["before"]["art"]["h"] < 65:
                 fail("sheet illustration is clipped too small", width)
             if not page.locator("#sheet-extra").is_visible():
