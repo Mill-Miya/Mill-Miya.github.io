@@ -62,6 +62,40 @@
   const headerTheme = document.querySelector(".header-theme");
   const themeButtons = [...document.querySelectorAll("[data-header-theme]")];
 
+  // Cycle only the site-wide editorial accent. Never override project color identities.
+  const accentCycle = document.getElementById("accent-cycle");
+  const accentAnnouncement = document.getElementById("accent-announcement");
+  const accentOptions = [
+    { key: "blue", name: "Sky Blue" },
+    { key: "sage", name: "Sage Green" },
+    { key: "copper", name: "Copper" },
+    { key: "violet", name: "Violet" }
+  ];
+  function syncAccentLabel() {
+    const current = root.dataset.accentChoice || "blue";
+    const index = Math.max(0, accentOptions.findIndex(item => item.key === current));
+    const next = accentOptions[(index + 1) % accentOptions.length];
+    accentCycle?.setAttribute("aria-label",
+      "Change accent color. Current: " + accentOptions[index].name + ". Next: " + next.name + ".");
+    if (accentCycle) accentCycle.title = "Accent: " + accentOptions[index].name + " — click to change";
+  }
+  accentCycle?.addEventListener("click", () => {
+    const current = root.dataset.accentChoice || "blue";
+    const index = Math.max(0, accentOptions.findIndex(item => item.key === current));
+    const next = accentOptions[(index + 1) % accentOptions.length];
+    if (next.key === "blue") delete root.dataset.accentChoice;
+    else root.dataset.accentChoice = next.key;
+    try {
+      if (next.key === "blue") localStorage.removeItem("mill-miya.accent");
+      else localStorage.setItem("mill-miya.accent", next.key);
+    } catch {
+      // The current view still changes when storage is unavailable.
+    }
+    syncAccentLabel();
+    if (accentAnnouncement) accentAnnouncement.textContent = "Accent color: " + next.name;
+  });
+  syncAccentLabel();
+
   function savePreference(attribute, storageKey, value) {
     if (value === "system") delete root.dataset[attribute];
     else root.dataset[attribute] = value;

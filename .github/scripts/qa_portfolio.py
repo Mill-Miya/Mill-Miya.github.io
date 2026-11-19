@@ -84,6 +84,44 @@ with sync_playwright() as p:
           };
         }""")
         if errors: fail("JavaScript error: "+repr(errors), width)
+        # The final punctuation in the hero is an actual keyboard/touch
+        # button. Cycling changes the global accent, not project identity colors.
+        accent=page.locator("#accent-cycle")
+        if not accent.is_visible() or accent.get_attribute("type") != "button":
+            fail("hero punctuation is not an accessible accent switch", width)
+        if width in (390,1440):
+            original_project_color=page.locator('.project-card[data-project="01"]').evaluate(
+                "el => getComputedStyle(el).getPropertyValue('--project-accent').trim()"
+            )
+            for next_color in ("sage","copper","violet"):
+                accent.click()
+                current_color=page.evaluate("() => document.documentElement.dataset.accentChoice")
+                if current_color != next_color:
+                    fail("accent color did not advance to "+next_color, width)
+                actual=accent.evaluate("el => getComputedStyle(el).color")
+                expected=page.evaluate("""() => {
+                    const checker=document.createElement('i');
+                    checker.style.color='var(--electric)';
+                    document.body.appendChild(checker);
+                    const color=getComputedStyle(checker).color;
+                    checker.remove();
+                    return color;
+                }""")
+                if actual != expected:
+                    fail("hero accent is not tied to site-wide palette", width)
+                if page.locator('.project-card[data-project="01"]').evaluate(
+                    "el => getComputedStyle(el).getPropertyValue('--project-accent').trim()"
+                ) != original_project_color:
+                    fail("global accent changed a project's identity color", width)
+            page.reload(wait_until="load")
+            if page.evaluate("() => document.documentElement.dataset.accentChoice") != "violet":
+                fail("accent preference did not survive reload", width)
+            accent=page.locator("#accent-cycle")
+            accent.click()
+            if page.evaluate("() => document.documentElement.dataset.accentChoice || 'blue'") != "blue":
+                fail("accent switch did not return to the original sky blue", width)
+            if page.evaluate("() => localStorage.getItem('mill-miya.accent')") is not None:
+                fail("original accent should clear the persisted override", width)
         if metrics["scrollWidth"] > metrics["innerWidth"] + 1:
             fail("horizontal overflow: "+json.dumps(metrics["scrollWidth"]), width)
         if metrics["logoOverlap"]: fail("header branding overlaps navigation", width)
