@@ -532,10 +532,25 @@ with sync_playwright() as p:
             fail("N.O.V.A. original dark glass, white nucleus or concentric signature missing", width)
         if nova.locator(".nova-dot").count()!=1:
             fail("Single amber index marker missing", width)
-        # The orbiting amber marker must finish precisely on the title's final dot.
+        # All title periods align before the amber point arrives on the final one.
         period=nova.locator(".nova-title-period")
-        if period.count()!=1 or period.inner_text()!=".":
-            fail("N.O.V.A. final punctuation target is missing", width)
+        punctuation=nova.locator(".nova-title-punctuation")
+        if period.count()!=1 or period.inner_text()!="." or punctuation.count()!=4:
+            fail("N.O.V.A. requires four matched punctuation marks and one landing target", width)
+        punct_metrics=nova.evaluate("""art=>{
+          return [...art.querySelectorAll('.nova-title-punctuation')].map(el=>{
+            const r=el.getBoundingClientRect();
+            const s=getComputedStyle(el);
+            return {x:r.x,y:r.y,width:r.width,height:r.height,
+                    marginBottom:s.marginBottom,verticalAlign:s.verticalAlign};
+          });
+        }""")
+        if (max(p["y"] for p in punct_metrics)-min(p["y"] for p in punct_metrics)>.6 or
+            max(p["height"] for p in punct_metrics)-min(p["height"] for p in punct_metrics)>.5 or
+            max(p["width"] for p in punct_metrics)-min(p["width"] for p in punct_metrics)>.5 or
+            len(set(p["marginBottom"] for p in punct_metrics))!=1 or
+            len(set(p["verticalAlign"] for p in punct_metrics))!=1):
+            fail("All N.O.V.A. punctuation marks must share a single baseline: "+str(punct_metrics), width)
         point_error=nova.evaluate("""art=>{
           const o=art.getBoundingClientRect(),p=art.querySelector('.nova-title-period').getBoundingClientRect();
           const orbit=art.querySelector('.nova-orbits'),angle=34*Math.PI/180;
