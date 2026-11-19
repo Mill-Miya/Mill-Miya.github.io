@@ -291,7 +291,7 @@
       resetListingMotion(next);
       void next.art.getBoundingClientRect().width;
       next.art.classList.add("is-playing");
-      next.timer = window.setTimeout(() => finishListingMotion(next), next.motion.duration / 1.6 + 250);
+      next.timer = window.setTimeout(() => finishListingMotion(next), next.duration + 250);
     }
     function scheduleCenteredMotion() {
       if (listingFrame === null) listingFrame = requestAnimationFrame(updateCenteredMotion);
@@ -300,7 +300,7 @@
       const media = document.querySelector(`.project-card[data-sheet-id="${id}"] .project-media`);
       const art = media?.querySelector(motion.selector);
       if (!media || !art) continue;
-      const entry = { art, motion, timer: null };
+      const entry = { art, duration: motion.duration / 1.6, timer: null };
       listingMotions.push(entry);
       art.addEventListener("animationend", event => {
         if (event.animationName === motion.finishAnimation &&
@@ -315,6 +315,14 @@
       });
       media.addEventListener("pointerleave", () => {
         if (entry !== centeredMotion) art.classList.remove("is-hovering", "is-complete");
+      });
+    }
+    // Private previews use the same viewport trigger with their existing swing timing.
+    for (const media of document.querySelectorAll(".project-media--locked")) {
+      const entry = { art: media, duration: 1750, timer: null };
+      listingMotions.push(entry);
+      media.addEventListener("animationend", event => {
+        if (event.animationName === "mm-lock-damped-swing") finishListingMotion(entry);
       });
     }
     window.addEventListener("scroll", scheduleCenteredMotion, { passive: true });
