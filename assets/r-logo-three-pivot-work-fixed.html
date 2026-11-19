@@ -17,7 +17,7 @@ label{cursor:pointer}label input{vertical-align:middle;accent-color:#b6cbd7}
 .description{font-size:12px;color:#9fb0bb;line-height:1.6;margin:11px 0 0}
 @media(max-width:500px){body{padding:8px}.kicker{font-size:10px}.clock{min-width:78px}}
 </style></head><body><main>
-<div class="head"><h1>R / CONSTRUCTION &amp; THREE-PIVOT SCRAPER · WORK</h1><div class="kicker">2.63s GUIDE · NO GAPS · SOLID WHITE</div></div>
+<div class="head"><h1>R / CONSTRUCTION &amp; THREE-PIVOT SCRAPER · WORK</h1><div class="kicker">2.30s GUIDE · NO GAPS · SOLID WHITE</div></div>
 <div class="stage"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" width="1254" height="1254" id="guide-svg" role="img" aria-label="Rロゴの設計線を描画するアニメーション">
 <rect width="1254" height="1254" fill="#0a121b"/>
 <defs>
@@ -111,21 +111,21 @@ label{cursor:pointer}label input{vertical-align:middle;accent-color:#b6cbd7}
   <line id="blade-leg" x1="627" y1="627" x2="627" y2="627" stroke="#d6b68c" stroke-width="2.4" visibility="hidden" />
   <circle id="debug-moving-b" r="6" fill="#f7f7f7" visibility="hidden" />
 </g></svg></div>
-<div class="controls"><button id="toggle" type="button">一時停止</button><button id="restart" type="button">最初から再生</button><input type="range" id="timeline" min="0" max="5.5034" step="0.005" value="0" aria-label="再生位置"><span class="clock" id="clock">0.00 / 5.50s</span></div>
+<div class="controls"><button id="toggle" type="button">一時停止</button><button id="restart" type="button">最初から再生</button><input type="range" id="timeline" min="0" max="5.1734" step="0.005" value="0" aria-label="再生位置"><span class="clock" id="clock">0.00 / 5.17s</span></div>
 <div class="subcontrols"><label><input type="checkbox" id="show-blade">3支点・移動するスクレーパー線を表示</label><label>速度 <select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label></div>
-<p class="description">ガイド線の実描画終了（2.63秒）の直後から、待ち時間・塗装前後の空回りなしで各工程を連続再生。外枠：反時計回り → 下側AND：時計回り → 上側OR：反時計回り → 脚 → 右先端。青が緑星方向（270°）に到達すると、緑星を支点に青星方向（90°）から反時計回りで引き継ぎます。脚の左側の尖端は先端から根元へ塗り、脚の下側の細い接続が塗られた時点から、折り返し面も重ねて開始。右先端は斜め上へ進む直線で、細い部分は早く、広い面はゆっくり塗ります。元SVGの曲線で塗装工程を分割し、白100%で連続表示します。</p>
+<p class="description">ガイド線の実描画終了（2.30秒）の直後から、待ち時間・塗装前後の空回りなしで各工程を連続再生。外枠：反時計回り → 下側AND：時計回り → 上側OR：反時計回り → 脚 → 右先端。青が緑星方向（270°）に到達すると、緑星を支点に青星方向（90°）から反時計回りで引き継ぎます。脚の左側の尖端は先端から根元へ塗り、脚の下側の細い接続が塗られた時点から、折り返し面も重ねて開始。右先端は斜め上へ進む直線で、細い部分は早く、広い面はゆっくり塗ります。元SVGの曲線で塗装工程を分割し、白100%で連続表示します。</p>
 <script>
 (()=>{'use strict';
-const total=5.5034;
-const schedule=[[0.0,0.57],[0.03,0.42],[0.24,0.37],[0.46,0.66],[0.53,0.66],[0.56,0.72],[0.65,0.66],[0.83,0.64],[0.92,0.66],[1.02,0.66],[0.17,0.43],[0.18,0.43],[0.19,0.43],[0.2,0.43],[1.37,0.58],[1.43,0.58],[1.48,0.61],[1.53,0.63],[1.58,0.62],[1.6,0.58],[1.64,0.58],[1.69,0.6],[1.75,0.53],[1.95,0.55],[2.0,0.57],[2.03,0.55],[2.07,0.5],[2.11,0.52],[2.14,0.41],[2.19,0.43],[2.24,0.39],[1.03,1.60],[1.93,0.62]];
+const total=5.1734;
+const schedule=[[0.0,0.57],[0.03,0.42],[0.24,0.37],[0.46,0.66],[0.53,0.66],[0.56,0.72],[0.65,0.66],[0.83,0.64],[0.92,0.66],[1.02,0.66],[0.17,0.43],[0.18,0.43],[0.19,0.43],[0.2,0.43],[1.37,0.58],[1.43,0.58],[1.48,0.61],[1.53,0.63],[1.58,0.62],[1.6,0.58],[1.64,0.58],[1.69,0.6],[1.75,0.53],[1.95,0.55],[2.0,0.57],[2.03,0.55],[2.07,0.5],[2.11,0.52],[2.14,0.41],[2.19,0.43],[2.24,0.39],[1.03,1.60],[1.93,0.62].map(([start,duration])=>[start*0.8745247148288973,duration*0.8745247148288973]);
 const lines=[...document.querySelectorAll('#guide-paths > *')];
 const lengths=lines.map(el=>{const len=el.getTotalLength();if(!(len>0))throw new Error('Invalid guide length');el.style.visibility='hidden';return len;});
 const stages=[
- {name:'red',start:2.63,end:3.4035,from:-34,to:-318.5,pivot:{x:627,y:627},direction:'ccw',fill:document.getElementById('filled-red'),clip:document.getElementById('clip-red')},
- {name:'blue',start:3.4035,end:3.7035,from:90,to:270,pivot:{x:627,y:757},direction:'cw',fill:document.getElementById('filled-blue'),clip:document.getElementById('clip-blue')},
- {name:'green',start:3.7035,end:4.0943,from:90,to:-88.1,pivot:{x:627,y:495},direction:'ccw',fill:document.getElementById('filled-green'),clip:document.getElementById('clip-green')},
- {name:'foot',start:4.0943,end:4.8261,from:90,to:4.7,pivot:{x:627,y:627},fill:document.getElementById('filled-foot'),clip:document.getElementById('clip-foot')},
- {name:'tip',start:4.7234,end:5.5034,mode:'fold',from:17.9,to:-25.6,pivot:{x:627,y:627},fill:document.getElementById('filled-tip'),clip:document.getElementById('clip-tip')}
+ {name:'red',start:2.3,end:3.0735,from:-34,to:-318.5,pivot:{x:627,y:627},direction:'ccw',fill:document.getElementById('filled-red'),clip:document.getElementById('clip-red')},
+ {name:'blue',start:3.0735,end:3.3735,from:90,to:270,pivot:{x:627,y:757},direction:'cw',fill:document.getElementById('filled-blue'),clip:document.getElementById('clip-blue')},
+ {name:'green',start:3.3735,end:3.7643,from:90,to:-88.1,pivot:{x:627,y:495},direction:'ccw',fill:document.getElementById('filled-green'),clip:document.getElementById('clip-green')},
+ {name:'foot',start:3.7643,end:4.4961,from:90,to:4.7,pivot:{x:627,y:627},fill:document.getElementById('filled-foot'),clip:document.getElementById('clip-foot')},
+ {name:'tip',start:4.3934,end:5.1734,mode:'fold',from:17.9,to:-25.6,pivot:{x:627,y:627},fill:document.getElementById('filled-tip'),clip:document.getElementById('clip-tip')}
 ];
 const R=1800;
 const input=document.getElementById('timeline'),clock=document.getElementById('clock'),toggle=document.getElementById('toggle');
@@ -247,7 +247,7 @@ input.addEventListener('input',()=>{stop();paintAt(Number(input.value))});
 showBlade.addEventListener('change',()=>drawPaint(t));
 document.getElementById('speed').addEventListener('change',e=>{speed=Number(e.target.value)});
 window.setLogoTime=(sec)=>{stop();paintAt(Number(sec))};
-window.getLogoStatus=()=>({time:t,total,running,speed,stage:t<2.63?'guides':t<3.4035?'red':t<3.7035?'blue':t<4.0943?'green':t<4.7234?'foot':t<4.8261?'foot+fold':t<5.5034?'tip':'complete',guideCount:lines.length,paintVisible:stages.map(s=>s.fill.getAttribute('visibility')==='visible'),debugVisible:debug.getAttribute('visibility')==='visible'});
+window.getLogoStatus=()=>({time:t,total,running,speed,stage:t<2.3?'guides':t<3.0735?'red':t<3.3735?'blue':t<3.7643?'green':t<4.3934?'foot':t<4.4961?'foot+fold':t<5.1734?'tip':'complete',guideCount:lines.length,paintVisible:stages.map(s=>s.fill.getAttribute('visibility')==='visible'),debugVisible:debug.getAttribute('visibility')==='visible'});
 paintAt(0);if(matchMedia('(prefers-reduced-motion: reduce)').matches){stop();paintAt(total)}else play();
 })();
 </script>
