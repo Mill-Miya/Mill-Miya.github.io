@@ -326,7 +326,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   .art-nova:is(.is-hovering,.is-playing) .nova-idle-hint{
     animation:nova-idle-invite var(--nova-motion-duration) ease-in-out 1 both}
   .art-nova:is(.is-hovering,.is-playing) .nova-dot{
-    animation:nova-point-activate var(--nova-motion-duration) ease-in-out 1 both}
+    animation:nova-point-activate var(--nova-motion-duration) cubic-bezier(.4,0,.2,1) 1 both}
   .art-nova:is(.is-hovering,.is-playing) .nova-panel-core{
     animation:nova-panel-core-in var(--nova-motion-duration) ease-out 1 both}
   .art-nova:is(.is-hovering,.is-playing) .nova-panel-memory{
@@ -358,14 +358,11 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   0%,25%{transform:scale(.88);opacity:.8}
   50%,100%{transform:scale(1);opacity:1}
 }
+/* One continuous easing from the original orbital point to the final period.
+   Translation and rotation interpolate together; no mid-course pause or docking phase. */
 @keyframes nova-point-activate{
-  0%,25%{transform:rotate(-24deg);opacity:.5}
-  50%,72%{transform:rotate(34deg);opacity:1}
-  90%,100%{transform:translate(var(--nova-point-dx,0px),var(--nova-point-dy,0px)) rotate(34deg);opacity:1}
-}
-@keyframes nova-point-dock-size{
-  0%,72%{transform:scale(1)}
-  90%,100%{transform:scale(.68)}
+  0%{transform:translate(0px,0px) rotate(-24deg);opacity:.75}
+  100%{transform:translate(var(--nova-point-dx,0px),var(--nova-point-dy,0px)) rotate(34deg);opacity:1}
 }
 @keyframes nova-wire-core-in{0%,48%{opacity:0;transform:scaleX(0)}58%,100%{opacity:1;transform:scaleX(1)}}
 @keyframes nova-wire-memory-in{0%,58%{opacity:0;transform:scaleX(0)}68%,100%{opacity:1;transform:scaleX(1)}}
@@ -1133,8 +1130,4 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 }
 .art-nova.is-dot-aligned .nova-ui-caption strong .nova-title-period{background:transparent}
 .art-nova .nova-dot::before{transform:scale(.68);transform-origin:center}
-@media(prefers-reduced-motion:no-preference){
-  .art-nova:is(.is-hovering,.is-playing) .nova-dot::before{
-    animation:nova-point-dock-size var(--nova-motion-duration) ease-in-out 1 both
-  }
-}
+

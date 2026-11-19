@@ -602,6 +602,34 @@ with sync_playwright() as p:
             if (preview["name"]!="nova-orbit-activate" or
                     abs(preview["duration"]-3.75)>.02 or preview["count"]!="1"):
                 fail("N.O.V.A. preview must run a 3.75-second one-shot", width)
+            # The satellite travels once from orbit to the title period.
+            # No intermediate rotate-then-translate hold or second size animation.
+            satellite=nova.locator(".nova-dot").evaluate("""el=>{
+              const a=el.getAnimations().find(a=>a.animationName==='nova-point-activate');
+              if(!a) return null;
+              const keys=a.effect.getKeyframes();
+              const samples=[];
+              for(const time of [0,750,1500,2250,3000,3750]){
+                a.currentTime=time;
+                const computed=getComputedStyle(el);
+                const m=new DOMMatrix(computed.transform);
+                samples.push({x:m.m41,y:m.m42,a:m.a,b:m.b});
+              }
+              return {offsets:keys.map(k=>k.offset),
+                easing:getComputedStyle(el).animationTimingFunction,samples,
+                secondPhase:el.getAnimations({subtree:true}).some(a=>a.animationName==='nova-point-dock-size')};
+            }""")
+            if not satellite or satellite["offsets"]!=[0,1] or satellite["secondPhase"]:
+                fail("N.O.V.A. amber point must have one uninterrupted motion: "+str(satellite), width)
+            if "cubic-bezier" not in satellite["easing"]:
+                fail("N.O.V.A. amber motion must ease continuously", width)
+            if any(
+                sum(abs(v) for v in [
+                    satellite["samples"][k+1][key]-satellite["samples"][k][key]
+                    for key in ("x","y","a","b")
+                ])<.01 for k in range(5)
+            ):
+                fail("N.O.V.A. amber point paused mid-journey: "+str(satellite), width)
             page.mouse.move(0,0)
             page.locator('.project-card[data-sheet-id="nova"] .project-title-button').click()
             art=page.locator("#sheet-visual .art-nova")
