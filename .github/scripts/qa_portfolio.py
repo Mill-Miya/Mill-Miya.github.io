@@ -1630,15 +1630,34 @@ with sync_playwright() as p:
             # Explicit REPLAY must restore the original drawing speed and must not auto-spin.
             page.emulate_media(reduced_motion="no-preference")
             page.locator('#motion-choice').select_option('system')
+            # Prior sheet checks may have scrolled far below the hero. Browsers
+            # throttle offscreen iframes, so inspect a true visible first visit.
+            page.locator('.hero').evaluate(
+                "el => el.scrollIntoView({block:'start',behavior:'instant'})"
+            )
             page.reload(wait_until='load')
+            page.locator('.hero').scroll_into_view_if_needed()
             construction=page.frame_locator('#hero-logo-frame').locator('body')
             if not construction.evaluate("() => Math.abs(window.getLogoStatus().speed-1.35)<0.001"):
                 fail("first-load construction playback must be faster", width)
             if page.evaluate("() => !!document.createElement('canvas').getContext('webgl2')"):
-                page.wait_for_function(
-                    "document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
-                    timeout=11000
-                )
+                try:
+                    page.wait_for_function(
+                        "document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
+                        timeout=11000
+                    )
+                except Exception:
+                    print("OPENING_SEQUENCE_DIAGNOSTICS", {
+                        "motion":page.evaluate("""() => ({
+                            choice:document.documentElement.dataset.motionChoice,
+                            systemReduced:matchMedia('(prefers-reduced-motion: reduce)').matches,
+                            hero:document.querySelector('.hero').getBoundingClientRect().top,
+                            classes:document.querySelector('.hero-visual').className,
+                            hasSpinFactory:typeof window.createRLogoSpin
+                        })"""),
+                        "iframe":construction.evaluate("() => window.getLogoStatus()")
+                    }, flush=True)
+                    raise
                 page.wait_for_function(
                     "!document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
                     timeout=7000
