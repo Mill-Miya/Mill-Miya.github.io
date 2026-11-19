@@ -22,9 +22,9 @@ def fail(msg, width):
 def start_listing(page, media, art, width):
     """Use the same center-entry path as phones, and hover on desktop."""
     if width <= 760:
-        page.locator('.hero').evaluate("el => el.scrollIntoView({block:'start'})")
+        page.locator('.hero').evaluate("el => el.scrollIntoView({block:'start',behavior:'instant'})")
         page.wait_for_function("!document.querySelector('.project-card .is-playing')")
-        art.evaluate("el => el.scrollIntoView({block:'center'})")
+        art.evaluate("el => el.scrollIntoView({block:'center',behavior:'instant'})")
         page.wait_for_function("""selector =>
             document.querySelector(selector)?.classList.contains('is-playing')
         """, arg='.project-card .' + next(c for c in art.get_attribute('class').split() if c.startswith('art-')))
@@ -35,7 +35,7 @@ def start_listing(page, media, art, width):
 def leave_listing(page, art, width):
     page.mouse.move(0, 0)
     if width <= 760:
-        page.locator('.hero').evaluate("el => el.scrollIntoView({block:'start'})")
+        page.locator('.hero').evaluate("el => el.scrollIntoView({block:'start',behavior:'instant'})")
         page.wait_for_function("!document.querySelector('.project-card .is-playing')")
 
 
@@ -184,7 +184,6 @@ with sync_playwright() as p:
             if page.evaluate("localStorage.getItem('mill-miya.motion')") is not None:
                 fail("System must clear the stored motion override", width)
             theme.select_option('system')
-            page.locator("#motion-choice").select_option("system")
             page.emulate_media(reduced_motion="reduce")
         if width in (320,390,820,1024,1440):
             page.screenshot(path=str(OUT/f"portfolio_{width}.png"),full_page=True,animations="disabled")
