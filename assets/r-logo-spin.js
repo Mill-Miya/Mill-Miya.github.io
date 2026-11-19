@@ -23,8 +23,8 @@
     "Dv5uhvX81ofr2eSqE90horXfOJnR4TGQZeMPh3Hk233z5Jl07ORQa6LkmWU="
   ].join("");
   const depth = 0.21616895;
-  const duration = 2150;
-  const hold = 350;
+  const duration = 2800;
+  const hold = 120;
 
   function readContours() {
     const bytes = Uint8Array.from(atob(encoded), c => c.charCodeAt(0));
@@ -137,8 +137,10 @@
       const height=Math.max(1,Math.round(canvas.clientHeight*ratio));
       if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}
       gl.viewport(0,0,width,height);
-      // An impulse at the tap: maximum speed at the first frame, then friction-like deceleration.
-      const smooth=1-Math.pow(1-progress,3);
+      // Retain the tap's initial impulse while extending a visibly slow, zero-velocity finish.
+      // The initial angular velocity matches the previous 2.15s cubic curve.
+      const remaining=1-progress;
+      const smooth=1-remaining*remaining*(1-1.9*progress+2*progress*progress);
       const yaw=smooth*Math.PI*8; // four full turns, always finishing face-on
       // Keep the camera level with the XY face: Y-axis spin only, no pitch.
       const cy=Math.cos(yaw),sy=Math.sin(yaw);

@@ -1365,7 +1365,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 
 
 /* CAD-derived 3D spin is an optional, short-lived overlay after engraving ends. */
-.hero-logo-wrap .hero-logo-spin-canvas{position:absolute;inset:0;z-index:3;display:block;width:100%;height:100%;opacity:0;pointer-events:none;transition:opacity .24s ease}
+.hero-logo-wrap .hero-logo-spin-canvas{position:absolute;inset:0;z-index:3;display:block;width:100%;height:100%;opacity:0;pointer-events:none;transition:opacity .44s cubic-bezier(.22,1,.36,1)}
 .hero-logo-wrap .hero-logo-spin-trigger{position:absolute;inset:0;z-index:3;width:100%;height:100%;padding:0;border:0;background:transparent;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .hero-logo-spin-trigger[hidden]{display:none}
 .hero-logo-spin-trigger:disabled{cursor:default}
