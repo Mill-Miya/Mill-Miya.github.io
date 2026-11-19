@@ -1353,3 +1353,12 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 /* Keep Safari's automatic text inflation out of precisely positioned diagrams. */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .project-art,.project-art *{-webkit-text-size-adjust:none;text-size-adjust:none}
+
+/* Keep small editorial metadata legible in both color themes. */
+.hero-flag,
+.project-number,
+.sheet-detail-heading,
+.project-locked-note,
+.works-count {
+  color: var(--muted);
+}
