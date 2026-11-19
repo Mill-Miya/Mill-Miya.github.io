@@ -1641,7 +1641,7 @@ with sync_playwright() as p:
             if not construction.evaluate("() => Math.abs(window.getLogoStatus().speed-1.35)<0.001"):
                 fail("first-load construction playback must be faster", width)
             if not construction.evaluate(
-                "() => Math.abs(window.getLogoStatus().total-5.7234)<0.002"
+                "() => Math.abs(window.getLogoStatus().total-5.6234)<0.002"
             ):
                 fail("opening guide fade was not shortened", width)
             if page.evaluate("() => !!document.createElement('canvas').getContext('webgl2')"):
