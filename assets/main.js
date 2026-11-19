@@ -52,7 +52,8 @@
   const logoReplay = document.getElementById("hero-logo-replay");
   const root = document.documentElement;
   const systemMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const motionAllowed = () => !systemMotion.matches && root.dataset.motionChoice !== "reduce";
+  const motionAllowed = () => root.dataset.motionChoice === "full" ||
+    (!systemMotion.matches && root.dataset.motionChoice !== "reduce");
   const themeChoice = document.getElementById("theme-choice");
   const motionChoice = document.getElementById("motion-choice");
   const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
@@ -96,12 +97,23 @@
   themeChoice?.addEventListener("change", () => setTheme(themeChoice.value));
   if (motionChoice) {
     motionChoice.value = root.dataset.motionChoice || "system";
-    motionChoice.addEventListener("change", () => savePreference("motionChoice", "mill-miya.motion", motionChoice.value));
+    motionChoice.addEventListener("change", () => {
+      savePreference("motionChoice", "mill-miya.motion", motionChoice.value);
+    });
   }
   if (themeChoice && motionChoice) document.querySelector(".site-preferences").hidden = false;
   systemTheme.addEventListener("change", syncTheme);
   syncTheme();
   if (headerTheme) headerTheme.hidden = false;
+
+  function requestMotion() {
+    if (motionAllowed()) return;
+    savePreference("motionChoice", "mill-miya.motion", "full");
+    if (motionChoice) {
+      motionChoice.value = "full";
+      motionChoice.dispatchEvent(new Event("change"));
+    }
+  }
 
   if (logoFrame && logoReplay) {
     const logoPanel = logoFrame.closest(".hero-visual");
@@ -109,7 +121,8 @@
     const sendLogoMessage = type => logoFrame.contentWindow?.postMessage({ channel, type }, "*");
     const syncReplay = () => {
       const ready = logoPanel.classList.contains("is-logo-ready");
-      logoReplay.hidden = !motionAllowed() || !ready;
+      logoReplay.hidden = !ready;
+      logoFrame.contentWindow?.postMessage({ channel, type: "motion", allowed: motionAllowed() }, "*");
       if (ready && !motionAllowed()) sendLogoMessage("show-static");
     };
 
@@ -123,7 +136,8 @@
     });
     logoFrame.addEventListener("load", () => sendLogoMessage("status"));
     logoReplay.addEventListener("click", () => {
-      if (motionAllowed()) sendLogoMessage("replay");
+      requestMotion();
+      sendLogoMessage("replay");
     });
     systemMotion.addEventListener("change", syncReplay);
     motionChoice?.addEventListener("change", syncReplay);
@@ -253,11 +267,14 @@
       // Safety fallback if the browser suppresses animationend (e.g. hidden tab).
       if (!motion.loop) motionTimer = window.setTimeout(() => finishSheetMotion(art), motion.duration + 250);
     }
-    motionButton.addEventListener("click", playSheetMotion);
+    motionButton.addEventListener("click", () => {
+      requestMotion();
+      playSheetMotion();
+    });
     // Touch layouts play the artwork crossing the viewport center, once per visit.
-    const centerPlayback = window.matchMedia("(max-width:760px), (hover:none), (pointer:coarse)");
+    const centerPlayback = window.matchMedia("(max-width:760px), (hover:none), (any-pointer:coarse)");
     const listingMotions = [];
-    let centeredMotion = null;
+    const centeredMotions = new Set();
     let listingFrame = null;
     function resetListingMotion(entry) {
       window.clearTimeout(entry.timer);
@@ -273,26 +290,33 @@
     }
     function updateCenteredMotion() {
       listingFrame = null;
-      let next = null;
+      let next = [];
       if (centerPlayback.matches && motionAllowed() && !dialog.open && !document.hidden) {
         const headerBottom = document.querySelector(".site-header").getBoundingClientRect().bottom;
         const center = (window.innerHeight + Math.max(0, headerBottom)) / 2;
         // Extend the trigger band 12% above and below the usable viewport center.
         const range = (window.innerHeight - Math.max(0, headerBottom)) * .12;
-        next = listingMotions.find(entry => {
+        next = listingMotions.filter(entry => {
           const bounds = entry.art.getBoundingClientRect();
           return bounds.width > 0 && bounds.top <= center + range && bounds.bottom >= center - range;
-        }) || null;
+        });
       }
-      if (next === centeredMotion) return;
-      if (centeredMotion) resetListingMotion(centeredMotion);
-      centeredMotion = next;
-      if (!next) return;
-      resetListingMotion(next);
-      void next.art.getBoundingClientRect().width;
-      next.art.classList.add("is-playing");
-      next.timer = window.setTimeout(() => finishListingMotion(next), next.duration + 250);
+      for (const entry of centeredMotions) {
+        if (!next.includes(entry)) {
+          resetListingMotion(entry);
+          centeredMotions.delete(entry);
+        }
+      }
+      for (const entry of next) {
+        if (centeredMotions.has(entry)) continue;
+        resetListingMotion(entry);
+        void entry.art.getBoundingClientRect().width;
+        centeredMotions.add(entry);
+        entry.art.classList.add("is-playing");
+        entry.timer = window.setTimeout(() => finishListingMotion(entry), entry.duration + 250);
+      }
     }
+
     function scheduleCenteredMotion() {
       if (listingFrame === null) listingFrame = requestAnimationFrame(updateCenteredMotion);
     }
@@ -314,7 +338,7 @@
         }
       });
       media.addEventListener("pointerleave", () => {
-        if (entry !== centeredMotion) art.classList.remove("is-hovering", "is-complete");
+        if (!centeredMotions.has(entry)) art.classList.remove("is-hovering", "is-complete");
       });
     }
     // Private previews use the same viewport trigger with their existing swing timing.
@@ -333,14 +357,14 @@
     for (const button of buttons) button.addEventListener("click", scheduleCenteredMotion);
     function syncMotionPreference() {
       const allowed = motionAllowed();
-      const showReplay = Boolean(activeMotion()) && allowed;
+      const showReplay = Boolean(activeMotion());
       if (!showReplay && document.activeElement === motionButton) closeButton.focus();
       motionButton.hidden = !showReplay;
       if (sheetVisualBrand) sheetVisualBrand.hidden = showReplay;
       if (!allowed) {
         resetSheetMotion();
         for (const entry of listingMotions) resetListingMotion(entry);
-        centeredMotion = null;
+        centeredMotions.clear();
       }
       scheduleCenteredMotion();
     }
@@ -354,7 +378,7 @@
       if (!card || !card.querySelector("[data-open-sheet]")) return;
       resetSheetMotion();
       for (const entry of listingMotions) resetListingMotion(entry);
-      centeredMotion = null;
+      centeredMotions.clear();
       if (!dialog.open && trigger instanceof HTMLElement) lastOpener = trigger;
       const selection = eligible();
       const current = selection.indexOf(card);

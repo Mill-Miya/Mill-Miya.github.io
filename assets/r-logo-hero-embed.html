@@ -294,6 +294,7 @@ for(const id of originalGeometryIds){
 }
 document.getElementById('guide-svg').appendChild(cleanFinal);
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
+let motionEnabled=!reducedMotion.matches;
 function showCompleted(){stop();paintAt(total)}
 function reportReady(){
  if(window.parent!==window)window.parent.postMessage({channel:'mill-miya-r-logo',type:'ready'},'*');
@@ -306,7 +307,13 @@ function reportCompleted(completed){
 }
 window.addEventListener('message',event=>{
  if(event.source!==window.parent || !event.data || event.data.channel!=='mill-miya-r-logo')return;
- if(event.data.type==='replay' && !reducedMotion.matches){stop();paintAt(0);play();}
+ if(event.data.type==='motion'){
+   const wasEnabled=motionEnabled;
+   motionEnabled=event.data.allowed===true;
+   if(!motionEnabled)showCompleted();
+   else if(!wasEnabled){stop();paintAt(0);play();}
+ }
+ if(event.data.type==='replay' && motionEnabled){stop();paintAt(0);play();}
  if(event.data.type==='show-static')showCompleted();
  if(event.data.type==='theme' && ['light','dark'].includes(event.data.theme)){
    document.documentElement.dataset.logoTheme=event.data.theme;
@@ -346,9 +353,13 @@ showBlade.addEventListener('change',()=>drawPaint(t));
 document.getElementById('speed').addEventListener('change',e=>{speed=Number(e.target.value)});
 window.setLogoTime=(sec)=>{stop();paintAt(Number(sec))};
 window.getLogoStatus=()=>({time:t,total,running,speed,stage:t<2.3?'guides':t<3.0735?'red':t<3.3735?'blue':t<3.7643?'green':t<4.3934?'foot':t<4.4961?'foot+fold':t<paintEnd?'tip':t<total?'guide-fade':'complete',guideCount:lines.length,paintVisible:stages.map(s=>s.fill.getAttribute('visibility')==='visible'),debugVisible:debug.getAttribute('visibility')==='visible'});
-if(reducedMotion.matches)showCompleted();
+if(!motionEnabled)showCompleted();
 else {paintAt(0);play()}
-reducedMotion.addEventListener('change',event=>{if(event.matches)showCompleted()});
+reducedMotion.addEventListener('change',event=>{
+ if(window.parent!==window)return;
+ motionEnabled=!event.matches;
+ if(!motionEnabled)showCompleted();
+});
 reportReady();
 })();
 </script>
