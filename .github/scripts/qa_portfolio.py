@@ -1077,66 +1077,56 @@ with sync_playwright() as p:
                 "(el) => parseFloat(getComputedStyle(el).animationDuration)")
             if abs(eq_preview_seconds - 4.0) > .02:
                 fail("equatorial listing preview must be exactly 1.6x (4s): "+str(eq_preview_seconds), width)
-            # At end, the target reaches the reticle and all pulley arrows
-            # return to their original orientation after whole turns.
-            final = card_art.evaluate("""el => {
-              const matrix = selector => {
-                const n=el.querySelector(selector);
-                const a=n.getAnimations().find(x=>x.animationName);
-                a.currentTime=4000;
-                return getComputedStyle(n).transform;
+            # Capture keyframes and sample terminal poses in one browser task.
+            # Seeking to the end queues animationend, which legitimately discards
+            # the one-shot CSS animations before a later evaluate can inspect them.
+            drive = card_art.evaluate("""art => {
+              const field=art.querySelector('.eq-target-field');
+              const motor=art.querySelector('.eq-small-rotor');
+              const pulley=art.querySelector('.eq-large-rotor');
+              const named=(node,name)=>node.getAnimations().find(a=>a.animationName===name);
+              const fieldAnim=named(field,'eq-target-acquire');
+              const motorAnim=named(motor,'eq-motor-turn');
+              const pulleyAnim=named(pulley,'eq-pulley-turn');
+              if(!fieldAnim || !motorAnim || !pulleyAnim) return {missing:true};
+              const clean=str=>(str || '').replace(/\\s+/g,'');
+              const start=anim=>clean(anim.effect.getKeyframes().find(f=>Math.abs(f.offset-.58)<.0001)?.transform);
+              const result={
+                timing:{field:start(fieldAnim),motor:start(pulleyAnim)},
+                motorTurns:motorAnim.effect.getKeyframes().at(-1).transform,
+                pulleyTurns:pulleyAnim.effect.getKeyframes().at(-1).transform,
+                easing:getComputedStyle(field).animationTimingFunction
               };
-              return {
-                target:matrix('.eq-target-field'),
-                motor:matrix('.eq-small-rotor'),
-                pulley:matrix('.eq-large-rotor')
+              const snapshot=time=>{
+                fieldAnim.currentTime=time;
+                motorAnim.currentTime=time;
+                pulleyAnim.currentTime=time;
+                const f=new DOMMatrix(getComputedStyle(field).transform);
+                const m=new DOMMatrix(getComputedStyle(pulley).transform);
+                const small=new DOMMatrix(getComputedStyle(motor).transform);
+                return {x:f.m41,y:f.m42,angle:Math.atan2(m.b,m.a),motorAngle:Math.atan2(small.b,small.a)};
               };
+              result.before=snapshot(3906);
+              result.end=snapshot(4000);
+              return result;
             }""")
-            if "-40" not in final["target"] or "36" not in final["target"]:
-                fail("star field never reaches the reticle center: "+str(final), width)
-            # The listing plays 1.6x faster than the 6.4s detail sheet. At
-            # 3906 ms both still move; at 4000 ms they finish together.
-            sync = card_art.evaluate("""art => {
-              const field = art.querySelector('.eq-target-field');
-              const pulley = art.querySelector('.eq-large-rotor');
-              const fieldAnim = field.getAnimations().find(a => a.animationName === 'eq-target-acquire');
-              const pulleyAnim = pulley.getAnimations().find(a => a.animationName === 'eq-pulley-turn');
-              const snapshot = time => {
-                fieldAnim.currentTime = time;
-                pulleyAnim.currentTime = time;
-                const f = new DOMMatrix(getComputedStyle(field).transform);
-                const m = new DOMMatrix(getComputedStyle(pulley).transform);
-                return {x:f.m41, y:f.m42, angle:Math.atan2(m.b,m.a)};
-              };
-              return {
-                easing:getComputedStyle(field).animationTimingFunction,
-                before:snapshot(3906),
-                end:snapshot(4000)
-              };
-            }""")
-            if sync["easing"] != "linear":
-                fail("star field must move linearly until the motor finishes: "+str(sync), width)
-            if abs(sync["before"]["x"] + 40) < 1 or abs(sync["before"]["y"] - 36) < 1:
-                fail("target was centered before motor stopped: "+str(sync), width)
-            if abs(sync["before"]["angle"]) < .05:
-                fail("motor arrow returned to initial angle before target arrival: "+str(sync), width)
-            if abs(sync["end"]["x"] + 40) > .01 or abs(sync["end"]["y"] - 36) > .01 or abs(sync["end"]["angle"]) > .001:
-                fail("target and motor final pose did not coincide: "+str(sync), width)
-            timing = card_art.evaluate("""el => {
-              const frames = selector => el.querySelector(selector).getAnimations()[0].effect.getKeyframes();
-              const beforeMovement = frames('.eq-target-field').find(f => Math.abs(f.offset-0.58)<0.0001);
-              const motorStart = frames('.eq-large-rotor').find(f => Math.abs(f.offset-0.58)<0.0001);
-              const clean = str => (str || '').replace(/\\s+/g,'');
-              return {field:clean(beforeMovement?.transform),motor:clean(motorStart?.transform)};
-            }""")
-            if timing["field"] not in ("translate(0px)", "translate(0px,0px)") or timing["motor"]!="rotate(0deg)":
-                fail("field movement is not synchronized with motor start: "+str(timing), width)
-            if "1800" not in page.locator(".eq-small-rotor").first.evaluate(
-                "(el) => el.getAnimations().find(x=>x.animationName==='eq-motor-turn')?.effect.getKeyframes().at(-1).transform || ''"):
-                fail("motor does not complete five full turns", width)
-            if "360" not in page.locator(".eq-large-rotor").first.evaluate(
-                "(el) => el.getAnimations().find(x=>x.animationName==='eq-pulley-turn')?.effect.getKeyframes().at(-1).transform || ''"):
-                fail("large pulley does not complete one full turn", width)
+            if drive.get("missing"):
+                fail("equatorial listing drive animation missing", width)
+            if drive["easing"] != "linear":
+                fail("star field must move linearly until the motor finishes: "+str(drive), width)
+            if abs(drive["before"]["x"] + 40) < 1 or abs(drive["before"]["y"] - 36) < 1:
+                fail("target was centered before motor stopped: "+str(drive), width)
+            if abs(drive["before"]["angle"]) < .05:
+                fail("motor arrow returned to initial angle before target arrival: "+str(drive), width)
+            if (abs(drive["end"]["x"] + 40) > .01 or abs(drive["end"]["y"] - 36) > .01 or
+                    abs(drive["end"]["angle"]) > .001 or abs(drive["end"]["motorAngle"]) > .001):
+                fail("target and motor final pose did not coincide: "+str(drive), width)
+            if drive["timing"]["field"] not in ("translate(0px)", "translate(0px,0px)") or drive["timing"]["motor"] != "rotate(0deg)":
+                fail("field movement is not synchronized with motor start: "+str(drive), width)
+            if "1800" not in drive["motorTurns"]:
+                fail("motor does not complete five full turns: "+str(drive), width)
+            if "360" not in drive["pulleyTurns"]:
+                fail("large pulley does not complete one full turn: "+str(drive), width)
             leave_listing(page, card_art, width)
             if any(c in (card_art.get_attribute("class") or "") for c in ("is-hovering", "is-playing")):
                 fail("listing animation did not reset when pointer left", width)
