@@ -1090,7 +1090,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .art-nova .nova-glass{stroke:#8ab0bb;stroke-opacity:.40;stroke-width:.7}
 .art-nova .nova-rings{opacity:.72}
 .art-nova .nova-core{background:#eafaff;box-shadow:0 0 3px #d4f4ff70}
-.art-nova .nova-dot::before{background:#eabd72;box-shadow:none;width:5px;height:5px}
+.art-nova .nova-dot::before{background:#eabd72;box-shadow:none;width:6px;height:6px}
 .art-nova .nova-hud{color:#b6dbe4;font-family:Consolas,"Courier New",monospace}
 .art-nova .nova-panel{
  background:transparent;

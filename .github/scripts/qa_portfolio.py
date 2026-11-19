@@ -532,6 +532,15 @@ with sync_playwright() as p:
             fail("N.O.V.A. original dark glass, white nucleus or concentric signature missing", width)
         if nova.locator(".nova-dot").count()!=1:
             fail("Single amber index marker missing", width)
+        # A 6px source marker with the existing 0.68 scale gives an
+        # approximately 4px amber period while retaining the precise endpoint.
+        marker_size=nova.locator(".nova-dot").evaluate("""el=>{
+          const p=getComputedStyle(el,'::before');
+          return {width:parseFloat(p.width),height:parseFloat(p.height),
+                  scale:getComputedStyle(el).getPropertyValue('--nova-point-dx')!==undefined};
+        }""")
+        if abs(marker_size["width"]-6)>.1 or abs(marker_size["height"]-6)>.1:
+            fail("N.O.V.A. amber dot should be a slightly larger 6px marker: "+str(marker_size), width)
         # All title periods align before the amber point arrives on the final one.
         period=nova.locator(".nova-title-period")
         punctuation=nova.locator(".nova-title-punctuation")
