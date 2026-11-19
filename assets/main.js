@@ -277,9 +277,11 @@
       if (centerPlayback.matches && motionAllowed() && !dialog.open && !document.hidden) {
         const headerBottom = document.querySelector(".site-header").getBoundingClientRect().bottom;
         const center = (window.innerHeight + Math.max(0, headerBottom)) / 2;
+        // Extend the trigger band 12% above and below the usable viewport center.
+        const range = (window.innerHeight - Math.max(0, headerBottom)) * .12;
         next = listingMotions.find(entry => {
           const bounds = entry.art.getBoundingClientRect();
-          return bounds.width > 0 && bounds.top <= center && bounds.bottom >= center;
+          return bounds.width > 0 && bounds.top <= center + range && bounds.bottom >= center - range;
         }) || null;
       }
       if (next === centeredMotion) return;
