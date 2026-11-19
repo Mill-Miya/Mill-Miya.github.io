@@ -1,4 +1,4 @@
-/* Static portfolio. No external requests, analytics, cookies or local storage. */
+/* Static portfolio. Appearance preferences stay in this browser. */
 (() => {
   "use strict";
   const buttons = [...document.querySelectorAll("[data-filter]")];
@@ -50,13 +50,48 @@
 
   const logoFrame = document.getElementById("hero-logo-frame");
   const logoReplay = document.getElementById("hero-logo-replay");
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const root = document.documentElement;
+  const systemMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const motionAllowed = () => !systemMotion.matches && root.dataset.motionChoice !== "reduce";
+  const themeChoice = document.getElementById("theme-choice");
+  const motionChoice = document.getElementById("motion-choice");
+  const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
+  const themeColor = document.querySelector('meta[name="theme-color"]');
+
+  function updateThemeColor() {
+    if (themeColor) themeColor.content = getComputedStyle(document.body).backgroundColor;
+  }
+
+  function bindPreference(control, attribute, storageKey, onChange) {
+    if (!control) return;
+    const preference = root.dataset[attribute];
+    control.value = preference || "system";
+    control.addEventListener("change", () => {
+      if (control.value === "system") delete root.dataset[attribute];
+      else root.dataset[attribute] = control.value;
+      try {
+        if (control.value === "system") localStorage.removeItem(storageKey);
+        else localStorage.setItem(storageKey, control.value);
+      } catch {
+        // The current view still updates when storage is unavailable.
+      }
+      onChange?.();
+    });
+  }
+
+  bindPreference(themeChoice, "themeChoice", "mill-miya.theme", updateThemeColor);
+  bindPreference(motionChoice, "motionChoice", "mill-miya.motion");
+  if (themeChoice && motionChoice) document.querySelector(".site-preferences").hidden = false;
+  systemTheme.addEventListener("change", updateThemeColor);
+  updateThemeColor();
   if (logoFrame && logoReplay) {
     const logoPanel = logoFrame.closest(".hero-visual");
     const channel = "mill-miya-r-logo";
     const sendLogoMessage = type => logoFrame.contentWindow?.postMessage({ channel, type }, "*");
     const syncReplay = () => {
-      logoReplay.hidden = reducedMotion.matches || !logoPanel.classList.contains("is-logo-ready");
+      const ready = logoPanel.classList.contains("is-logo-ready");
+      logoReplay.hidden = !motionAllowed() || !ready;
+      if (ready && !motionAllowed()) sendLogoMessage("show-static");
     };
 
     window.addEventListener("message", event => {
@@ -67,13 +102,12 @@
     });
     logoFrame.addEventListener("load", () => sendLogoMessage("status"));
     logoReplay.addEventListener("click", () => {
-      if (!reducedMotion.matches) sendLogoMessage("replay");
+      if (motionAllowed()) sendLogoMessage("replay");
     });
-    reducedMotion.addEventListener("change", syncReplay);
+    systemMotion.addEventListener("change", syncReplay);
+    motionChoice?.addEventListener("change", syncReplay);
     sendLogoMessage("status");
   }
-
-
 
   // The orange index lands on the actual final punctuation in "N.O.V.A.".
   // The listing card and enlarged sheet use different layouts, so measure each.
@@ -168,7 +202,6 @@
       }
     };
     const activeMotion = () => motions[activeCard?.dataset.sheetId] || null;
-    const motionAllowed = () => !reducedMotion.matches;
     function resetSheetMotion() {
       if (motionTimer !== null) {
         window.clearTimeout(motionTimer);
@@ -219,6 +252,20 @@
         art.classList.remove("is-hovering", "is-complete");
       });
     }
+    function syncMotionPreference() {
+      const allowed = motionAllowed();
+      const showReplay = Boolean(activeMotion()) && allowed;
+      if (!showReplay && document.activeElement === motionButton) closeButton.focus();
+      motionButton.hidden = !showReplay;
+      if (sheetVisualBrand) sheetVisualBrand.hidden = showReplay;
+      if (!allowed) {
+        resetSheetMotion();
+        for (const art of listingArts) art.classList.remove("is-hovering", "is-complete");
+      }
+    }
+    systemMotion.addEventListener("change", syncMotionPreference);
+    motionChoice?.addEventListener("change", syncMotionPreference);
+
     const eligible = () => cards.filter(card => !card.hidden && card.querySelector("[data-open-sheet]"));
 
     function openSheet(card, trigger) {
@@ -279,10 +326,9 @@
         sheetVisual.replaceChildren();
       }
       const showMotion = Boolean(motions[card.dataset.sheetId]) && motionAllowed();
-      motionButton.hidden = !showMotion;
+      syncMotionPreference();
       motionButton.textContent = motions[card.dataset.sheetId]?.loop ? "RESTART" : "REPLAY";
       motionButton.setAttribute("aria-label", `${sheetTitle.textContent} のアニメーションを再生`);
-      if (sheetVisualBrand) sheetVisualBrand.hidden = showMotion;
       // Each sheet starts at the beginning of its own right-side content.
       if (sheetBody) sheetBody.scrollTop = 0;
       if (sheetCopySide) sheetCopySide.scrollTop = 0;

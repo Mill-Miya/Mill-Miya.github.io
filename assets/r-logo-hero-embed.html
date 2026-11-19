@@ -273,6 +273,7 @@ function reportCompleted(completed){
 window.addEventListener('message',event=>{
  if(event.source!==window.parent || !event.data || event.data.channel!=='mill-miya-r-logo')return;
  if(event.data.type==='replay' && !reducedMotion.matches){stop();paintAt(0);play();}
+ if(event.data.type==='show-static')showCompleted();
  if(event.data.type==='status'){
    reportReady();
    if(window.parent!==window)window.parent.postMessage({channel:'mill-miya-r-logo',type:t>=total?'completed':'started'},'*');

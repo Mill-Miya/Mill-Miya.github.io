@@ -111,6 +111,33 @@ with sync_playwright() as p:
                     fail(f"group heading overlaps card {i+1}", width)
         if page.locator("#hero-logo-replay").is_visible():
             fail("reduced-motion preference unexpectedly exposes hero replay", width)
+        if width in (390, 1440):
+            theme = page.locator('#theme-choice')
+            motion = page.locator('#motion-choice')
+            theme.select_option('dark')
+            if page.locator('body').evaluate("(el) => getComputedStyle(el).backgroundColor") != "rgb(22, 28, 31)":
+                fail("dark theme did not reach the page surface", width)
+            first = page.locator('.project-card[data-project="01"]')
+            card_accent = first.locator('.project-year').evaluate("(el) => getComputedStyle(el).color")
+            if card_accent == page.locator('.project-card[data-project="02"] .project-year').evaluate(
+                "(el) => getComputedStyle(el).color"
+            ):
+                fail("different projects share their identity color", width)
+            first.locator('.sheet-link').click()
+            if page.locator('#sheet-kind').evaluate("(el) => getComputedStyle(el).color") != card_accent:
+                fail("card and detail identity colors differ", width)
+            page.keyboard.press("Escape")
+            page.emulate_media(reduced_motion="no-preference")
+            motion.select_option('reduce')
+            if page.locator("#hero-logo-replay").is_visible() or not page.locator(".hero-logo-poster").is_visible():
+                fail("site motion preference does not show a static hero mark", width)
+            first.locator('.sheet-link').click()
+            if page.locator(".sheet-motion-play").is_visible():
+                fail("site motion preference unexpectedly exposes detail replay", width)
+            page.keyboard.press("Escape")
+            motion.select_option('system')
+            theme.select_option('system')
+            page.emulate_media(reduced_motion="reduce")
         if width in (320,390,820,1024,1440):
             page.screenshot(path=str(OUT/f"portfolio_{width}.png"),full_page=True,animations="disabled")
         # Verify existing category filtering on narrow and full desktop.
