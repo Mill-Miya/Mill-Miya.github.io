@@ -81,6 +81,10 @@
       nova: {
         selector: ".art-nova", duration: 6000,
         finishAnimation: "nova-panel-system-in", finishTarget: "nova-panel-system"
+      },
+      "university-ai": {
+        selector: ".art-university", duration: 5500,
+        finishAnimation: "up-toast-appear", finishTarget: "up-toast"
       }
     };
     const activeMotion = () => motions[activeCard?.dataset.sheetId] || null;
@@ -90,7 +94,7 @@
         window.clearTimeout(motionTimer);
         motionTimer = null;
       }
-      for (const art of sheetVisual.querySelectorAll(".art-eqmount, .art-sorava, .art-wallpipe, .art-nova")) {
+      for (const art of sheetVisual.querySelectorAll(".art-eqmount, .art-sorava, .art-wallpipe, .art-nova, .art-university")) {
         art.classList.remove("is-playing", "is-hovering", "is-complete");
       }
     }
