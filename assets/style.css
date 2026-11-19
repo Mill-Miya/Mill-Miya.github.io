@@ -1311,3 +1311,14 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .header-theme button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 .header-theme button[aria-pressed="false"]:hover{background:var(--surface);color:var(--ink)}
 .header-theme button:focus-visible{position:relative;z-index:1}
+
+
+/* Give the animation the same visual weight on narrow screens as on desktop. */
+@media(max-width:820px){
+  .hero-visual{aspect-ratio:1.25/1}
+  .hero-logo-wrap{inset:5% 8% 10%}
+}
+@media(max-width:640px){
+  .hero-visual{aspect-ratio:1/1}
+  .hero-logo-wrap{inset:5% 4% 9%}
+}

@@ -80,6 +80,9 @@
       button.setAttribute("aria-pressed", String(button.dataset.headerTheme === effectiveTheme));
     }
     if (themeColor) themeColor.content = getComputedStyle(document.body).backgroundColor;
+    logoFrame?.contentWindow?.postMessage({
+      channel: "mill-miya-r-logo", type: "theme", theme: effectiveTheme
+    }, "*");
   }
 
   function setTheme(choice) {
@@ -111,10 +114,12 @@
     };
 
     window.addEventListener("message", event => {
-      if (event.source !== logoFrame.contentWindow ||
-          event.data?.channel !== channel || event.data.type !== "ready") return;
-      logoPanel.classList.add("is-logo-ready");
-      syncReplay();
+      if (event.source !== logoFrame.contentWindow || event.data?.channel !== channel) return;
+      if (event.data.type === "ready") syncTheme();
+      if (event.data.type === "theme-applied") {
+        logoPanel.classList.add("is-logo-ready");
+        syncReplay();
+      }
     });
     logoFrame.addEventListener("load", () => sendLogoMessage("status"));
     logoReplay.addEventListener("click", () => {

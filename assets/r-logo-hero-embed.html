@@ -28,14 +28,15 @@ main{width:100%;height:100%;max-width:none;margin:0;padding:0;display:block}
 #draft-grid{display:none}
 #laser-tip{pointer-events:none}
 /* The host dark theme presents the black mark as a drawing. */
-@media(prefers-color-scheme:dark){
-  html,body,.stage{background:#fff}
-  #guide-svg > rect:first-child{fill:#fff}
-  #scraper-fill,#clean-final-logo > path{fill:#000}
-  #guide-paths [data-segment]{stroke:#426778!important}
-  #draft-grid{display:inline}
-  #laser-tip{display:none}
+:root[data-logo-theme="dark"]{
+  background:#fff;
 }
+:root[data-logo-theme="dark"] body,:root[data-logo-theme="dark"] .stage{background:#fff}
+:root[data-logo-theme="dark"] #guide-svg > rect:first-child{fill:#fff}
+:root[data-logo-theme="dark"] #scraper-fill,:root[data-logo-theme="dark"] #clean-final-logo > path{fill:#000}
+:root[data-logo-theme="dark"] #guide-paths [data-segment]{stroke:#426778!important}
+:root[data-logo-theme="dark"] #draft-grid{display:inline}
+:root[data-logo-theme="dark"] #laser-tip{display:none}
 </style></head><body><main>
 <div class="head"><h1>R / CONSTRUCTION &amp; THREE-PIVOT SCRAPER · WORK</h1><div class="kicker">2.30s GUIDE · NO GAPS · SOLID WHITE</div></div>
 <div class="stage"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" width="1254" height="1254" id="guide-svg" role="img" aria-label="Rロゴの設計線を描画するアニメーション">
@@ -150,7 +151,7 @@ const total=paintEnd+guideFadeDuration;
 const schedule=[[0.0,0.57],[0.03,0.42],[0.24,0.37],[0.46,0.66],[0.53,0.66],[0.56,0.72],[0.65,0.66],[0.83,0.64],[0.92,0.66],[1.02,0.66],[0.17,0.43],[0.18,0.43],[0.19,0.43],[0.2,0.43],[1.37,0.58],[1.43,0.58],[1.48,0.61],[1.53,0.63],[1.58,0.62],[1.6,0.58],[1.64,0.58],[1.69,0.6],[1.75,0.53],[1.95,0.55],[2.0,0.57],[2.03,0.55],[2.07,0.5],[2.11,0.52],[2.14,0.41],[2.19,0.43],[2.24,0.39],[1.03,1.60],[1.93,0.62]].map(([start,duration])=>[start*0.8745247148288973,duration*0.8745247148288973]);
 const lines=[...document.querySelectorAll('#guide-paths [data-segment]')];
 const laserTip=document.getElementById('laser-tip');
-const draftingTheme=matchMedia('(prefers-color-scheme: dark)');
+const isDrafting=()=>document.documentElement.dataset.logoTheme==='dark';
 const lengths=lines.map(el=>{const len=el.getTotalLength();if(!(len>0))throw new Error('Invalid guide length');el.style.visibility='hidden';return len;});
 const stages=[
  {name:'red',start:2.3,end:3.0735,from:-34,to:-318.5,pivot:{x:627,y:627},direction:'ccw',fill:document.getElementById('filled-red'),clip:document.getElementById('clip-red')},
@@ -229,7 +230,7 @@ function drawGuides(now){
    else{
      el.style.strokeDasharray=`${lengths[i]} ${lengths[i]+2}`;
      el.style.strokeDashoffset=String(lengths[i]*(1-p));
-     if(!draftingTheme.matches && (!laserGuide || start>=laserGuide.start)){
+     if(!isDrafting() && (!laserGuide || start>=laserGuide.start)){
        laserGuide={path:el,start,distance:lengths[i]*p};
      }
    }
@@ -309,6 +310,11 @@ window.addEventListener('message',event=>{
  if(event.source!==window.parent || !event.data || event.data.channel!=='mill-miya-r-logo')return;
  if(event.data.type==='replay' && !reducedMotion.matches){stop();paintAt(0);play();}
  if(event.data.type==='show-static')showCompleted();
+ if(event.data.type==='theme' && ['light','dark'].includes(event.data.theme)){
+   document.documentElement.dataset.logoTheme=event.data.theme;
+   drawGuides(t);
+   window.parent.postMessage({channel:'mill-miya-r-logo',type:'theme-applied'},'*');
+ }
  if(event.data.type==='status'){
    reportReady();
    if(window.parent!==window)window.parent.postMessage({channel:'mill-miya-r-logo',type:t>=total?'completed':'started'},'*');
