@@ -58,32 +58,48 @@
   const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
   const themeColor = document.querySelector('meta[name="theme-color"]');
 
-  function updateThemeColor() {
+  const headerTheme = document.querySelector(".header-theme");
+  const themeButtons = [...document.querySelectorAll("[data-header-theme]")];
+
+  function savePreference(attribute, storageKey, value) {
+    if (value === "system") delete root.dataset[attribute];
+    else root.dataset[attribute] = value;
+    try {
+      if (value === "system") localStorage.removeItem(storageKey);
+      else localStorage.setItem(storageKey, value);
+    } catch {
+      // The current view still updates when storage is unavailable.
+    }
+  }
+
+  function syncTheme() {
+    const choice = root.dataset.themeChoice || "system";
+    const effectiveTheme = choice === "system" ? (systemTheme.matches ? "dark" : "light") : choice;
+    if (themeChoice) themeChoice.value = choice;
+    for (const button of themeButtons) {
+      button.setAttribute("aria-pressed", String(button.dataset.headerTheme === effectiveTheme));
+    }
     if (themeColor) themeColor.content = getComputedStyle(document.body).backgroundColor;
   }
 
-  function bindPreference(control, attribute, storageKey, onChange) {
-    if (!control) return;
-    const preference = root.dataset[attribute];
-    control.value = preference || "system";
-    control.addEventListener("change", () => {
-      if (control.value === "system") delete root.dataset[attribute];
-      else root.dataset[attribute] = control.value;
-      try {
-        if (control.value === "system") localStorage.removeItem(storageKey);
-        else localStorage.setItem(storageKey, control.value);
-      } catch {
-        // The current view still updates when storage is unavailable.
-      }
-      onChange?.();
-    });
+  function setTheme(choice) {
+    savePreference("themeChoice", "mill-miya.theme", choice);
+    syncTheme();
   }
 
-  bindPreference(themeChoice, "themeChoice", "mill-miya.theme", updateThemeColor);
-  bindPreference(motionChoice, "motionChoice", "mill-miya.motion");
+  for (const button of themeButtons) {
+    button.addEventListener("click", () => setTheme(button.dataset.headerTheme));
+  }
+  themeChoice?.addEventListener("change", () => setTheme(themeChoice.value));
+  if (motionChoice) {
+    motionChoice.value = root.dataset.motionChoice || "system";
+    motionChoice.addEventListener("change", () => savePreference("motionChoice", "mill-miya.motion", motionChoice.value));
+  }
   if (themeChoice && motionChoice) document.querySelector(".site-preferences").hidden = false;
-  systemTheme.addEventListener("change", updateThemeColor);
-  updateThemeColor();
+  systemTheme.addEventListener("change", syncTheme);
+  syncTheme();
+  if (headerTheme) headerTheme.hidden = false;
+
   if (logoFrame && logoReplay) {
     const logoPanel = logoFrame.closest(".hero-visual");
     const channel = "mill-miya-r-logo";

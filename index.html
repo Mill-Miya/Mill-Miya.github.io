@@ -26,8 +26,8 @@
       if (localStorage.getItem('mill-miya.motion') === 'reduce') root.dataset.motionChoice = 'reduce';
     } catch {}
   </script>
-  <link rel="stylesheet" href="assets/style.css?v=78">
-  <script src="assets/main.js?v=21" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=79">
+  <script src="assets/main.js?v=22" defer></script>
   <title>Mill-Miya — Selected Works</title>
 </head>
 <body>
@@ -41,7 +41,13 @@
       <a href="#works">Works <span>01</span></a>
       <a href="#areas">Areas <span>02</span></a>
     </nav>
-    <a class="header-github" href="https://github.com/Mill-Miya" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+    <div class="header-actions">
+      <a class="header-github" href="https://github.com/Mill-Miya" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+      <div class="header-theme" role="group" aria-label="Color theme" hidden>
+        <button type="button" data-header-theme="light" aria-pressed="false">Light</button>
+        <button type="button" data-header-theme="dark" aria-pressed="false">Dark</button>
+      </div>
+    </div>
   </header>
 
   <main id="main">

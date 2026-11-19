@@ -1293,3 +1293,21 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .project-links .sheet-link:hover,.project-links a:hover{
   color:var(--project-accent);border-color:var(--project-accent);
 }
+
+.header-actions{
+  display:flex;align-items:center;gap:12px;flex:none;
+}
+.header-theme{
+  display:flex;flex:none;align-items:center;
+  border:1px solid var(--line-strong);border-radius:var(--control-radius);
+}
+.header-theme[hidden]{display:none}
+.header-theme button{
+  min-width:var(--control-size);min-height:var(--control-size);
+  padding:0 4px;border:0;background:transparent;color:var(--muted);
+  font-size:11px;font-weight:650;cursor:pointer;
+  transition:background-color var(--ui-feedback),color var(--ui-feedback);
+}
+.header-theme button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.header-theme button[aria-pressed="false"]:hover{background:var(--surface);color:var(--ink)}
+.header-theme button:focus-visible{position:relative;z-index:1}
