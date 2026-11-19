@@ -34,11 +34,15 @@ jobs:
       - name: Install Japanese font for accurate visual inspection
         timeout-minutes: 5
         run: |
-          if ! fc-match -f '%{family}' 'Noto Sans CJK JP' | grep -q 'Noto Sans CJK'; then
-            sudo apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 update -qq
-            sudo apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 install -y fonts-noto-cjk
-            fc-cache -f
-          fi
+          # Only Japanese regular/bold are needed; pin official font data and verify Git blob hashes.
+          qa_font_dir="$HOME/.local/share/fonts/portfolio-qa"
+          mkdir -p "$qa_font_dir"
+          qa_font_source="https://raw.githubusercontent.com/notofonts/noto-cjk/f8d157532fbfaeda587e826d4cd5b21a49186f7c/Sans/OTF/Japanese"
+          curl -fL --retry 1 --retry-max-time 90 --connect-timeout 15 --max-time 60 "$qa_font_source/NotoSansCJKjp-Regular.otf" -o "$qa_font_dir/NotoSansCJKjp-Regular.otf"
+          curl -fL --retry 1 --retry-max-time 90 --connect-timeout 15 --max-time 60 "$qa_font_source/NotoSansCJKjp-Bold.otf" -o "$qa_font_dir/NotoSansCJKjp-Bold.otf"
+          test "$(git hash-object "$qa_font_dir/NotoSansCJKjp-Regular.otf")" = "f56224957fb13a81b4c14bac34f2f058a017f9fb"
+          test "$(git hash-object "$qa_font_dir/NotoSansCJKjp-Bold.otf")" = "d006db30aee377d6d8b5bb15375ef068f403f213"
+          fc-cache -f "$qa_font_dir"
           fc-match -f '%{family}' 'Noto Sans CJK JP' | grep 'Noto Sans CJK'
       - name: Check 15 widths and page controls
         run: python .github/scripts/qa_portfolio.py
