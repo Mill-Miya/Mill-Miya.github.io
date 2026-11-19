@@ -242,7 +242,8 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   z-index:1;transform:scale(1)}
 .art-nova .nova-dot{position:absolute;inset:0;width:100%;height:100%;z-index:2;
   background:none;box-shadow:none;border:0;border-radius:0;
-  transform:rotate(34deg);transform-origin:50% 50%}
+  transform:translate(var(--nova-point-dx,0px),var(--nova-point-dy,0px)) rotate(34deg);
+  transform-origin:50% 50%}
 .art-nova .nova-dot::before{content:"";position:absolute;left:calc(50% - 3px);top:5%;
   width:6px;height:6px;border-radius:50%;background:#eabd72;box-shadow:0 0 8px #eabd7270}
 .art-nova .nova-hud{position:absolute;inset:0;z-index:3;pointer-events:none;
@@ -359,7 +360,12 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 }
 @keyframes nova-point-activate{
   0%,25%{transform:rotate(-24deg);opacity:.5}
-  50%,100%{transform:rotate(34deg);opacity:1}
+  50%,72%{transform:rotate(34deg);opacity:1}
+  90%,100%{transform:translate(var(--nova-point-dx,0px),var(--nova-point-dy,0px)) rotate(34deg);opacity:1}
+}
+@keyframes nova-point-dock-size{
+  0%,72%{transform:scale(1)}
+  90%,100%{transform:scale(.68)}
 }
 @keyframes nova-wire-core-in{0%,48%{opacity:0;transform:scaleX(0)}58%,100%{opacity:1;transform:scaleX(1)}}
 @keyframes nova-wire-memory-in{0%,58%{opacity:0;transform:scaleX(0)}68%,100%{opacity:1;transform:scaleX(1)}}
@@ -1117,4 +1123,18 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .art-university .up-taskbar-app{border-radius:2px}
 .project-sheet[data-theme="nova"],.project-sheet[data-theme="university-ai"]{
  --sheet-accent:#076b93;--sheet-panel:#e9eeec;--sheet-muted:#56727d
+}
+/* The final N.O.V.A. period is the measured docking target for the orbiting dot.
+   A real dot circle gives reliable alignment across all viewport and sheet sizes. */
+.art-nova .nova-ui-caption strong .nova-title-period{
+  display:inline-block;width:.14em;height:.14em;margin-left:.06em;margin-bottom:.055em;
+  vertical-align:baseline;overflow:hidden;border-radius:50%;
+  color:transparent;background:#bad6dd;font-size:inherit;line-height:0;letter-spacing:0
+}
+.art-nova.is-dot-aligned .nova-ui-caption strong .nova-title-period{background:transparent}
+.art-nova .nova-dot::before{transform:scale(.68);transform-origin:center}
+@media(prefers-reduced-motion:no-preference){
+  .art-nova:is(.is-hovering,.is-playing) .nova-dot::before{
+    animation:nova-point-dock-size var(--nova-motion-duration) ease-in-out 1 both
+  }
 }

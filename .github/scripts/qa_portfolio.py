@@ -532,6 +532,22 @@ with sync_playwright() as p:
             fail("N.O.V.A. original dark glass, white nucleus or concentric signature missing", width)
         if nova.locator(".nova-dot").count()!=1:
             fail("Single amber index marker missing", width)
+        # The orbiting amber marker must finish precisely on the title's final dot.
+        period=nova.locator(".nova-title-period")
+        if period.count()!=1 or period.inner_text()!=".":
+            fail("N.O.V.A. final punctuation target is missing", width)
+        point_error=nova.evaluate("""art=>{
+          const o=art.getBoundingClientRect(),p=art.querySelector('.nova-title-period').getBoundingClientRect();
+          const orbit=art.querySelector('.nova-orbits'),angle=34*Math.PI/180;
+          const r=orbit.offsetWidth*.45-3;
+          const style=getComputedStyle(art),dx=parseFloat(style.getPropertyValue('--nova-point-dx'));
+          const dy=parseFloat(style.getPropertyValue('--nova-point-dy'));
+          return {aligned:art.classList.contains('is-dot-aligned'),
+            distance:Math.hypot(o.left+o.width*.5+r*Math.sin(angle)+dx-p.left-p.width*.5,
+              o.top+o.height*.46-r*Math.cos(angle)+dy-p.top-p.height*.5)};
+        }""")
+        if not point_error["aligned"] or point_error["distance"]>.8:
+            fail("N.O.V.A. satellite must coincide with last punctuation: "+str(point_error), width)
         if nova.locator(".nova-nucleus").get_attribute("r")!="4.3":
             fail("N.O.V.A. nucleus must be small, not a large generic glowing ball", width)
         expected_hud=((".nova-panel-core","CORE","COHERENT","INTEGRITY","NEURAL FIELD"),
@@ -589,6 +605,20 @@ with sync_playwright() as p:
             page.mouse.move(0,0)
             page.locator('.project-card[data-sheet-id="nova"] .project-title-button').click()
             art=page.locator("#sheet-visual .art-nova")
+            page.wait_for_function("""() =>
+              document.querySelector("#sheet-visual .art-nova")?.classList.contains("is-dot-aligned")
+            """, timeout=1500)
+            sheet_error=art.evaluate("""art=>{
+              const o=art.getBoundingClientRect(),p=art.querySelector('.nova-title-period').getBoundingClientRect();
+              const orbit=art.querySelector('.nova-orbits'),angle=34*Math.PI/180;
+              const r=orbit.offsetWidth*.45-3;
+              const style=getComputedStyle(art),dx=parseFloat(style.getPropertyValue('--nova-point-dx'));
+              const dy=parseFloat(style.getPropertyValue('--nova-point-dy'));
+              return Math.hypot(o.left+o.width*.5+r*Math.sin(angle)+dx-p.left-p.width*.5,
+                o.top+o.height*.46-r*Math.cos(angle)+dy-p.top-p.height*.5);
+            }""")
+            if sheet_error>.8:
+                fail("N.O.V.A. enlarged sheet dot must match punctuation: "+str(sheet_error), width)
             page.wait_for_function("""()=>
               document.querySelector('#sheet-visual .art-nova')?.classList.contains('is-playing')
             """, timeout=1500)

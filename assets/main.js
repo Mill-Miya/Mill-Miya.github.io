@@ -34,6 +34,45 @@
   applyFilter("all");
 
 
+
+  // The orange index lands on the actual final punctuation in "N.O.V.A.".
+  // The listing card and enlarged sheet use different layouts, so measure each.
+  function alignNovaPeriod(art) {
+    if (!art?.classList.contains("art-nova")) return;
+    const orbit = art.querySelector(".nova-orbits");
+    const period = art.querySelector(".nova-title-period");
+    if (!orbit || !period) return;
+    const outer = art.getBoundingClientRect();
+    const target = period.getBoundingClientRect();
+    const orbitWidth = orbit.offsetWidth;
+    if (!outer.width || !outer.height || !target.width || !target.height || !orbitWidth) return;
+    // Original orbiter: top:5%, 6px marker, rotated by 34 degrees.
+    const radius = orbitWidth * .45 - 3;
+    const angle = 34 * Math.PI / 180;
+    const dotX = outer.left + outer.width * .5 + radius * Math.sin(angle);
+    const dotY = outer.top + outer.height * .46 - radius * Math.cos(angle);
+    art.style.setProperty("--nova-point-dx", (target.left + target.width * .5 - dotX).toFixed(3) + "px");
+    art.style.setProperty("--nova-point-dy", (target.top + target.height * .5 - dotY).toFixed(3) + "px");
+    art.classList.add("is-dot-aligned");
+  }
+  const novaResizeObserver = typeof ResizeObserver === "function"
+    ? new ResizeObserver(entries => {
+        for (const entry of entries) alignNovaPeriod(entry.target);
+      })
+    : null;
+  function observeNova(art) {
+    if (!art?.classList.contains("art-nova")) return;
+    alignNovaPeriod(art);
+    novaResizeObserver?.observe(art);
+  }
+  observeNova(document.querySelector('.project-card[data-sheet-id="nova"] .art-nova'));
+  document.fonts?.ready.then(() => {
+    document.querySelectorAll(".art-nova").forEach(alignNovaPeriod);
+  });
+  window.addEventListener("resize", () => {
+    document.querySelectorAll(".art-nova").forEach(alignNovaPeriod);
+  }, { passive: true });
+
   // Lightweight, accessible work sheets. Content is derived solely from visible public cards.
   const dialog = document.getElementById("project-sheet");
   if (dialog && typeof dialog.showModal === "function") {
@@ -166,6 +205,8 @@
       const position = String(current + 1).padStart(2, "0") + " / " + String(selection.length).padStart(2, "0");
       sheetPosition.textContent = position;
       sheetVisualIndex.textContent = position;
+      const oldNova = sheetVisual.querySelector(".art-nova");
+      if (oldNova) novaResizeObserver?.unobserve(oldNova);
       const art = card.querySelector(".project-art")?.cloneNode(true);
       if (art) {
         const motion = motions[card.dataset.sheetId];
@@ -214,6 +255,7 @@
       prevButton.disabled = selection.length < 2;
       nextButton.disabled = selection.length < 2;
       if (!dialog.open) dialog.showModal();
+      observeNova(art);
       closeButton.focus();
       // Play exactly once when an animated sheet opens, including navigation
       // from another sheet. Static artwork stays static; reduced-motion is honored.
