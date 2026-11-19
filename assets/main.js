@@ -4,6 +4,8 @@
   const buttons = [...document.querySelectorAll("[data-filter]")];
   const cards = [...document.querySelectorAll("[data-project]")];
   const count = document.querySelector("#visible-count");
+  const countUnit = document.querySelector("#project-count-unit");
+  const grid = document.querySelector("#project-grid");
   const category = (card, filter) => filter === "all" || (card.dataset.tags || "").split(/\s+/).includes(filter);
 
   function applyFilter(filter) {
@@ -38,11 +40,38 @@
       button.setAttribute("aria-pressed", String(active));
     }
     if (count) count.textContent = String(total).padStart(2, "0");
+    if (countUnit) countUnit.textContent = total === 1 ? "PROJECT" : "PROJECTS";
+    grid?.classList.toggle("is-single-project", total === 1);
   }
   for (const button of buttons) {
     button.addEventListener("click", () => applyFilter(button.dataset.filter || "all"));
   }
   applyFilter("all");
+
+  const logoFrame = document.getElementById("hero-logo-frame");
+  const logoReplay = document.getElementById("hero-logo-replay");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  if (logoFrame && logoReplay) {
+    const logoPanel = logoFrame.closest(".hero-visual");
+    const channel = "mill-miya-r-logo";
+    const sendLogoMessage = type => logoFrame.contentWindow?.postMessage({ channel, type }, "*");
+    const syncReplay = () => {
+      logoReplay.hidden = reducedMotion.matches || !logoPanel.classList.contains("is-logo-ready");
+    };
+
+    window.addEventListener("message", event => {
+      if (event.source !== logoFrame.contentWindow ||
+          event.data?.channel !== channel || event.data.type !== "ready") return;
+      logoPanel.classList.add("is-logo-ready");
+      syncReplay();
+    });
+    logoFrame.addEventListener("load", () => sendLogoMessage("status"));
+    logoReplay.addEventListener("click", () => {
+      if (!reducedMotion.matches) sendLogoMessage("replay");
+    });
+    reducedMotion.addEventListener("change", syncReplay);
+    sendLogoMessage("status");
+  }
 
 
 
@@ -103,6 +132,7 @@
     motionButton.hidden = true;
     // Keep replay in the image panel's bottom-right caption row, not over the art.
     sheetVisualBottom?.appendChild(motionButton);
+    const sheetBody = dialog.querySelector(".sheet-body");
     const sheetCopySide = dialog.querySelector(".sheet-copy-side");
     const sheetActions = document.getElementById("sheet-actions");
     const sheetCounter = document.getElementById("sheet-counter");
@@ -138,7 +168,7 @@
       }
     };
     const activeMotion = () => motions[activeCard?.dataset.sheetId] || null;
-    const motionAllowed = () => !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const motionAllowed = () => !reducedMotion.matches;
     function resetSheetMotion() {
       if (motionTimer !== null) {
         window.clearTimeout(motionTimer);
@@ -254,13 +284,13 @@
       motionButton.setAttribute("aria-label", `${sheetTitle.textContent} のアニメーションを再生`);
       if (sheetVisualBrand) sheetVisualBrand.hidden = showMotion;
       // Each sheet starts at the beginning of its own right-side content.
+      if (sheetBody) sheetBody.scrollTop = 0;
       if (sheetCopySide) sheetCopySide.scrollTop = 0;
       sheetTags.replaceChildren(...[...card.querySelectorAll(".tag-row span")].map(tag => tag.cloneNode(true)));
       const live = card.querySelector(".project-links a[href]");
       sheetActions.replaceChildren();
       if (live) {
         const link = live.cloneNode(true);
-        link.textContent = "Open live site ↗";
         sheetActions.append(link);
       }
       prevButton.disabled = selection.length < 2;

@@ -109,6 +109,8 @@ with sync_playwright() as p:
                 iy=min(g["b"],a["b"])-max(g["t"],a["t"])
                 if ix>3 and iy>3:
                     fail(f"group heading overlaps card {i+1}", width)
+        if page.locator("#hero-logo-replay").is_visible():
+            fail("reduced-motion preference unexpectedly exposes hero replay", width)
         if width in (320,390,820,1024,1440):
             page.screenshot(path=str(OUT/f"portfolio_{width}.png"),full_page=True,animations="disabled")
         # Verify existing category filtering on narrow and full desktop.
@@ -128,6 +130,8 @@ with sync_playwright() as p:
                 fail("Hardware filter should show one physical work", width)
             if not page.locator('#physical-group-label').is_visible():
                 fail("Physical work label hidden by Hardware filter", width)
+            if page.get_by_role("status").inner_text().strip() != "01 PROJECT":
+                fail("single-project result is not announced with a singular unit", width)
             if page.locator('#archive-group-label').is_visible():
                 fail("Software archive header visible without software cards", width)
             page.locator('button[data-filter="engineering"]').click()
@@ -366,7 +370,7 @@ with sync_playwright() as p:
             page.mouse.move(0,0)
             if "is-hovering" in (pipe_art.get_attribute("class") or ""):
                 fail("WallPipe hover did not reset", width)
-            page.locator('.project-card[data-project="02"] .project-title-button').click()
+            page.locator('.project-card[data-project="02"] .sheet-link').click()
             pipe_sheet=page.locator("#sheet-visual .art-wallpipe")
             page.wait_for_function("""() =>
                 document.querySelector('#sheet-visual .art-wallpipe')?.classList.contains('is-playing')
@@ -675,7 +679,7 @@ with sync_playwright() as p:
             ):
                 fail("N.O.V.A. amber point paused mid-journey: "+str(satellite), width)
             page.mouse.move(0,0)
-            page.locator('.project-card[data-sheet-id="nova"] .project-title-button').click()
+            page.locator('.project-card[data-sheet-id="nova"] .sheet-link').click()
             art=page.locator("#sheet-visual .art-nova")
             page.wait_for_function("""() =>
               document.querySelector("#sheet-visual .art-nova")?.classList.contains("is-dot-aligned")
@@ -767,7 +771,7 @@ with sync_playwright() as p:
                 art.screenshot(path=str(OUT/"nova_complete_1440.png"), animations="disabled")
             page.locator("#sheet-close").click()
             page.emulate_media(reduced_motion="reduce")
-            page.locator('.project-card[data-sheet-id="nova"] .project-title-button').click()
+            page.locator('.project-card[data-sheet-id="nova"] .sheet-link').click()
             if page.locator(".sheet-motion-play").is_visible():
                 fail("N.O.V.A. reduced-motion mode must not autoplay", width)
             if page.locator("#sheet-visual .nova-panel-system").evaluate(
@@ -830,7 +834,7 @@ with sync_playwright() as p:
                     abs(preview["seconds"]-3.4375)>.025 or preview["count"]!="1"):
                 fail("University AI hover preview must run 1.6x and once: "+str(preview), width)
             page.mouse.move(0,0)
-            page.locator('.project-card[data-sheet-id="university-ai"] .project-title-button').click()
+            page.locator('.project-card[data-sheet-id="university-ai"] .sheet-link').click()
             art=page.locator("#sheet-visual .art-university")
             page.wait_for_function("""()=>
               document.querySelector('#sheet-visual .art-university')?.classList.contains('is-playing')
@@ -893,7 +897,7 @@ with sync_playwright() as p:
                 art.screenshot(path=str(OUT/"university_complete_1440.png"),animations="disabled")
             page.locator("#sheet-close").click()
             page.emulate_media(reduced_motion="reduce")
-            page.locator('.project-card[data-sheet-id="university-ai"] .project-title-button').click()
+            page.locator('.project-card[data-sheet-id="university-ai"] .sheet-link').click()
             if page.locator(".sheet-motion-play").is_visible():
                 fail("University AI must respect reduced motion preference", width)
             if page.locator("#sheet-visual .up-toast").evaluate(
@@ -1067,7 +1071,11 @@ with sync_playwright() as p:
         # Five eligible projects open sheets; the physical project has no live demo.
         if width in (320, 390, 820, 1440):
             trigger = page.locator('.project-card[data-project="01"] .project-media-hit')
-            trigger.click()
+            detail = page.locator('.project-card[data-project="01"] .sheet-link')
+            if trigger.get_attribute("tabindex") != "-1" or detail.get_attribute("tabindex") == "-1":
+                fail("redundant tab stop or missing keyboard detail action", width)
+            detail.focus()
+            page.keyboard.press("Enter")
             sheet = page.locator('#project-sheet')
             if not sheet.evaluate("(el) => el.open"):
                 fail("sheet did not open", width)
@@ -1129,10 +1137,10 @@ with sync_playwright() as p:
             page.keyboard.press("Escape")
             if sheet.evaluate("(el) => el.open"):
                 fail("Escape did not close dialog", width)
-            if not trigger.evaluate("(el) => document.activeElement === el"):
+            if not detail.evaluate("(el) => document.activeElement === el"):
                 fail("focus did not return to opener", width)
             # Project without a public demo still needs a detail sheet.
-            page.locator('.project-card[data-project="04"] .project-title-button').click()
+            page.locator('.project-card[data-project="04"] .sheet-link').click()
             if page.locator("#sheet-title").inner_text().strip() != "University AI":
                 fail("non-demo project sheet missing", width)
             if "連携も実装済み" not in page.locator("#sheet-extra").inner_text():
@@ -1155,7 +1163,7 @@ with sync_playwright() as p:
             if overflows["total"] > overflows["viewport"] + 1:
                 fail("work sheet overflows horizontally", width)
             page.locator("#sheet-close").click()
-            page.locator('.project-card[data-project="04"] .project-title-button').click()
+            page.locator('.project-card[data-project="04"] .sheet-link').click()
             page.locator("#sheet-next").click()
             if page.locator("#sheet-title").inner_text().strip() != "DIY Automatic Equatorial Mount":
                 fail("sheet navigation did not reach the physical project", width)
@@ -1175,7 +1183,7 @@ with sync_playwright() as p:
                 # Exercise the actual mouse-hover and mobile replay paths with motion enabled.
                 page.emulate_media(reduced_motion="no-preference")
                 page.locator("#sheet-close").click()
-                page.locator('.project-card[data-project="07"] .project-title-button').click()
+                page.locator('.project-card[data-project="07"] .sheet-link').click()
                 art = page.locator("#sheet-visual .art-eqmount")
                 play_button = page.locator(".sheet-motion-play")
                 page.wait_for_function("""() => document.querySelector('#sheet-visual .art-eqmount')?.classList.contains('is-playing')""", timeout=1500)
@@ -1349,7 +1357,7 @@ with sync_playwright() as p:
                 page.mouse.move(0, 0)
                 if "is-hovering" in (sorava_card.get_attribute("class") or ""):
                     fail("Sorava listing animation did not reset", width)
-                page.locator('.project-card[data-project="01"] .project-title-button').click()
+                page.locator('.project-card[data-project="01"] .sheet-link').click()
                 sorava_sheet = page.locator("#sheet-visual .art-sorava")
                 page.wait_for_function("""() =>
                   document.querySelector('#sheet-visual .art-sorava')?.classList.contains('is-playing')
@@ -1470,7 +1478,7 @@ with sync_playwright() as p:
                     fail("Sorava NEXT/PREV autoplay requires pointer hover", width)
                 page.locator("#sheet-close").click()
                 page.emulate_media(reduced_motion="reduce")
-                page.locator('.project-card[data-project="01"] .project-title-button').click()
+                page.locator('.project-card[data-project="01"] .sheet-link').click()
                 if page.locator(".sheet-motion-play").is_visible():
                     fail("Sorava reduced motion unexpectedly exposes replay", width)
                 if page.locator("#sheet-visual .sorava-guest-received").evaluate(
