@@ -19,6 +19,26 @@ VISUALS = {
 def fail(msg, width):
     raise AssertionError(f"{width}px: {msg}")
 
+def start_listing(page, media, art, width):
+    """Use the same center-entry path as phones, and hover on desktop."""
+    if width <= 760:
+        page.locator('.hero').evaluate("el => el.scrollIntoView({block:'start'})")
+        page.wait_for_function("!document.querySelector('.project-card .is-playing')")
+        art.evaluate("el => el.scrollIntoView({block:'center'})")
+        page.wait_for_function("""selector =>
+            document.querySelector(selector)?.classList.contains('is-playing')
+        """, arg='.project-card .' + next(c for c in art.get_attribute('class').split() if c.startswith('art-')))
+    else:
+        media.hover()
+
+
+def leave_listing(page, art, width):
+    page.mouse.move(0, 0)
+    if width <= 760:
+        page.locator('.hero').evaluate("el => el.scrollIntoView({block:'start'})")
+        page.wait_for_function("!document.querySelector('.project-card .is-playing')")
+
+
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
     for width in WIDTHS:
@@ -109,8 +129,8 @@ with sync_playwright() as p:
                 iy=min(g["b"],a["b"])-max(g["t"],a["t"])
                 if ix>3 and iy>3:
                     fail(f"group heading overlaps card {i+1}", width)
-        if page.locator("#hero-logo-replay").is_visible():
-            fail("reduced-motion preference unexpectedly exposes hero replay", width)
+        if not page.locator("#hero-logo-replay").is_visible():
+            fail("reduced-motion preference must retain explicit hero replay", width)
         if width in (390, 1440):
             theme = page.locator('#theme-choice')
             motion = page.locator('#motion-choice')
@@ -134,14 +154,37 @@ with sync_playwright() as p:
             page.keyboard.press("Escape")
             page.emulate_media(reduced_motion="no-preference")
             motion.select_option('reduce')
-            if page.locator("#hero-logo-replay").is_visible() or not page.locator(".hero-logo-poster").is_visible():
+            if not page.locator("#hero-logo-replay").is_visible() or not page.locator(".hero-logo-poster").is_visible():
                 fail("site motion preference does not show a static hero mark", width)
             first.locator('.sheet-link').click()
-            if page.locator(".sheet-motion-play").is_visible():
-                fail("site motion preference unexpectedly exposes detail replay", width)
+            if not page.locator(".sheet-motion-play").is_visible():
+                fail("site reduced motion must retain explicit detail replay", width)
+            if page.locator("#sheet-visual .is-playing").count():
+                fail("site reduce unexpectedly autoplays the sheet", width)
+            page.locator(".sheet-motion-play").click()
+            page.wait_for_function("document.querySelector('#sheet-visual .art-sorava')?.classList.contains('is-playing')")
+            if motion.input_value() != 'full' or page.evaluate("localStorage.getItem('mill-miya.motion')") != 'full':
+                fail("detail REPLAY did not persist full motion", width)
+            if page.locator("#sheet-visual .sorava-guest-received").evaluate("el => getComputedStyle(el).animationName") != 'sorava-guest-receive':
+                fail("explicit detail replay did not start CSS animation", width)
             page.keyboard.press("Escape")
             motion.select_option('system')
+            page.emulate_media(reduced_motion="reduce")
+            page.locator('#hero-logo-replay').click()
+            page.wait_for_function("document.documentElement.dataset.motionChoice === 'full'")
+            logo = page.frame_locator('#hero-logo-frame').locator('body')
+            if not logo.evaluate("() => window.getLogoStatus().running"):
+                fail("hero REPLAY did not enable iframe playback under OS reduce", width)
+            if motion.input_value() != 'full' or page.evaluate("localStorage.getItem('mill-miya.motion')") != 'full':
+                fail("hero REPLAY did not persist full motion", width)
+            page.reload(wait_until='load')
+            if motion.input_value() != 'full':
+                fail("full motion did not survive reload", width)
+            motion.select_option('system')
+            if page.evaluate("localStorage.getItem('mill-miya.motion')") is not None:
+                fail("System must clear the stored motion override", width)
             theme.select_option('system')
+            page.locator("#motion-choice").select_option("system")
             page.emulate_media(reduced_motion="reduce")
         if width in (320,390,820,1024,1440):
             page.screenshot(path=str(OUT/f"portfolio_{width}.png"),full_page=True,animations="disabled")
@@ -185,7 +228,7 @@ with sync_playwright() as p:
                 fail("locked work missing lock visual", width)
             if locked.locator("[data-open-sheet], a[href]").count()!=0:
                 fail("locked work still has actionable controls", width)
-            if locked.locator(".project-locked-note").inner_text().strip()!="PREVIEW UNAVAILABLE":
+            if locked.locator(".project-locked-note").inner_text().strip()!="PRIVATE PREVIEW":
                 fail("locked work availability note missing", width)
             if page.locator(f'a[href*="{url_fragment}"]').count()!=0:
                 fail("locked work demo link leaked", width)
@@ -350,8 +393,8 @@ with sync_playwright() as p:
             page.emulate_media(reduced_motion="no-preference")
             pipe_media=page.locator('.project-card[data-project="02"] .project-media')
             pipe_art=pipe_media.locator(".art-wallpipe")
-            pipe_media.hover()
-            if "is-hovering" not in (pipe_art.get_attribute("class") or ""):
+            start_listing(page, pipe_media, pipe_art, width)
+            if ("is-playing" if width <= 760 else "is-hovering") not in (pipe_art.get_attribute("class") or ""):
                 fail("WallPipe listing did not start playback on hover", width)
             # Source-level opacity checks do not catch clone-paint regressions.
             # Confirm the *visible* live water group begins fully concealed.
@@ -399,8 +442,8 @@ with sync_playwright() as p:
             if pipe_art.locator(".wp-upstream-stream").evaluate(
                     "(el) => getComputedStyle(el).animationName")!="wp-upstream-travel":
                 fail("Left-side water must move immediately upon preview start", width)
-            page.mouse.move(0,0)
-            if "is-hovering" in (pipe_art.get_attribute("class") or ""):
+            leave_listing(page, pipe_art, width)
+            if any(c in (pipe_art.get_attribute("class") or "") for c in ("is-hovering", "is-playing")):
                 fail("WallPipe hover did not reset", width)
             page.locator('.project-card[data-project="02"] .sheet-link').click()
             pipe_sheet=page.locator("#sheet-visual .art-wallpipe")
@@ -569,6 +612,7 @@ with sync_playwright() as p:
             if "is-playing" not in (pipe_sheet.get_attribute("class") or ""):
                 fail("WallPipe replay did not restart", width)
             page.locator("#sheet-close").click()
+            page.locator("#motion-choice").select_option("system")
             page.emulate_media(reduced_motion="reduce")
 
         # N.O.V.A. must reproduce the actual source site's Full HUD vocabulary,
@@ -671,8 +715,8 @@ with sync_playwright() as p:
         if width in (390,1440):
             page.emulate_media(reduced_motion="no-preference")
             media=page.locator('.project-card[data-sheet-id="nova"] .project-media')
-            media.hover()
-            if "is-hovering" not in (nova.get_attribute("class") or ""):
+            start_listing(page, media, nova, width)
+            if ("is-playing" if width <= 760 else "is-hovering") not in (nova.get_attribute("class") or ""):
                 fail("N.O.V.A. card hover animation did not begin", width)
             preview=nova.locator(".nova-orbits").evaluate("""el=>({
               name:getComputedStyle(el).animationName,
@@ -802,10 +846,11 @@ with sync_playwright() as p:
             if width==1440:
                 art.screenshot(path=str(OUT/"nova_complete_1440.png"), animations="disabled")
             page.locator("#sheet-close").click()
+            page.locator("#motion-choice").select_option("system")
             page.emulate_media(reduced_motion="reduce")
             page.locator('.project-card[data-sheet-id="nova"] .sheet-link').click()
-            if page.locator(".sheet-motion-play").is_visible():
-                fail("N.O.V.A. reduced-motion mode must not autoplay", width)
+            if not page.locator(".sheet-motion-play").is_visible():
+                fail("N.O.V.A. reduced motion must retain explicit replay", width)
             if page.locator("#sheet-visual .nova-panel-system").evaluate(
                     "(el)=>getComputedStyle(el).animationName")!="none":
                 fail("N.O.V.A. reduced-motion must remain static", width)
@@ -854,8 +899,8 @@ with sync_playwright() as p:
                 university.screenshot(path=str(OUT/"university_card_390.png"),animations="disabled")
             page.emulate_media(reduced_motion="no-preference")
             media=page.locator('.project-card[data-sheet-id="university-ai"] .project-media')
-            media.hover()
-            if "is-hovering" not in (university.get_attribute("class") or ""):
+            start_listing(page, media, university, width)
+            if ("is-playing" if width <= 760 else "is-hovering") not in (university.get_attribute("class") or ""):
                 fail("University AI card hover must trigger one-shot preview", width)
             preview=university.locator(".up-dialog").evaluate("""el=>({
               name:getComputedStyle(el).animationName,
@@ -928,10 +973,11 @@ with sync_playwright() as p:
             if width==1440:
                 art.screenshot(path=str(OUT/"university_complete_1440.png"),animations="disabled")
             page.locator("#sheet-close").click()
+            page.locator("#motion-choice").select_option("system")
             page.emulate_media(reduced_motion="reduce")
             page.locator('.project-card[data-sheet-id="university-ai"] .sheet-link').click()
-            if page.locator(".sheet-motion-play").is_visible():
-                fail("University AI must respect reduced motion preference", width)
+            if not page.locator(".sheet-motion-play").is_visible():
+                fail("University AI reduced motion must retain explicit replay", width)
             if page.locator("#sheet-visual .up-toast").evaluate(
                     "(el)=>getComputedStyle(el).animationName")!="none":
                 fail("Reduced-motion University AI preview must remain static", width)
@@ -1022,8 +1068,8 @@ with sync_playwright() as p:
             page.emulate_media(reduced_motion="no-preference")
             card_media = page.locator('.project-card[data-project="07"] .project-media')
             card_art = card_media.locator(".art-eqmount")
-            card_media.hover()
-            if "is-hovering" not in (card_art.get_attribute("class") or ""):
+            start_listing(page, card_media, card_art, width)
+            if ("is-playing" if width <= 760 else "is-hovering") not in (card_art.get_attribute("class") or ""):
                 fail("listing card did not start motion under the overlay", width)
             if "eq-pulley-turn" not in card_art.locator(".eq-large-rotor").evaluate(
                 "(el) => getComputedStyle(el).animationName"):
@@ -1092,9 +1138,10 @@ with sync_playwright() as p:
             if "360" not in page.locator(".eq-large-rotor").first.evaluate(
                 "(el) => el.getAnimations().find(x=>x.animationName==='eq-pulley-turn')?.effect.getKeyframes().at(-1).transform || ''"):
                 fail("large pulley does not complete one full turn", width)
-            page.mouse.move(0,0)
-            if "is-hovering" in (card_art.get_attribute("class") or ""):
+            leave_listing(page, card_art, width)
+            if any(c in (card_art.get_attribute("class") or "") for c in ("is-hovering", "is-playing")):
                 fail("listing animation did not reset when pointer left", width)
+            page.locator("#motion-choice").select_option("system")
             page.emulate_media(reduced_motion="reduce")
         if width in (390, 1440):
             page.locator('.project-card[data-project="07"] .project-art').screenshot(
@@ -1209,8 +1256,8 @@ with sync_playwright() as p:
                 fail("hardware sheet contains an invented demo link", width)
             if page.locator('#sheet-visual .art-eqmount').count()!=1:
                 fail("original equatorial mount illustration missing in sheet", width)
-            if page.locator(".sheet-motion-play").is_visible():
-                fail("reduced-motion preference unexpectedly exposes playback", width)
+            if not page.locator(".sheet-motion-play").is_visible():
+                fail("reduced motion must retain explicit playback", width)
             if width in (390, 1440):
                 # Exercise the actual mouse-hover and mobile replay paths with motion enabled.
                 page.emulate_media(reduced_motion="no-preference")
@@ -1292,6 +1339,7 @@ with sync_playwright() as p:
                 page.wait_for_function("""() => document.querySelector('#sheet-visual .art-eqmount')?.classList.contains('is-playing')""", timeout=1500)
                 # Old animation is discarded on navigation; reopening starts
                 # a fresh, single autoplay cycle rather than staying paused.
+                page.locator("#motion-choice").select_option("system")
                 page.emulate_media(reduced_motion="reduce")
                 if art.locator(".eq-large-rotor").count()!=1:
                     # After re-opening, the previous locator should still resolve to this clone.
@@ -1376,8 +1424,8 @@ with sync_playwright() as p:
                         arrow_location["y"] < .70 or arrow_location["y"] > .94 or
                         arrow_location["label"] != "FOLLOW ↗"):
                     fail("Sorava guidance arrow not in marked lower star-map position: "+str(arrow_location), width)
-                sorava_media.hover()
-                if "is-hovering" not in (sorava_card.get_attribute("class") or ""):
+                start_listing(page, sorava_media, sorava_card, width)
+                if ("is-playing" if width <= 760 else "is-hovering") not in (sorava_card.get_attribute("class") or ""):
                     fail("Sorava listing hover did not start playback", width)
                 if sorava_card.locator(".sorava-guest-received").evaluate(
                     "(el) => getComputedStyle(el).animationName")!="sorava-guest-receive":
@@ -1509,10 +1557,11 @@ with sync_playwright() as p:
                 if page.locator("#sheet-visual .art-sorava.is-hovering").count()!=0:
                     fail("Sorava NEXT/PREV autoplay requires pointer hover", width)
                 page.locator("#sheet-close").click()
+                page.locator("#motion-choice").select_option("system")
                 page.emulate_media(reduced_motion="reduce")
                 page.locator('.project-card[data-project="01"] .sheet-link').click()
-                if page.locator(".sheet-motion-play").is_visible():
-                    fail("Sorava reduced motion unexpectedly exposes replay", width)
+                if not page.locator(".sheet-motion-play").is_visible():
+                    fail("Sorava reduced motion must retain explicit replay", width)
                 if page.locator("#sheet-visual .sorava-guest-received").evaluate(
                     "(el) => getComputedStyle(el).animationName")!="none":
                     fail("Sorava ignores reduced-motion settings", width)
