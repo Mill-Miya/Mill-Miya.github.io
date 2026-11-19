@@ -203,6 +203,35 @@ with sync_playwright() as p:
                 fail("System must clear the stored motion override", width)
             theme.select_option('system')
             page.emulate_media(reduced_motion="reduce")
+        # 3D spin is opt-in after the exact 2D logo reaches its completed state.
+        if width in (390, 1440):
+            page.frame_locator('#hero-logo-frame').locator('body').evaluate(
+                "() => window.setLogoTime(window.getLogoStatus().total)"
+            )
+            page.wait_for_function(
+                "document.querySelector('.hero-visual').classList.contains('is-logo-complete')"
+            )
+            trigger=page.locator('#hero-logo-spin')
+            if not trigger.is_visible():
+                fail("finished R logo is not touch/click accessible", width)
+            can_webgl=page.evaluate(
+                "() => !!document.createElement('canvas').getContext('webgl2')"
+            )
+            trigger.click()
+            if can_webgl:
+                page.wait_for_function(
+                    "document.querySelector('.hero-visual').classList.contains('is-logo-spinning')"
+                )
+                if page.locator('#hero-logo-spin-canvas').evaluate("el => el.width == 0"):
+                    fail("3D logo canvas did not render", width)
+                page.wait_for_function(
+                    "!document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
+                    timeout=6000
+                )
+                if not trigger.is_visible():
+                    fail("3D spin failed to restore the original logo", width)
+            elif page.locator('.hero-logo-frame').count() != 1:
+                fail("WebGL fallback lost the original logo", width)
         if width in (320,390,820,1024,1440):
             page.screenshot(path=str(OUT/f"portfolio_{width}.png"),full_page=True,animations="disabled")
         # Verify existing category filtering on narrow and full desktop.

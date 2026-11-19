@@ -119,6 +119,22 @@
     const logoPanel = logoFrame.closest(".hero-visual");
     const channel = "mill-miya-r-logo";
     const sendLogoMessage = type => logoFrame.contentWindow?.postMessage({ channel, type }, "*");
+    const spinTrigger = document.getElementById("hero-logo-spin");
+    const spinCanvas = document.getElementById("hero-logo-spin-canvas");
+    let spinner = null;
+    const finishSpin = () => {
+      logoPanel.classList.remove("is-logo-spinning");
+      if (spinTrigger) spinTrigger.disabled = false;
+    };
+    const cancelSpin = () => {
+      spinner?.stop();
+      finishSpin();
+    };
+    const setLogoFinished = complete => {
+      logoPanel.classList.toggle("is-logo-complete", complete);
+      if (spinTrigger) spinTrigger.hidden = !complete;
+      if (!complete) cancelSpin();
+    };
     const syncReplay = () => {
       const ready = logoPanel.classList.contains("is-logo-ready");
       logoReplay.hidden = !ready;
@@ -129,6 +145,8 @@
     window.addEventListener("message", event => {
       if (event.source !== logoFrame.contentWindow || event.data?.channel !== channel) return;
       if (event.data.type === "ready") syncTheme();
+      if (event.data.type === "started") setLogoFinished(false);
+      if (event.data.type === "completed") setLogoFinished(true);
       if (event.data.type === "theme-applied") {
         logoPanel.classList.add("is-logo-ready");
         syncReplay();
@@ -136,8 +154,29 @@
     });
     logoFrame.addEventListener("load", () => sendLogoMessage("status"));
     logoReplay.addEventListener("click", () => {
+      setLogoFinished(false);
       requestMotion();
       sendLogoMessage("replay");
+    });
+    spinTrigger?.addEventListener("click", () => {
+      if (!spinCanvas || !logoPanel.classList.contains("is-logo-complete") ||
+          logoPanel.classList.contains("is-logo-spinning")) return;
+      try {
+        if (!spinner) spinner = window.createRLogoSpin?.(spinCanvas, finishSpin);
+        if (!spinner) {
+          spinTrigger.hidden = true; // WebGL2 unavailable: keep the original 2D logo.
+          return;
+        }
+        const choice = root.dataset.themeChoice || "system";
+        const dark = choice === "dark" || (choice === "system" && systemTheme.matches);
+        spinTrigger.disabled = true;
+        logoPanel.classList.add("is-logo-spinning");
+        spinner.play(dark);
+      } catch (error) {
+        console.warn("R logo 3D view is unavailable", error);
+        finishSpin();
+        spinTrigger.hidden = true;
+      }
     });
     systemMotion.addEventListener("change", syncReplay);
     motionChoice?.addEventListener("change", syncReplay);
