@@ -1073,10 +1073,9 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   outline-offset:-1px;
 }
 
-/* NOVA follows its original Visual Playground's near-black concentric signature.
-   Simplified portfolio HUD: no external tick forest; three restrained panels.
-   University AI remains on the light technical drawing palette. */
-.art-nova{background:radial-gradient(ellipse at 50% 45%,#09202b35,transparent 54%),#03080d;color:#b6dbe4}
+/* NOVA retains the original dark-glass signature but uses a quieter graphite
+   atmosphere for the portfolio. Keep the three compact original HUD panels. */
+.art-nova{background:#1d2b32;color:#b6dbe4}
 .art-university{background:#e4e9e6;color:#1e292c}
 .art-nova::before,.art-university::before{content:none}
 .art-nova .engineering-frame,.art-university .engineering-frame{
@@ -1084,15 +1083,15 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 }
 .art-nova .nova-orbits{top:46%;width:38%}
 .art-nova .nova-glass-halo,.art-nova .nova-radial-ticks{display:none}
-.art-nova .nova-surface-lines{opacity:.13}
-.art-nova .nova-glass{stroke:#9fc9d1;stroke-opacity:.47;stroke-width:.7}
-.art-nova .nova-rings{opacity:1}
-.art-nova .nova-core{background:#eafaff;box-shadow:0 0 5px #d4f4ff99}
-.art-nova .nova-dot::before{background:#eabd72;box-shadow:0 0 8px #eabd7270;width:6px;height:6px}
+.art-nova .nova-surface-lines{opacity:.10}
+.art-nova .nova-glass{stroke:#8ab0bb;stroke-opacity:.40;stroke-width:.7}
+.art-nova .nova-rings{opacity:.72}
+.art-nova .nova-core{background:#eafaff;box-shadow:0 0 3px #d4f4ff70}
+.art-nova .nova-dot::before{background:#eabd72;box-shadow:none;width:5px;height:5px}
 .art-nova .nova-hud{color:#b6dbe4;font-family:Consolas,"Courier New",monospace}
 .art-nova .nova-panel{
- background:linear-gradient(110deg,#0b243027,transparent 90%);
- border:0;border-top:1px solid #42697592;border-bottom:1px solid #1a394585;
+ background:transparent;
+ border:0;border-top:1px solid #64808a80;border-bottom:1px solid #49626c70;
  color:#b6dbe4;padding:8px 7px 6px 9px
 }
 .art-nova .nova-panel::before{background:#527b8594}
@@ -1101,11 +1100,11 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .art-nova .nova-panel strong{color:#c4e9f0;font-weight:400;letter-spacing:.045em}
 .art-nova .nova-panel dl div:nth-child(n+2){display:none}
 .art-nova .nova-panel small{display:none}
-.art-nova .nova-wire{background:#86dced72}
+.art-nova .nova-wire{background:#86dced45}
 .art-nova .nova-wire::after{background:#86dced99}
 .art-nova .nova-ui-caption{top:18%;gap:4px}
 .art-nova .nova-ui-caption span{color:#6f9ba9;letter-spacing:.25em}
-.art-nova .nova-ui-caption strong{color:#c5f0fa;font-weight:250;letter-spacing:.29em}
+.art-nova .nova-ui-caption strong{color:#bad6dd;font-weight:300;letter-spacing:.25em}
 .art-nova .nova-state-line{bottom:19%;color:#86dced;letter-spacing:.15em}
 .art-nova .nova-state-line::before{background:#86dced}
 .art-nova .nova-state-line b{color:#476470}
