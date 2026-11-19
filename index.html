@@ -18,7 +18,7 @@
   <link rel="icon" href="assets/favicon-48.png?v=3" sizes="48x48" type="image/png">
   <link rel="icon" href="assets/favicon.svg?v=3" type="image/svg+xml" sizes="any">
   <link rel="apple-touch-icon" href="assets/icon-180.png?v=3">
-  <link rel="stylesheet" href="assets/style.css?v=74">
+  <link rel="stylesheet" href="assets/style.css?v=75">
   <script src="assets/main.js?v=18" defer></script>
   <title>Mill-Miya — Selected Works</title>
 </head>
@@ -48,12 +48,14 @@
           </div>
           <div class="hero-visual" aria-label="Mill-Miya R personal symbol">
             <div class="hero-visual-top" aria-hidden="true"><span>R / 001</span><span>PERSONAL MARK</span></div>
-            <div class="hero-logo-wrap"><iframe id="hero-logo-frame" class="hero-logo-frame" src="assets/r-logo-hero-embed.html?v=3" title="Rロゴの設計・3支点スクレーパーアニメーション" aria-hidden="true" tabindex="-1" loading="eager" scrolling="no" sandbox="allow-scripts"></iframe></div>
-            <button id="hero-logo-replay" class="hero-logo-replay" type="button" aria-label="Rロゴアニメーションをもう一度再生" title="もう一度再生" hidden>
-              <svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11a9 9 0 1 1 2.64 6.36"/><path d="M3 4v7h7"/></svg>
-              <span>Replay</span>
-            </button>
-            <div class="hero-visual-bottom" aria-hidden="true"><span>IDENTITY / MILL-MIYA</span><span>JAPAN</span></div>
+            <div class="hero-logo-wrap"><iframe id="hero-logo-frame" class="hero-logo-frame" src="assets/r-logo-hero-embed.html?v=4" title="Rロゴの設計・3支点スクレーパーアニメーション" aria-hidden="true" tabindex="-1" loading="eager" scrolling="no" sandbox="allow-scripts"></iframe></div>
+            <div class="hero-visual-bottom">
+              <span aria-hidden="true">IDENTITY / MILL-MIYA</span>
+              <button id="hero-logo-replay" class="hero-logo-replay" type="button" aria-label="Rロゴアニメーションを最初から再生" title="最初から再生">
+                <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11a9 9 0 1 1 2.64 6.36"/><path d="M3 4v7h7"/></svg>
+                <span>REPLAY</span>
+              </button>
+            </div>
           </div>
         </div>
         <div class="hero-bottom"><span>Personal portfolio / 2026</span><a href="#works">WORKS <span aria-hidden="true">↓</span></a><span>SOFTWARE / HARDWARE / ASTRONOMY</span></div>
@@ -518,17 +520,8 @@
     const frame=document.getElementById('hero-logo-frame');
     const button=document.getElementById('hero-logo-replay');
     if(!frame || !button) return;
-    window.addEventListener('message',event=>{
-      if(event.source!==frame.contentWindow || !event.data || event.data.channel!=='mill-miya-r-logo')return;
-      if(event.data.type==='completed')button.hidden=false;
-      if(event.data.type==='started')button.hidden=true;
-    });
     button.addEventListener('click',()=>{
-      button.hidden=true;
       frame.contentWindow?.postMessage({channel:'mill-miya-r-logo',type:'replay'},'*');
-    });
-    frame.addEventListener('load',()=>{
-      frame.contentWindow?.postMessage({channel:'mill-miya-r-logo',type:'status'},'*');
     });
   })();
   </script>
