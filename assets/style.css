@@ -1132,3 +1132,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .art-nova.is-dot-aligned .nova-ui-caption strong .nova-title-period{background:transparent}
 .art-nova .nova-dot::before{transform:scale(.68);transform-origin:center}
 
+/* R logo three-pivot hero embed */
+.hero-visual{background:#0a121b}
+.hero-visual::before{display:none}
+.hero-logo-wrap .hero-logo-frame{position:relative;z-index:2;display:block;width:100%;height:100%;border:0;background:transparent;pointer-events:none}
