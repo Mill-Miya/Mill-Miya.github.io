@@ -1373,3 +1373,6 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .is-logo-spinning .hero-logo-frame{visibility:hidden}
 .is-logo-spinning .hero-logo-spin-canvas{opacity:1}
 @media(prefers-reduced-motion:reduce){.hero-logo-spin-canvas{transition:none!important}}
+
+/* Keep the R / DESIGN STUDY caption above the animation iframe and 3D canvas at all times. */
+.hero-visual-top{z-index:5;pointer-events:none}

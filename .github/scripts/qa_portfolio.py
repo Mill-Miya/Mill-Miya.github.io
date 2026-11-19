@@ -129,6 +129,20 @@ with sync_playwright() as p:
                 iy=min(g["b"],a["b"])-max(g["t"],a["t"])
                 if ix>3 and iy>3:
                     fail(f"group heading overlaps card {i+1}", width)
+        # The design-study caption must sit above the iframe (z:2) and 3D canvas (z:3).
+        # Otherwise it disappears except while the iframe is hidden for 3D playback.
+        caption=page.locator('.hero-visual-top')
+        if not caption.is_visible() or 'R / DESIGN STUDY' not in caption.inner_text():
+            fail("R logo design-study caption missing", width)
+        caption_z=caption.evaluate("el => Number.parseInt(getComputedStyle(el).zIndex,10)")
+        logo_z=page.locator('#hero-logo-frame').evaluate(
+            "el => Number.parseInt(getComputedStyle(el).zIndex,10)"
+        )
+        canvas_z=page.locator('#hero-logo-spin-canvas').evaluate(
+            "el => Number.parseInt(getComputedStyle(el).zIndex,10)"
+        )
+        if not caption_z > max(logo_z,canvas_z):
+            fail("design-study caption is hidden behind the logo renderer", width)
         if not page.locator("#hero-logo-replay").is_visible():
             fail("reduced-motion preference must retain explicit hero replay", width)
         if width in (390, 1440):
