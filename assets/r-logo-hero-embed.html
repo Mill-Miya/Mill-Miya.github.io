@@ -23,18 +23,27 @@ main{width:100%;height:100%;max-width:none;margin:0;padding:0;display:block}
 .head,.controls,.subcontrols,.description{display:none!important}
 .stage{border:0;border-radius:0;width:100%;height:100%;overflow:hidden;background:#0a121b}
 .stage svg{width:100%;height:100%;object-fit:contain;display:block}
-/* The host dark theme presents the original black mark on white. */
+/* The moving highlight follows the existing engraving path. */
+#guide-paths [data-segment]{stroke:#f4dbc2!important}
+#draft-grid{display:none}
+#laser-tip{pointer-events:none}
+/* The host dark theme presents the black mark as a drawing. */
 @media(prefers-color-scheme:dark){
   html,body,.stage{background:#fff}
   #guide-svg > rect:first-child{fill:#fff}
   #scraper-fill,#clean-final-logo > path{fill:#000}
-  #guide-paths [data-segment]{stroke:#27302c!important}
+  #guide-paths [data-segment]{stroke:#426778!important}
+  #draft-grid{display:inline}
+  #laser-tip{display:none}
 }
 </style></head><body><main>
 <div class="head"><h1>R / CONSTRUCTION &amp; THREE-PIVOT SCRAPER · WORK</h1><div class="kicker">2.30s GUIDE · NO GAPS · SOLID WHITE</div></div>
 <div class="stage"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" width="1254" height="1254" id="guide-svg" role="img" aria-label="Rロゴの設計線を描画するアニメーション">
 <rect width="1254" height="1254" fill="#0a121b"/>
 <defs>
+  <pattern id="draft-grid-pattern" width="48" height="48" patternUnits="userSpaceOnUse">
+    <path d="M48 0H0V48" fill="none" stroke="#9fb8c3" stroke-width="0.8"/>
+  </pattern>
   <!-- exact white source path, three independent center-to-perimeter sweep windows -->
   <clipPath id="wipe-red" clipPathUnits="userSpaceOnUse"><path id="clip-red" d="M627 627Z"/></clipPath>
   <clipPath id="wipe-blue" clipPathUnits="userSpaceOnUse"><path id="clip-blue" d="M627 757Z"/></clipPath>
@@ -79,6 +88,7 @@ main{width:100%;height:100%;max-width:none;margin:0;padding:0;display:block}
   <path id="filled-tip" visibility="hidden" clip-path="url(#wipe-tip)" d="M 951.975,471.975 A 576.4520265052622,576.4520265052622 0 0,1 988.9223461045462,743.0674539088453 A 0.8,0.8 0 0,0 990.283697185027,743.716302814973 L 1077.30152,656.69848 A 42.0,42.0 0.0 0,0 1077.30152,597.30152 L 951.975,471.975 Z"/>
 </g>
 <g id="guide-paths" fill="none" pointer-events="none">
+<rect id="draft-grid" x="96" y="96" width="1062" height="1062" fill="url(#draft-grid-pattern)" opacity=".36"/>
 <path d="M627 147 L1107 627 L627 1107 L147 627 Z" style="fill:none;stroke:#ffffff;stroke-width:1.5;opacity:0.57;stroke-linejoin:round;stroke-linecap:round" data-segment="0"/>
 <path d="M627 112V1142 M112 627H1142" style="fill:none;stroke:#ffffff;stroke-width:1.35;opacity:0.48;stroke-linejoin:round;stroke-linecap:round" data-segment="1"/>
 <path d="M627 627L627 347 M627 627L907 627" style="fill:none;stroke:#ffffff;stroke-width:1.35;opacity:0.48;stroke-linejoin:round;stroke-linecap:round" data-segment="2"/>
@@ -113,6 +123,10 @@ main{width:100%;height:100%;max-width:none;margin:0;padding:0;display:block}
 <path d="M 858.8075879650387,469.94827704248837 A 252.2,252.2 0 0,0 877.7358805804153,397.73588058041526 L 770.0,290.0 L 656.69848,176.69848 A 42.0,42.0 0.0 0,0 597.30152,176.69848 L 176.69848,597.30152 A 42.0,42.0 0.0 0,0 176.69848,656.69848 L 597.30152,1077.30152 A 42.0,42.0 0.0 0,0 656.69848,1077.30152 L 880.375,853.625" fill="none" stroke="#ffffff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" opacity="0.74" data-segment="31"/>
 <path d="M 990.283697185027,743.716302814973 L 1077.30152,656.69848 A 42.0,42.0 0.0 0,0 1077.30152,597.30152 L 951.975,471.975" fill="none" stroke="#ffffff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" opacity="0.74" data-segment="32"/>
 </g>
+<g id="laser-tip" visibility="hidden" aria-hidden="true">
+  <circle r="12" fill="#e4a669" opacity=".2"/>
+  <circle r="4.2" fill="#ffd5a0"/>
+</g>
 <g id="radial-debug" visibility="hidden" pointer-events="none">
   <g id="debug-pivots" opacity="0.9">
     <polygon points="627.00,617.00 629.59,623.44 636.51,623.91 631.18,628.36 632.88,635.09 627.00,631.40 621.12,635.09 622.82,628.36 617.49,623.91 624.41,623.44" fill="none" stroke="#ed665e" stroke-width="2.6" stroke-linejoin="round"/>
@@ -134,7 +148,9 @@ const paintEnd=5.1734; // Last painted shape completes here.
 const guideFadeDuration=1.10; // Smoothly remove construction lines after painting.
 const total=paintEnd+guideFadeDuration;
 const schedule=[[0.0,0.57],[0.03,0.42],[0.24,0.37],[0.46,0.66],[0.53,0.66],[0.56,0.72],[0.65,0.66],[0.83,0.64],[0.92,0.66],[1.02,0.66],[0.17,0.43],[0.18,0.43],[0.19,0.43],[0.2,0.43],[1.37,0.58],[1.43,0.58],[1.48,0.61],[1.53,0.63],[1.58,0.62],[1.6,0.58],[1.64,0.58],[1.69,0.6],[1.75,0.53],[1.95,0.55],[2.0,0.57],[2.03,0.55],[2.07,0.5],[2.11,0.52],[2.14,0.41],[2.19,0.43],[2.24,0.39],[1.03,1.60],[1.93,0.62]].map(([start,duration])=>[start*0.8745247148288973,duration*0.8745247148288973]);
-const lines=[...document.querySelectorAll('#guide-paths > *')];
+const lines=[...document.querySelectorAll('#guide-paths [data-segment]')];
+const laserTip=document.getElementById('laser-tip');
+const draftingTheme=matchMedia('(prefers-color-scheme: dark)');
 const lengths=lines.map(el=>{const len=el.getTotalLength();if(!(len>0))throw new Error('Invalid guide length');el.style.visibility='hidden';return len;});
 const stages=[
  {name:'red',start:2.3,end:3.0735,from:-34,to:-318.5,pivot:{x:627,y:627},direction:'ccw',fill:document.getElementById('filled-red'),clip:document.getElementById('clip-red')},
@@ -204,13 +220,25 @@ function tipOnBoundary(deg,pivot,name){
  return {x:pivot.x+lo*c,y:pivot.y+lo*s};
 }
 function drawGuides(now){
+ let laserGuide=null;
  lines.forEach((el,i)=>{
    const [start,dur]=schedule[i],p=(now-start)/dur;
    if(p<=0){el.style.visibility='hidden';return}
    el.style.visibility='visible';
    if(p>=1){el.style.removeProperty('stroke-dasharray');el.style.removeProperty('stroke-dashoffset')}
-   else{el.style.strokeDasharray=`${lengths[i]} ${lengths[i]+2}`;el.style.strokeDashoffset=String(lengths[i]*(1-p))}
+   else{
+     el.style.strokeDasharray=`${lengths[i]} ${lengths[i]+2}`;
+     el.style.strokeDashoffset=String(lengths[i]*(1-p));
+     if(!draftingTheme.matches && (!laserGuide || start>=laserGuide.start)){
+       laserGuide={path:el,start,distance:lengths[i]*p};
+     }
+   }
  });
+ laserTip.setAttribute('visibility',laserGuide?'visible':'hidden');
+ if(laserGuide){
+   const {x,y}=laserGuide.path.getPointAtLength(laserGuide.distance);
+   laserTip.setAttribute('transform',`translate(${x} ${y})`);
+ }
 }
 function drawPaint(now){
  let active=null;
