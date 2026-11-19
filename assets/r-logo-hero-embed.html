@@ -23,6 +23,13 @@ main{width:100%;height:100%;max-width:none;margin:0;padding:0;display:block}
 .head,.controls,.subcontrols,.description{display:none!important}
 .stage{border:0;border-radius:0;width:100%;height:100%;overflow:hidden;background:#0a121b}
 .stage svg{width:100%;height:100%;object-fit:contain;display:block}
+/* The host dark theme presents the original black mark on white. */
+@media(prefers-color-scheme:dark){
+  html,body,.stage{background:#fff}
+  #guide-svg > rect:first-child{fill:#fff}
+  #scraper-fill,#clean-final-logo > path{fill:#000}
+  #guide-paths [data-segment]{stroke:#27302c!important}
+}
 </style></head><body><main>
 <div class="head"><h1>R / CONSTRUCTION &amp; THREE-PIVOT SCRAPER · WORK</h1><div class="kicker">2.30s GUIDE · NO GAPS · SOLID WHITE</div></div>
 <div class="stage"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" width="1254" height="1254" id="guide-svg" role="img" aria-label="Rロゴの設計線を描画するアニメーション">

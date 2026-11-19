@@ -117,6 +117,11 @@ with sync_playwright() as p:
             theme.select_option('dark')
             if page.locator('body').evaluate("(el) => getComputedStyle(el).backgroundColor") != "rgb(22, 28, 31)":
                 fail("dark theme did not reach the page surface", width)
+            if page.locator('.hero-logo-poster').evaluate("(el) => getComputedStyle(el).fill") != "rgb(0, 0, 0)":
+                fail("dark theme must use the black logo poster", width)
+            logo_ground = page.frame_locator('#hero-logo-frame').locator('#guide-svg > rect')
+            if logo_ground.evaluate("(el) => getComputedStyle(el).fill") != "rgb(255, 255, 255)":
+                fail("dark theme must use a white animation background", width)
             first = page.locator('.project-card[data-project="01"]')
             card_accent = first.locator('.project-year').evaluate("(el) => getComputedStyle(el).color")
             if card_accent == page.locator('.project-card[data-project="02"] .project-year').evaluate(
