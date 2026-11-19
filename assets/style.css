@@ -1074,22 +1074,23 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 }
 
 /* Equatorial-mount visual language for NOVA and University AI. */
-.art-nova,.art-university{background:#e4e9e6;color:#1e292c}
+.art-nova{background:#d8e1de;color:#1e292c}
+.art-university{background:#e4e9e6;color:#1e292c}
 .art-nova::before,.art-university::before{content:none}
 .art-nova .engineering-frame,.art-university .engineering-frame{
  position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;z-index:7
 }
 .art-nova .nova-orbits{top:46%;width:36%}
 .art-nova .nova-glass-halo,.art-nova .nova-radial-ticks,.art-nova .nova-particles{display:none}
-.art-nova .nova-surface-lines{opacity:.17}
+.art-nova .nova-surface-lines{opacity:.22}
 .art-nova .nova-glass{stroke:#60767b;stroke-opacity:.75;stroke-width:1.1}
 .art-nova .nova-rings{opacity:.7}
 .art-nova .nova-rings circle:nth-of-type(2),.art-nova .nova-rings circle:nth-of-type(4){display:none}
-.art-nova .nova-core{background:#fcfefd;box-shadow:0 0 0 2px #088fc934}
+.art-nova .nova-core{background:#f4f7f5;box-shadow:0 0 0 2px #088fc934}
 .art-nova .nova-dot::before{background:#088fc9;box-shadow:none;width:5px;height:5px}
 .art-nova .nova-hud{color:#26353a;font-family:Arial,sans-serif}
 .art-nova .nova-panel{
- background:none;border:0;border-top:1px solid #a8b8b6;border-bottom:1px solid #b9c7c4;
+ background:none;border:0;border-top:1px solid #96a8a5;border-bottom:1px solid #acbbb8;
  color:#26353a;padding:8px 4px 8px 8px
 }
 .art-nova .nova-panel::before{background:#9aabaa}
@@ -1097,7 +1098,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .art-nova .nova-panel-head{color:#53676c}
 .art-nova .nova-panel strong{color:#26353a;font-weight:600;letter-spacing:.02em}
 .art-nova .nova-panel dl,.art-nova .nova-panel small{display:none}
-.art-nova .nova-wire{background:#9eb1b0}
+.art-nova .nova-wire{background:#8fa2a1}
 .art-nova .nova-wire::after{background:#088fc9;box-shadow:none}
 .art-nova .nova-ui-caption{top:17%;gap:3px}
 .art-nova .nova-ui-caption span{color:#667a7f;letter-spacing:.12em}
