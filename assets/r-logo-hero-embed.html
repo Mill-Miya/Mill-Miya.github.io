@@ -244,7 +244,32 @@ function drawPaint(now){
    }else movingB.setAttribute('visibility','hidden');
  }else debug.setAttribute('visibility','hidden');
 }
-function paintAt(now){t=clamp(now,0,total);drawGuides(t);drawPaint(t);input.value=t;clock.textContent=`${t.toFixed(2)} / ${total.toFixed(2)}s`;}
+
+// Completed state: use the untouched original P1/P2/P3 geometry without construction guides.
+const originalGeometryIds=['filled-body','filled-foot','filled-tip'];
+const cleanFinal=document.createElementNS('http://www.w3.org/2000/svg','g');
+cleanFinal.setAttribute('id','clean-final-logo');
+cleanFinal.setAttribute('visibility','hidden');
+for(const id of originalGeometryIds){
+ const shape=document.getElementById(id).cloneNode(false);
+ for(const attr of ['id','visibility','mask','clip-path'])shape.removeAttribute(attr);
+ shape.setAttribute('fill','#ffffff');
+ cleanFinal.appendChild(shape);
+}
+document.getElementById('guide-svg').appendChild(cleanFinal);
+let completionNotified=false;
+function reportCompleted(completed){
+ if(completed===completionNotified)return;
+ completionNotified=completed;
+ if(window.parent!==window)window.parent.postMessage({channel:'mill-miya-r-logo',type:completed?'completed':'started'},'*');
+}
+window.addEventListener('message',event=>{
+ if(event.source!==window.parent || !event.data || event.data.channel!=='mill-miya-r-logo')return;
+ if(event.data.type==='replay'){stop();paintAt(0);play();}
+ if(event.data.type==='status' && window.parent!==window)window.parent.postMessage({channel:'mill-miya-r-logo',type:t>=total?'completed':'started'},'*');
+});
+
+function paintAt(now){t=clamp(now,0,total);drawGuides(t);drawPaint(t);const completed=t>=total-0.000001;document.getElementById('guide-paths').setAttribute('visibility',completed?'hidden':'visible');document.getElementById('scraper-fill').setAttribute('visibility',completed?'hidden':'visible');cleanFinal.setAttribute('visibility',completed?'visible':'hidden');if(completed)debug.setAttribute('visibility','hidden');input.value=t;clock.textContent=`${t.toFixed(2)} / ${total.toFixed(2)}s`;reportCompleted(completed);}
 function stop(){running=false;prev=null;toggle.textContent='再生';if(frame!==null){cancelAnimationFrame(frame);frame=null}}
 function animate(ts){frame=null;if(!running)return;if(prev!==null)paintAt(t+(ts-prev)/1000*speed);prev=ts;if(t>=total){stop();return}frame=requestAnimationFrame(animate)}
 function play(){if(running&&frame!==null)return;if(t>=total)paintAt(0);running=true;prev=null;toggle.textContent='一時停止';frame=requestAnimationFrame(animate)}
