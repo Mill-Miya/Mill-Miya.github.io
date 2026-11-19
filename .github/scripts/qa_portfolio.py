@@ -98,16 +98,23 @@ with sync_playwright() as p:
                 current_color=page.evaluate("() => document.documentElement.dataset.accentChoice")
                 if current_color != next_color:
                     fail("accent color did not advance to "+next_color, width)
-                actual=accent.evaluate("el => getComputedStyle(el).color")
-                expected=page.evaluate("""() => {
+                palette_matches=accent.evaluate("""async el => {
+                    // The punctuation has a 160ms color transition.
                     const checker=document.createElement('i');
                     checker.style.color='var(--electric)';
                     document.body.appendChild(checker);
-                    const color=getComputedStyle(checker).color;
-                    checker.remove();
-                    return color;
+                    try {
+                        for(let i=0; i<40; i++) {
+                            if(getComputedStyle(el).color === getComputedStyle(checker).color)
+                                return true;
+                            await new Promise(resolve => setTimeout(resolve, 25));
+                        }
+                        return false;
+                    } finally {
+                        checker.remove();
+                    }
                 }""")
-                if actual != expected:
+                if not palette_matches:
                     fail("hero accent is not tied to site-wide palette", width)
                 if page.locator('.project-card[data-project="01"]').evaluate(
                     "el => getComputedStyle(el).getPropertyValue('--project-accent').trim()"
