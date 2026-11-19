@@ -1073,40 +1073,43 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   outline-offset:-1px;
 }
 
-/* Equatorial-mount visual language for NOVA and University AI. */
-.art-nova{background:#d8e1de;color:#1e292c}
+/* NOVA follows its original Visual Playground's near-black concentric signature.
+   Simplified portfolio HUD: no external tick forest; three restrained panels.
+   University AI remains on the light technical drawing palette. */
+.art-nova{background:radial-gradient(ellipse at 50% 45%,#09202b35,transparent 54%),#03080d;color:#b6dbe4}
 .art-university{background:#e4e9e6;color:#1e292c}
 .art-nova::before,.art-university::before{content:none}
 .art-nova .engineering-frame,.art-university .engineering-frame{
  position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;z-index:7
 }
-.art-nova .nova-orbits{top:46%;width:36%}
-.art-nova .nova-glass-halo,.art-nova .nova-radial-ticks,.art-nova .nova-particles{display:none}
-.art-nova .nova-surface-lines{opacity:.22}
-.art-nova .nova-glass{stroke:#60767b;stroke-opacity:.75;stroke-width:1.1}
-.art-nova .nova-rings{opacity:.7}
-.art-nova .nova-rings circle:nth-of-type(2),.art-nova .nova-rings circle:nth-of-type(4){display:none}
-.art-nova .nova-core{background:#f4f7f5;box-shadow:0 0 0 2px #088fc934}
-.art-nova .nova-dot::before{background:#088fc9;box-shadow:none;width:5px;height:5px}
-.art-nova .nova-hud{color:#26353a;font-family:Arial,sans-serif}
+.art-nova .nova-orbits{top:46%;width:38%}
+.art-nova .nova-glass-halo,.art-nova .nova-radial-ticks{display:none}
+.art-nova .nova-surface-lines{opacity:.13}
+.art-nova .nova-glass{stroke:#9fc9d1;stroke-opacity:.47;stroke-width:.7}
+.art-nova .nova-rings{opacity:1}
+.art-nova .nova-core{background:#eafaff;box-shadow:0 0 5px #d4f4ff99}
+.art-nova .nova-dot::before{background:#eabd72;box-shadow:0 0 8px #eabd7270;width:6px;height:6px}
+.art-nova .nova-hud{color:#b6dbe4;font-family:Consolas,"Courier New",monospace}
 .art-nova .nova-panel{
- background:none;border:0;border-top:1px solid #96a8a5;border-bottom:1px solid #acbbb8;
- color:#26353a;padding:8px 4px 8px 8px
+ background:linear-gradient(110deg,#0b243027,transparent 90%);
+ border:0;border-top:1px solid #42697592;border-bottom:1px solid #1a394585;
+ color:#b6dbe4;padding:8px 7px 6px 9px
 }
-.art-nova .nova-panel::before{background:#9aabaa}
+.art-nova .nova-panel::before{background:#527b8594}
 .art-nova .nova-panel::after{content:none}
-.art-nova .nova-panel-head{color:#53676c}
-.art-nova .nova-panel strong{color:#26353a;font-weight:600;letter-spacing:.02em}
-.art-nova .nova-panel dl,.art-nova .nova-panel small{display:none}
-.art-nova .nova-wire{background:#8fa2a1}
-.art-nova .nova-wire::after{background:#088fc9;box-shadow:none}
-.art-nova .nova-ui-caption{top:17%;gap:3px}
-.art-nova .nova-ui-caption span{color:#667a7f;letter-spacing:.12em}
-.art-nova .nova-ui-caption strong{color:#26353a;font-weight:540;letter-spacing:.19em}
-.art-nova .nova-state-line{bottom:18%;color:#076b93;letter-spacing:.08em}
-.art-nova .nova-state-line::before{background:#088fc9}
-.art-nova .nova-state-line b{color:#667a7f}
-.art-nova .nova-idle-hint{color:#62777c}
+.art-nova .nova-panel-head{color:#88adb9}
+.art-nova .nova-panel strong{color:#c4e9f0;font-weight:400;letter-spacing:.045em}
+.art-nova .nova-panel dl div:nth-child(n+2){display:none}
+.art-nova .nova-panel small{display:none}
+.art-nova .nova-wire{background:#86dced72}
+.art-nova .nova-wire::after{background:#86dced99}
+.art-nova .nova-ui-caption{top:18%;gap:4px}
+.art-nova .nova-ui-caption span{color:#6f9ba9;letter-spacing:.25em}
+.art-nova .nova-ui-caption strong{color:#c5f0fa;font-weight:250;letter-spacing:.29em}
+.art-nova .nova-state-line{bottom:19%;color:#86dced;letter-spacing:.15em}
+.art-nova .nova-state-line::before{background:#86dced}
+.art-nova .nova-state-line b{color:#476470}
+.art-nova .nova-idle-hint{color:#76949f}
 .art-university .up-desktop{color:#26353a}
 .art-university .up-dialog{border-radius:3px;box-shadow:0 8px 19px #1e292c17}
 .art-university .up-tray-popup{border-radius:3px;box-shadow:0 6px 15px #1e292c1c}
