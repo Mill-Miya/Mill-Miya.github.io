@@ -560,6 +560,12 @@ with sync_playwright() as p:
             len(set(p["marginBottom"] for p in punct_metrics))!=1 or
             len(set(p["verticalAlign"] for p in punct_metrics))!=1):
             fail("All N.O.V.A. punctuation marks must share a single baseline: "+str(punct_metrics), width)
+        # Lower the whole punctuation family together by 2px, never just
+        # the satellite destination; the amber point follows the measured dot.
+        punctuation_offset=nova.locator(".nova-title-punctuation").first.evaluate(
+            "el=>parseFloat(getComputedStyle(el).top)")
+        if abs(punctuation_offset-2)>.1:
+            fail("N.O.V.A. punctuation offset must be subtly 2px lower", width)
         point_error=nova.evaluate("""art=>{
           const o=art.getBoundingClientRect(),p=art.querySelector('.nova-title-period').getBoundingClientRect();
           const orbit=art.querySelector('.nova-orbits'),angle=34*Math.PI/180;

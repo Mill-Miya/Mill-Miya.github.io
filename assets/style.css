@@ -1124,7 +1124,8 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 /* The four punctuation marks share identical size, baseline and spacing.
    The final one is the measured docking target for the orbiting amber dot. */
 .art-nova .nova-ui-caption strong .nova-title-punctuation{
-  display:inline-block;width:.14em;height:.14em;margin-left:.06em;margin-bottom:.055em;
+  display:inline-block;position:relative;top:2px;
+  width:.14em;height:.14em;margin-left:.06em;margin-bottom:.055em;
   vertical-align:baseline;overflow:hidden;border-radius:50%;
   color:transparent;background:#bad6dd;font-size:inherit;line-height:0;letter-spacing:0
 }
