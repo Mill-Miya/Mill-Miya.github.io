@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>R / Three-Pivot Scraper · Work / exact-arc binary fill</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Yu Gothic",Meiryo,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#12171b;color:#f3f6f8;display:grid;place-items:center;padding:16px}
+main{width:min(100%,810px)}.head{display:flex;gap:10px;align-items:baseline;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px}
+h1{font-size:16px;font-weight:600;letter-spacing:.035em;margin:0}.kicker{font:11px ui-monospace,Consolas,monospace;color:#a6b5c2}
+.stage{border:1px solid #34444e;border-radius:8px;overflow:hidden;background:#0a121b;line-height:0}
+.stage svg{display:block;width:100%;height:auto}
+.controls{display:flex;gap:10px;align-items:center;margin:13px 0 8px;flex-wrap:wrap}
+button,select{background:#25323a;color:#f3f6f8;border:1px solid #65747e;border-radius:5px;padding:8px 11px;font-size:13px;cursor:pointer}
+button:hover{background:#364751}input[type=range]{flex:1;min-width:100px;accent-color:#c9d4dc}
+.clock{min-width:92px;font:12px ui-monospace,monospace;text-align:right;color:#c4d3db;font-variant-numeric:tabular-nums}
+.subcontrols{display:flex;gap:15px;align-items:center;flex-wrap:wrap;font-size:12px;color:#bdcbd4}
+label{cursor:pointer}label input{vertical-align:middle;accent-color:#b6cbd7}
+.description{font-size:12px;color:#9fb0bb;line-height:1.6;margin:11px 0 0}
+@media(max-width:500px){body{padding:8px}.kicker{font-size:10px}.clock{min-width:78px}}
+
+/* Hero-only presentation. The supplied SVG geometry and JS animation are untouched. */
+html,body{width:100%;height:100%;min-height:0;margin:0;padding:0;display:block;overflow:hidden;background:#0a121b}
+main{width:100%;height:100%;max-width:none;margin:0;padding:0;display:block}
+.head,.controls,.subcontrols,.description{display:none!important}
+.stage{border:0;border-radius:0;width:100%;height:100%;overflow:hidden;background:#0a121b}
+.stage svg{width:100%;height:100%;object-fit:contain;display:block}
+</style></head><body><main>
+<div class="head"><h1>R / CONSTRUCTION &amp; THREE-PIVOT SCRAPER · WORK</h1><div class="kicker">2.63s GUIDE · NO GAPS · SOLID WHITE</div></div>
+<div class="stage"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" width="1254" height="1254" id="guide-svg" role="img" aria-label="Rロゴの設計線を描画するアニメーション">
+<rect width="1254" height="1254" fill="#0a121b"/>
+<defs>
+  <!-- exact white source path, three independent center-to-perimeter sweep windows -->
+  <clipPath id="wipe-red" clipPathUnits="userSpaceOnUse"><path id="clip-red" d="M627 627Z"/></clipPath>
+  <clipPath id="wipe-blue" clipPathUnits="userSpaceOnUse"><path id="clip-blue" d="M627 757Z"/></clipPath>
+  <clipPath id="wipe-green" clipPathUnits="userSpaceOnUse"><path id="clip-green" d="M627 495Z"/></clipPath>
+  <clipPath id="wipe-foot-sweep" clipPathUnits="userSpaceOnUse"><path id="clip-foot" d="M627 627Z"/></clipPath>
+  <clipPath id="wipe-tip" clipPathUnits="userSpaceOnUse"><path id="clip-tip" d="M627 627Z"/></clipPath>
+  <!-- Exact-arc timing partition. The final source path remains unchanged.
+       Blue completes the material left of x=627; green starts along the two-star axis.
+       Red is their complement, including the narrow top ribbon and bottom rim. -->
+  <mask id="area-red" maskUnits="userSpaceOnUse" x="0" y="0" width="1254" height="1254">
+    <rect width="1254" height="1254" fill="white"/>
+    <path d="M627 622.8 A149.93545543584725 149.93545543584725 0 0 0 627 907 A280 280 0 0 1 457.67486846618317 850 A203.14379616335947 203.14379616335947 0 0 1 431.1624428343677 800 A202.10000000000002 142.10000000000002 0 0 1 572.8278578948604 628 Z" fill="black"/><path d="M632.0739322814651 353.0469835089975 A143.56 143.56 0 0 1 652.5078 611.16 C623.5309147688395 627.9794296877324 614.0108614381197 619.9435056479788 572.8278578948604 628 L627 622.8 A252.2 252.2 0 0 0 855.9208988050817 476.4303364106464 A274 274 0 0 0 632.0739322814651 353.0469835089975 Z" fill="black"/>
+  </mask>
+  <clipPath id="handoff-left"><rect x="0" y="0" width="627" height="1254"/></clipPath>
+  <clipPath id="handoff-right"><rect x="627" y="0" width="627" height="1254"/></clipPath>
+  <mask id="area-blue" maskUnits="userSpaceOnUse" x="0" y="0" width="1254" height="1254">
+    <rect width="1254" height="1254" fill="black"/>
+    <path d="M627 622.8 A149.93545543584725 149.93545543584725 0 0 0 627 907 A280 280 0 0 1 457.67486846618317 850 A203.14379616335947 203.14379616335947 0 0 1 431.1624428343677 800 A202.10000000000002 142.10000000000002 0 0 1 572.8278578948604 628 Z" fill="white"/>
+    <path d="M632.0739322814651 353.0469835089975 A143.56 143.56 0 0 1 652.5078 611.16 C623.5309147688395 627.9794296877324 614.0108614381197 619.9435056479788 572.8278578948604 628 L627 622.8 A252.2 252.2 0 0 0 855.9208988050817 476.4303364106464 A274 274 0 0 0 632.0739322814651 353.0469835089975 Z" fill="white" clip-path="url(#handoff-left)"/>
+  </mask>
+  <mask id="area-green" maskUnits="userSpaceOnUse" x="0" y="0" width="1254" height="1254">
+    <rect width="1254" height="1254" fill="black"/>
+    <path d="M632.0739322814651 353.0469835089975 A143.56 143.56 0 0 1 652.5078 611.16 C623.5309147688395 627.9794296877324 614.0108614381197 619.9435056479788 572.8278578948604 628 L627 622.8 A252.2 252.2 0 0 0 855.9208988050817 476.4303364106464 A274 274 0 0 0 632.0739322814651 353.0469835089975 Z" fill="white" clip-path="url(#handoff-right)"/>
+  </mask>
+<filter id="binary-threshold" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+ <feMorphology operator="dilate" radius="1"/>
+ <feComponentTransfer><feFuncR type="discrete" tableValues="0 1"/><feFuncG type="discrete" tableValues="0 1"/><feFuncB type="discrete" tableValues="0 1"/></feComponentTransfer>
+</filter>
+<mask id="body-reveal" maskUnits="userSpaceOnUse" x="0" y="0" width="1254" height="1254" style="mask-type:luminance">
+ <g filter="url(#binary-threshold)" fill="white"><rect width="1254" height="1254" fill="black"/>
+  <g mask="url(#area-red)"><path id="filled-red" visibility="hidden" clip-path="url(#wipe-red)" d="M0 0H1254V1254H0Z"/></g>
+  <g mask="url(#area-blue)"><path id="filled-blue" visibility="hidden" clip-path="url(#wipe-blue)" d="M0 0H1254V1254H0Z"/></g>
+  <g mask="url(#area-green)"><path id="filled-green" visibility="hidden" clip-path="url(#wipe-green)" d="M0 0H1254V1254H0Z"/></g>
+ </g>
+</mask>
+</defs>
+<g id="scraper-fill" fill="#ffffff" aria-label="3つの独立支点で回転する二値塗り">
+  <!-- Body is the EXACT original P1 path, never an approximation. 3 masks partition only the paint timing. -->
+  <path id="filled-body" mask="url(#body-reveal)" d="M 858.8075879650387,469.94827704248837 A 252.2,252.2 0 0,0 877.7358805804153,397.73588058041526 L 770.0,290.0 L 656.69848,176.69848 A 42.0,42.0 0.0 0,0 597.30152,176.69848 L 176.69848,597.30152 A 42.0,42.0 0.0 0,0 176.69848,656.69848 L 597.30152,1077.30152 A 42.0,42.0 0.0 0,0 656.69848,1077.30152 L 880.375,853.625 L 722.902930377269,906.9216837300232 A 149.93545543584725,149.93545543584725 0 0,1 627.0,907.0 A 149.93545543584725,149.93545543584725 0.0 0,1 627.0,622.8 A 252.2,252.2 0 0,0 855.9208988050817,476.4303364106464 A 274.0,274.0 0 0,0 632.0739322814651,353.0469835089975 A 143.56,143.56 0 0,1 652.5078,611.16 C 623.5309147688395,627.9794296877324 614.0108614381197,619.9435056479788 572.8278578948604,628.0 A 202.10000000000002,142.10000000000002 0 0,0 431.1624428343677,800.0 A 203.14379616335947,203.14379616335947 0 0,0 457.67486846618317,850.0 A 280.0,280.0 0 0,1 627.0,347.0 A 280.0,280.0 0 0,1 858.8075879650387,469.94827704248837 Z"/>
+  <!-- Foot and tip: source path AND timing exactly preserved from prior approved prototype. -->
+  <path id="filled-foot" visibility="hidden" clip-path="url(#wipe-foot-sweep)" d="M 730.93679,664.73753 C 628.1909007585219,670.4051661174622 616.1611539819643,720.0610768413272 614.4477138429185,728.2912513300691 A 64.0,64.0 0 0,0 626.5258272576347,780.5508014155092 A 0.6,0.6 0 0,0 627.5826195669595,780.0397918020061 A 51.0,51.0 0 0,1 644.3639642626957,728.7509878514275 C 657.2022050904571,718.0012696667102 673.9360973010882,714.7451001519297 700.0,714.7451001519297 A 312.94148883285516,312.94148883285516 0 0,1 745.0,717.9974296121586 C 776.6295883041212,722.5934299260505 825.2849473210729,734.6113587294444 830.0,735.7710078550373 A 709.5027564752111,709.5027564752111 0 0,0 895.0,748.5724134095996 C 896.2615651228084,748.7601811018825 912.515145372656,751.1758396213418 930.0,752.8956053990611 C 942.5586446797965,754.1308417104385 955.1172893595931,754.9445927947128 967.6759340393896,753.4519424129464 A 18.0,18.0 0 0,0 983.4702470825283,737.2861860803645 A 570.4520265052622,570.4520265052622 0 0,0 985.4314733231299,656.6815612400471 C 984.3114172418129,666.0153619176886 974.2759746056636,678.1441102997983 950.0,685.1387828697292 A 107.8593553584303,107.8593553584303 0 0,1 920.0,689.3551329594382 C 888.9811611738791,689.3156725895058 835.6023038008613,675.8668596952393 825.0,673.3078961196654 A 324.6917715870368,324.6917715870368 0 0,0 730.93679,664.73753 Z"/>
+  <path id="filled-tip" visibility="hidden" clip-path="url(#wipe-tip)" d="M 951.975,471.975 A 576.4520265052622,576.4520265052622 0 0,1 988.9223461045462,743.0674539088453 A 0.8,0.8 0 0,0 990.283697185027,743.716302814973 L 1077.30152,656.69848 A 42.0,42.0 0.0 0,0 1077.30152,597.30152 L 951.975,471.975 Z"/>
+</g>
+<g id="guide-paths" fill="none" pointer-events="none">
+<path d="M627 147 L1107 627 L627 1107 L147 627 Z" style="fill:none;stroke:#ffffff;stroke-width:1.5;opacity:0.57;stroke-linejoin:round;stroke-linecap:round" data-segment="0"/>
+<path d="M627 112V1142 M112 627H1142" style="fill:none;stroke:#ffffff;stroke-width:1.35;opacity:0.48;stroke-linejoin:round;stroke-linecap:round" data-segment="1"/>
+<path d="M627 627L627 347 M627 627L907 627" style="fill:none;stroke:#ffffff;stroke-width:1.35;opacity:0.48;stroke-linejoin:round;stroke-linecap:round" data-segment="2"/>
+<ellipse cx="626.9999995011243" cy="627.0" rx="280.0" ry="280.0" style="fill:none;stroke:#ffffff;stroke-width:1.45;opacity:0.54;stroke-linejoin:round;stroke-linecap:round" data-segment="3"/>
+<ellipse cx="627.0000032830939" cy="627.0" rx="274.0" ry="274.0" style="fill:none;stroke:#ffffff;stroke-width:1.45;opacity:0.54;stroke-linejoin:round;stroke-linecap:round" data-segment="4"/>
+<ellipse cx="626.9999956633866" cy="370.6" rx="252.2" ry="252.2" style="fill:none;stroke:#ffffff;stroke-width:1.45;opacity:0.54;stroke-linejoin:round;stroke-linecap:round" data-segment="5"/>
+<ellipse cx="580.4399991138981" cy="486.99999969619364" rx="143.56" ry="143.56" style="fill:none;stroke:#ffffff;stroke-width:1.45;opacity:0.54;stroke-linejoin:round;stroke-linecap:round" data-segment="6"/>
+<ellipse cx="674.8354554358473" cy="764.9" rx="149.93545543584725" ry="149.93545543584725" style="fill:none;stroke:#ffffff;stroke-width:1.45;opacity:0.54;stroke-linejoin:round;stroke-linecap:round" data-segment="7"/>
+<ellipse cx="627.0" cy="764.9" rx="202.10000000000002" ry="142.10000000000002" style="fill:none;stroke:#ffffff;stroke-width:1.45;opacity:0.54;stroke-linejoin:round;stroke-linecap:round" data-segment="8"/>
+<ellipse cx="622.1428209674771" cy="730.7620256810243" rx="203.14379616335947" ry="203.14379616335947" style="fill:none;stroke:#ffffff;stroke-width:1.45;opacity:0.54;stroke-linejoin:round;stroke-linecap:round" data-segment="9"/>
+<circle cx="627.0000" cy="206.3970" r="42" style="fill:none;stroke:#ffffff;stroke-width:1.45;opacity:0.54;stroke-linejoin:round;stroke-linecap:round" data-segment="10"/>
+<circle cx="206.3970" cy="627.0000" r="42" style="fill:none;stroke:#ffffff;stroke-width:1.45;opacity:0.54;stroke-linejoin:round;stroke-linecap:round" data-segment="11"/>
+<circle cx="627.0000" cy="1047.6030" r="42" style="fill:none;stroke:#ffffff;stroke-width:1.45;opacity:0.54;stroke-linejoin:round;stroke-linecap:round" data-segment="12"/>
+<circle cx="1047.6030" cy="627.0000" r="42" style="fill:none;stroke:#ffffff;stroke-width:1.45;opacity:0.54;stroke-linejoin:round;stroke-linecap:round" data-segment="13"/>
+<path d="M 722.902930377269,906.9216837300232 A 149.93545543584725,149.93545543584725 0 0,1 627.0,907.0" style="fill:none;stroke:#ffffff;stroke-width:2.25;opacity:0.74;stroke-linejoin:round;stroke-linecap:round" data-segment="14"/>
+<path d="M 627.0,907.0 A 149.93545543584725,149.93545543584725 0.0 0,1 627.0,622.8" style="fill:none;stroke:#ffffff;stroke-width:2.25;opacity:0.74;stroke-linejoin:round;stroke-linecap:round" data-segment="15"/>
+<path d="M 627.0,622.8 A 252.2,252.2 0 0,0 855.9208988050817,476.4303364106464" style="fill:none;stroke:#ffffff;stroke-width:2.25;opacity:0.74;stroke-linejoin:round;stroke-linecap:round" data-segment="16"/>
+<path d="M 855.9208988050817,476.4303364106464 A 274.0,274.0 0 0,0 632.0739322814651,353.0469835089975" style="fill:none;stroke:#ffffff;stroke-width:2.25;opacity:0.74;stroke-linejoin:round;stroke-linecap:round" data-segment="17"/>
+<path d="M 632.0739322814651,353.0469835089975 A 143.56,143.56 0 0,1 652.5078,611.16 C 623.5309147688395,627.9794296877324 614.0108614381197,619.9435056479788 572.8278578948604,628.0" style="fill:none;stroke:#ffffff;stroke-width:2.25;opacity:0.74;stroke-linejoin:round;stroke-linecap:round" data-segment="18"/>
+<path d="M 572.8278578948604,628.0 A 202.10000000000002,142.10000000000002 0 0,0 431.1624428343677,800.0" style="fill:none;stroke:#ffffff;stroke-width:2.25;opacity:0.74;stroke-linejoin:round;stroke-linecap:round" data-segment="19"/>
+<path d="M 431.1624428343677,800.0 A 203.14379616335947,203.14379616335947 0 0,0 457.67486846618317,850.0" style="fill:none;stroke:#ffffff;stroke-width:2.25;opacity:0.74;stroke-linejoin:round;stroke-linecap:round" data-segment="20"/>
+<path d="M 457.67486846618317,850.0 A 280.0,280.0 0 0,1 627.0,347.0" style="fill:none;stroke:#ffffff;stroke-width:2.25;opacity:0.74;stroke-linejoin:round;stroke-linecap:round" data-segment="21"/>
+<path d="M 627,347 A 280,280 0 0,1 858.8075879650387,469.94827704248837" style="fill:none;stroke:#ffffff;stroke-width:2.25;opacity:0.74;stroke-linejoin:round;stroke-linecap:round" data-segment="22"/>
+<path d="M730.93679 664.73753 C628.1909007585219 670.4051661174622 616.1611539819643 720.0610768413272 614.4477138429185 728.2912513300691 A64 64 0 0 0 626.5258272576347 780.5508014155092" style="fill:none;stroke:#ffffff;stroke-width:2.25;opacity:0.74;stroke-linejoin:round;stroke-linecap:round" data-segment="23"/>
+<path d="M627.5826195669595 780.0397918020061 A51 51 0 0 1 644.3639642626957 728.7509878514275 C657.2022050904571 718.0012696667102 673.9360973010882 714.7451001519297 700 714.7451001519297" style="fill:none;stroke:#ffffff;stroke-width:2.25;opacity:0.74;stroke-linejoin:round;stroke-linecap:round" data-segment="24"/>
+<path d="M700 714.7451001519297 A312.94148883285516 312.94148883285516 0 0 1 745 717.9974296121586 C776.6295883041212 722.5934299260505 825.2849473210729 734.6113587294444 830 735.7710078550373 A709.5027564752111 709.5027564752111 0 0 0 895 748.5724134095996" style="fill:none;stroke:#ffffff;stroke-width:2.25;opacity:0.74;stroke-linejoin:round;stroke-linecap:round" data-segment="25"/>
+<path d="M985.4314733231299 656.6815612400471 C984.3114172418129 666.0153619176886 974.2759746056636 678.1441102997983 950 685.1387828697292 A107.8593553584303 107.8593553584303 0 0 1 920 689.3551329594382 C888.9811611738791 689.3156725895058 835.6023038008613 675.8668596952393 825 673.3078961196654" style="fill:none;stroke:#ffffff;stroke-width:2.25;opacity:0.74;stroke-linejoin:round;stroke-linecap:round" data-segment="26"/>
+<path d="M951.975 471.975 A576.4520265052622 576.4520265052622 0 0 1 988.9223461045462 743.0674539088453" style="fill:none;stroke:#ffffff;stroke-width:2.25;opacity:0.74;stroke-linejoin:round;stroke-linecap:round" data-segment="27"/>
+<path d="M 825.0,673.3078961196654 A 324.6917715870368,324.6917715870368 0 0,0 730.93679,664.73753" fill="none" stroke="#ffffff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" opacity=".74" data-segment="28" style=""/>
+<path d="M 895.0,748.5724134095996 C 896.2615651228084,748.7601811018825 912.515145372656,751.1758396213418 930.0,752.8956053990611 C 942.5586446797965,754.1308417104385 955.1172893595931,754.9445927947128 967.6759340393896,753.4519424129464 A 18.0,18.0 0 0,0 983.4702470825283,737.2861860803645 A 570.4520265052622,570.4520265052622 0 0,0 985.4314733231299,656.6815612400471" fill="none" stroke="#ffffff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" opacity=".74" data-segment="29" style=""/>
+<path d="M 722.902930377269,906.9216837300232 L 880.375,853.625" fill="none" stroke="#ffffff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" opacity=".74" data-segment="30" style=""/>
+<path d="M 858.8075879650387,469.94827704248837 A 252.2,252.2 0 0,0 877.7358805804153,397.73588058041526 L 770.0,290.0 L 656.69848,176.69848 A 42.0,42.0 0.0 0,0 597.30152,176.69848 L 176.69848,597.30152 A 42.0,42.0 0.0 0,0 176.69848,656.69848 L 597.30152,1077.30152 A 42.0,42.0 0.0 0,0 656.69848,1077.30152 L 880.375,853.625" fill="none" stroke="#ffffff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" opacity="0.74" data-segment="31"/>
+<path d="M 990.283697185027,743.716302814973 L 1077.30152,656.69848 A 42.0,42.0 0.0 0,0 1077.30152,597.30152 L 951.975,471.975" fill="none" stroke="#ffffff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" opacity="0.74" data-segment="32"/>
+</g>
+<g id="radial-debug" visibility="hidden" pointer-events="none">
+  <g id="debug-pivots" opacity="0.9">
+    <polygon points="627.00,617.00 629.59,623.44 636.51,623.91 631.18,628.36 632.88,635.09 627.00,631.40 621.12,635.09 622.82,628.36 617.49,623.91 624.41,623.44" fill="none" stroke="#ed665e" stroke-width="2.6" stroke-linejoin="round"/>
+    <polygon points="627.00,747.00 629.59,753.44 636.51,753.91 631.18,758.36 632.88,765.09 627.00,761.40 621.12,765.09 622.82,758.36 617.49,753.91 624.41,753.44" fill="none" stroke="#5799ff" stroke-width="2.6" stroke-linejoin="round"/>
+    <polygon points="627.00,485.00 629.59,491.44 636.51,491.91 631.18,496.36 632.88,503.09 627.00,499.40 621.12,503.09 622.82,496.36 617.49,491.91 624.41,491.44" fill="none" stroke="#43c78d" stroke-width="2.6" stroke-linejoin="round"/>
+  </g>
+  <line id="blade-red" x1="627" y1="627" x2="627" y2="627" stroke="#ed665e" stroke-width="2.6" visibility="hidden" />
+  <line id="blade-blue" x1="627" y1="757" x2="627" y2="757" stroke="#5799ff" stroke-width="2.6" visibility="hidden" />
+  <line id="blade-green" x1="627" y1="495" x2="627" y2="495" stroke="#43c78d" stroke-width="2.6" visibility="hidden" />
+  <line id="blade-leg" x1="627" y1="627" x2="627" y2="627" stroke="#d6b68c" stroke-width="2.4" visibility="hidden" />
+  <circle id="debug-moving-b" r="6" fill="#f7f7f7" visibility="hidden" />
+</g></svg></div>
+<div class="controls"><button id="toggle" type="button">一時停止</button><button id="restart" type="button">最初から再生</button><input type="range" id="timeline" min="0" max="5.5034" step="0.005" value="0" aria-label="再生位置"><span class="clock" id="clock">0.00 / 5.50s</span></div>
+<div class="subcontrols"><label><input type="checkbox" id="show-blade">3支点・移動するスクレーパー線を表示</label><label>速度 <select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label></div>
+<p class="description">ガイド線の実描画終了（2.63秒）の直後から、待ち時間・塗装前後の空回りなしで各工程を連続再生。外枠：反時計回り → 下側AND：時計回り → 上側OR：反時計回り → 脚 → 右先端。青が緑星方向（270°）に到達すると、緑星を支点に青星方向（90°）から反時計回りで引き継ぎます。脚の左側の尖端は先端から根元へ塗り、脚の下側の細い接続が塗られた時点から、折り返し面も重ねて開始。右先端は斜め上へ進む直線で、細い部分は早く、広い面はゆっくり塗ります。元SVGの曲線で塗装工程を分割し、白100%で連続表示します。</p>
+<script>
+(()=>{'use strict';
+const total=5.5034;
+const schedule=[[0.0,0.57],[0.03,0.42],[0.24,0.37],[0.46,0.66],[0.53,0.66],[0.56,0.72],[0.65,0.66],[0.83,0.64],[0.92,0.66],[1.02,0.66],[0.17,0.43],[0.18,0.43],[0.19,0.43],[0.2,0.43],[1.37,0.58],[1.43,0.58],[1.48,0.61],[1.53,0.63],[1.58,0.62],[1.6,0.58],[1.64,0.58],[1.69,0.6],[1.75,0.53],[1.95,0.55],[2.0,0.57],[2.03,0.55],[2.07,0.5],[2.11,0.52],[2.14,0.41],[2.19,0.43],[2.24,0.39],[1.03,1.60],[1.93,0.62]];
+const lines=[...document.querySelectorAll('#guide-paths > *')];
+const lengths=lines.map(el=>{const len=el.getTotalLength();if(!(len>0))throw new Error('Invalid guide length');el.style.visibility='hidden';return len;});
+const stages=[
+ {name:'red',start:2.63,end:3.4035,from:-34,to:-318.5,pivot:{x:627,y:627},direction:'ccw',fill:document.getElementById('filled-red'),clip:document.getElementById('clip-red')},
+ {name:'blue',start:3.4035,end:3.7035,from:90,to:270,pivot:{x:627,y:757},direction:'cw',fill:document.getElementById('filled-blue'),clip:document.getElementById('clip-blue')},
+ {name:'green',start:3.7035,end:4.0943,from:90,to:-88.1,pivot:{x:627,y:495},direction:'ccw',fill:document.getElementById('filled-green'),clip:document.getElementById('clip-green')},
+ {name:'foot',start:4.0943,end:4.8261,from:90,to:4.7,pivot:{x:627,y:627},fill:document.getElementById('filled-foot'),clip:document.getElementById('clip-foot')},
+ {name:'tip',start:4.7234,end:5.5034,mode:'fold',from:17.9,to:-25.6,pivot:{x:627,y:627},fill:document.getElementById('filled-tip'),clip:document.getElementById('clip-tip')}
+];
+const R=1800;
+const input=document.getElementById('timeline'),clock=document.getElementById('clock'),toggle=document.getElementById('toggle');
+const showBlade=document.getElementById('show-blade'),debug=document.getElementById('radial-debug');
+const debugLines=Object.fromEntries(['red','blue','green','foot','tip'].map(n=>[n,document.getElementById(['foot','tip'].includes(n)?'blade-leg':'blade-'+n)]));
+const movingB=document.getElementById('debug-moving-b');
+let t=0,running=true,frame=null,prev=null,speed=1;
+const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+const radians=deg=>deg*Math.PI/180;
+// A is fixed for each region. B is on a ray to the boundary. Only 100% white or unpainted is rendered.
+function sectorAt(pivot,from,to,progress){
+ if(progress<=0)return `M${pivot.x} ${pivot.y}Z`;
+
+ const current=from+(to-from)*progress;
+ const count=Math.max(1,Math.ceil(Math.abs(current-from)/2));
+ let d=`M ${pivot.x} ${pivot.y}`;
+ for(let k=0;k<=count;k++){
+   const a=radians(from+(current-from)*k/count);
+   d+=` L ${(pivot.x+R*Math.cos(a)).toFixed(3)} ${(pivot.y+R*Math.sin(a)).toFixed(3)}`;
+ }
+ return d+' Z';
+}
+// Start exactly at the pointed hook. The horizontal front rises from the
+// tip and meets the rotating front at their computed intersection: no seam.
+function pointedFootAt(progress){
+ const p=clamp(progress,0,1);
+ if(p<=0)return 'M0 0Z';
+ const y=781-141*clamp(p/0.36,0,1);
+ const angle=radians(90+(4.7-90)*p),cot=Math.cos(angle)/Math.sin(angle);
+ const xTop=627+(y-627)*cot,xBottom=627+(1254-627)*cot;
+ return `M0 ${y} L${xTop} ${y} L${xBottom} 1254 L0 1254Z`;
+}
+// Sweep a straight cross-section up-left along the folded face.
+// The foot reaches the lower connecting neck at 4.7234s; the folded face
+// starts immediately, while the upper foot edge is still being painted.
+function foldFront(progress){
+ const p=clamp(progress,0,1);
+ const travel=-Math.expm1(-2*p)/-Math.expm1(-2);
+ return 1734.01+(1423.8-1734.01)*travel;
+}
+function foldedTipAt(progress){
+ if(progress<=0)return 'M0 0Z';
+ const q=foldFront(progress);
+ // Intersection of x+y>=q with the viewBox. Source P3 remains the final clip.
+ return `M ${q-1254} 1254 L1254 ${q-1254} L1254 1254 Z`;
+}
+// B follows the actual source geometry, never the construction diamond.
+const bodyGeometry=new Path2D(document.getElementById('filled-body').getAttribute('d'));
+const footGeometry=new Path2D(document.getElementById('filled-foot').getAttribute('d'));
+const tipGeometry=new Path2D(document.getElementById('filled-tip').getAttribute('d'));
+const hitContext=document.createElement('canvas').getContext('2d');
+function tipOnBoundary(deg,pivot,name){
+ const a=radians(deg),c=Math.cos(a),s=Math.sin(a);
+ const shape=name==='foot'?footGeometry:name==='tip'?tipGeometry:bodyGeometry;
+ let last=0;
+ for(let r=0;r<=1600;r+=0.75)if(hitContext.isPointInPath(shape,pivot.x+r*c,pivot.y+r*s))last=r;
+ if(!last)return null;
+ let lo=last,hi=last+0.75;
+ for(let i=0;i<16;i++){const r=(lo+hi)/2;if(hitContext.isPointInPath(shape,pivot.x+r*c,pivot.y+r*s))lo=r;else hi=r;}
+ return {x:pivot.x+lo*c,y:pivot.y+lo*s};
+}
+function drawGuides(now){
+ lines.forEach((el,i)=>{
+   const [start,dur]=schedule[i],p=(now-start)/dur;
+   if(p<=0){el.style.visibility='hidden';return}
+   el.style.visibility='visible';
+   if(p>=1){el.style.removeProperty('stroke-dasharray');el.style.removeProperty('stroke-dashoffset')}
+   else{el.style.strokeDasharray=`${lengths[i]} ${lengths[i]+2}`;el.style.strokeDashoffset=String(lengths[i]*(1-p))}
+ });
+}
+function drawPaint(now){
+ let active=null;
+ // No final-body substitution: each sweep stays visible after it finishes.
+ for(const s of stages){
+   let p=clamp((now-s.start)/(s.end-s.start),0,1);
+   if(s.name==='red'){
+     const elapsed=now-s.start,normal=0.60/0.8535;
+     p=clamp(elapsed<=0.60?elapsed/0.8535:normal+(1-normal)*(elapsed-0.60)/(s.end-s.start-0.60),0,1);
+   }
+   s.fill.setAttribute('visibility',p>0?'visible':'hidden');
+   s.clip.setAttribute('d',s.name==='foot'?pointedFootAt(p):s.mode==='fold'?foldedTipAt(p):sectorAt(s.pivot,s.from,s.to,p));
+   if(now>=s.start && now<s.end)active={s,p};
+ }
+ Object.values(debugLines).forEach(l=>l.setAttribute('visibility','hidden'));
+ if(showBlade.checked){
+   debug.setAttribute('visibility','visible');
+   if(active){
+     if(active.s.name==='foot' && active.p<0.36){
+       const y=781-141*clamp(active.p/0.36,0,1),line=debugLines.foot;
+       line.setAttribute('visibility','visible');line.setAttribute('x1',610);line.setAttribute('y1',y);line.setAttribute('x2',644);line.setAttribute('y2',y);movingB.setAttribute('visibility','hidden');return;
+     }
+     if(active.s.mode==='fold'){
+       const q=foldFront(active.p),line=debugLines.tip;
+       line.setAttribute('visibility','visible');
+       line.setAttribute('x1',q-800);line.setAttribute('y1',800);
+       line.setAttribute('x2',1100);line.setAttribute('y2',q-1100);
+       movingB.setAttribute('visibility','hidden');return;
+     }
+     const angle=active.s.from+(active.s.to-active.s.from)*active.p;
+     let b=tipOnBoundary(angle,active.s.pivot,active.s.name);
+     // At the handoff the blade reverses its anchor on the same two-star segment.
+     if(active.s.name==='green' && active.p===0)b={x:627,y:757};
+     if(!b){movingB.setAttribute('visibility','hidden');return;}
+     const line=debugLines[active.s.name];
+     line.setAttribute('visibility','visible');
+     line.setAttribute('x1',active.s.pivot.x);line.setAttribute('y1',active.s.pivot.y);
+     line.setAttribute('x2',b.x);line.setAttribute('y2',b.y);
+     movingB.setAttribute('cx',b.x);movingB.setAttribute('cy',b.y);movingB.setAttribute('visibility','visible');
+   }else movingB.setAttribute('visibility','hidden');
+ }else debug.setAttribute('visibility','hidden');
+}
+function paintAt(now){t=clamp(now,0,total);drawGuides(t);drawPaint(t);input.value=t;clock.textContent=`${t.toFixed(2)} / ${total.toFixed(2)}s`;}
+function stop(){running=false;prev=null;toggle.textContent='再生';if(frame!==null){cancelAnimationFrame(frame);frame=null}}
+function animate(ts){frame=null;if(!running)return;if(prev!==null)paintAt(t+(ts-prev)/1000*speed);prev=ts;if(t>=total){stop();return}frame=requestAnimationFrame(animate)}
+function play(){if(running&&frame!==null)return;if(t>=total)paintAt(0);running=true;prev=null;toggle.textContent='一時停止';frame=requestAnimationFrame(animate)}
+toggle.addEventListener('click',()=>running?stop():play());
+document.getElementById('restart').addEventListener('click',()=>{stop();paintAt(0);play()});
+input.addEventListener('input',()=>{stop();paintAt(Number(input.value))});
+showBlade.addEventListener('change',()=>drawPaint(t));
+document.getElementById('speed').addEventListener('change',e=>{speed=Number(e.target.value)});
+window.setLogoTime=(sec)=>{stop();paintAt(Number(sec))};
+window.getLogoStatus=()=>({time:t,total,running,speed,stage:t<2.63?'guides':t<3.4035?'red':t<3.7035?'blue':t<4.0943?'green':t<4.7234?'foot':t<4.8261?'foot+fold':t<5.5034?'tip':'complete',guideCount:lines.length,paintVisible:stages.map(s=>s.fill.getAttribute('visibility')==='visible'),debugVisible:debug.getAttribute('visibility')==='visible'});
+paintAt(0);if(matchMedia('(prefers-reduced-motion: reduce)').matches){stop();paintAt(total)}else play();
+})();
+</script>
+</main></body></html>
