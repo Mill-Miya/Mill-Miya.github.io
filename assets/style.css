@@ -1326,8 +1326,5 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 }
 
 
-/* Inline playback is available to touch, mouse and keyboard users. */
-.project-media-hit[hidden]{display:none}
-.project-preview-label{position:absolute;right:12px;bottom:12px;display:grid;place-items:center;min-width:76px;min-height:44px;padding:10px 12px;background:var(--paper);color:var(--ink);border:1px solid var(--line-strong);border-radius:var(--control-radius);font:12px var(--font-mono);letter-spacing:.06em}
 .project-title-button{display:inline-block;max-width:100%;min-height:44px;margin:0;padding:0;border:0;background:transparent;color:inherit;font:inherit;letter-spacing:inherit;line-height:inherit;text-align:left;cursor:pointer}
 .project-title-button:hover{text-decoration:underline;text-underline-offset:.15em;text-decoration-thickness:1px}

@@ -254,66 +254,85 @@
       if (!motion.loop) motionTimer = window.setTimeout(() => finishSheetMotion(art), motion.duration + 250);
     }
     motionButton.addEventListener("click", playSheetMotion);
-    // Listing images play inline. Titles and detail buttons open the sheet.
+    // Touch layouts play the artwork crossing the viewport center, once per visit.
+    const centerPlayback = window.matchMedia("(max-width:760px), (hover:none), (pointer:coarse)");
     const listingMotions = [];
+    let centeredMotion = null;
+    let listingFrame = null;
     function resetListingMotion(entry) {
       window.clearTimeout(entry.timer);
       entry.timer = null;
-      entry.tapped = false;
       entry.art.classList.remove("is-playing", "is-hovering", "is-complete");
+    }
+    function finishListingMotion(entry) {
+      if (!entry.art.classList.contains("is-playing")) return;
+      window.clearTimeout(entry.timer);
+      entry.timer = null;
+      entry.art.classList.add("is-complete");
+      entry.art.classList.remove("is-playing");
+    }
+    function updateCenteredMotion() {
+      listingFrame = null;
+      let next = null;
+      if (centerPlayback.matches && motionAllowed() && !dialog.open && !document.hidden) {
+        const headerBottom = document.querySelector(".site-header").getBoundingClientRect().bottom;
+        const center = (window.innerHeight + Math.max(0, headerBottom)) / 2;
+        next = listingMotions.find(entry => {
+          const bounds = entry.art.getBoundingClientRect();
+          return bounds.width > 0 && bounds.top <= center && bounds.bottom >= center;
+        }) || null;
+      }
+      if (next === centeredMotion) return;
+      if (centeredMotion) resetListingMotion(centeredMotion);
+      centeredMotion = next;
+      if (!next) return;
+      resetListingMotion(next);
+      void next.art.getBoundingClientRect().width;
+      next.art.classList.add("is-playing");
+      next.timer = window.setTimeout(() => finishListingMotion(next), next.motion.duration / 1.6 + 250);
+    }
+    function scheduleCenteredMotion() {
+      if (listingFrame === null) listingFrame = requestAnimationFrame(updateCenteredMotion);
     }
     for (const [id, motion] of Object.entries(motions)) {
       const media = document.querySelector(`.project-card[data-sheet-id="${id}"] .project-media`);
       const art = media?.querySelector(motion.selector);
-      const playButton = media?.querySelector("[data-play-card]");
-      if (!media || !art || !playButton) continue;
-      const entry = { art, playButton, timer: null, tapped: false };
-      const title = media.closest(".project-card").querySelector(".project-info h3").textContent.trim();
+      if (!media || !art) continue;
+      const entry = { art, motion, timer: null };
       listingMotions.push(entry);
-      function finishListingMotion() {
-        if (!art.classList.contains("is-playing")) return;
-        window.clearTimeout(entry.timer);
-        entry.timer = null;
-        art.classList.add("is-complete");
-        art.classList.remove("is-playing");
-      }
-      playButton.addEventListener("click", () => {
-        if (!motionAllowed()) return;
-        for (const current of listingMotions) resetListingMotion(current);
-        void art.getBoundingClientRect().width;
-        entry.tapped = true;
-        art.classList.add("is-playing");
-        playButton.querySelector(".project-preview-label").textContent = "REPLAY";
-        playButton.setAttribute("aria-label", `${title} のアニメーションを再再生`);
-        // Listing playback uses the existing 1.6× preview speed.
-        entry.timer = window.setTimeout(finishListingMotion, motion.duration / 1.6 + 250);
-      });
       art.addEventListener("animationend", event => {
         if (event.animationName === motion.finishAnimation &&
-            event.target.classList.contains(motion.finishTarget)) finishListingMotion();
+            event.target.classList.contains(motion.finishTarget)) finishListingMotion(entry);
       });
       media.addEventListener("pointerenter", event => {
-        if (!entry.tapped && event.pointerType === "mouse" && motionAllowed() &&
+        if (!centerPlayback.matches && event.pointerType === "mouse" && motionAllowed() &&
             window.matchMedia("(hover:hover) and (pointer:fine)").matches) {
           art.classList.remove("is-complete");
           art.classList.add("is-hovering");
         }
       });
       media.addEventListener("pointerleave", () => {
-        if (!entry.tapped) art.classList.remove("is-hovering", "is-complete");
+        if (entry !== centeredMotion) art.classList.remove("is-hovering", "is-complete");
       });
     }
+    window.addEventListener("scroll", scheduleCenteredMotion, { passive: true });
+    window.addEventListener("resize", scheduleCenteredMotion, { passive: true });
+    window.visualViewport?.addEventListener("resize", scheduleCenteredMotion, { passive: true });
+    document.addEventListener("visibilitychange", scheduleCenteredMotion);
+    centerPlayback.addEventListener("change", scheduleCenteredMotion);
+    for (const button of buttons) button.addEventListener("click", scheduleCenteredMotion);
     function syncMotionPreference() {
       const allowed = motionAllowed();
       const showReplay = Boolean(activeMotion()) && allowed;
       if (!showReplay && document.activeElement === motionButton) closeButton.focus();
       motionButton.hidden = !showReplay;
       if (sheetVisualBrand) sheetVisualBrand.hidden = showReplay;
-      for (const entry of listingMotions) entry.playButton.hidden = !allowed;
       if (!allowed) {
         resetSheetMotion();
         for (const entry of listingMotions) resetListingMotion(entry);
+        centeredMotion = null;
       }
+      scheduleCenteredMotion();
     }
     systemMotion.addEventListener("change", syncMotionPreference);
     motionChoice?.addEventListener("change", syncMotionPreference);
@@ -325,6 +344,7 @@
       if (!card || !card.querySelector("[data-open-sheet]")) return;
       resetSheetMotion();
       for (const entry of listingMotions) resetListingMotion(entry);
+      centeredMotion = null;
       if (!dialog.open && trigger instanceof HTMLElement) lastOpener = trigger;
       const selection = eligible();
       const current = selection.indexOf(card);
@@ -426,6 +446,7 @@
     dialog.addEventListener("close", () => {
       resetSheetMotion();
       activeCard = null;
+      scheduleCenteredMotion();
       if (lastOpener?.isConnected && !lastOpener.closest("[hidden]")) lastOpener.focus();
       lastOpener = null;
     });
