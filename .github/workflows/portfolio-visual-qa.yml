@@ -32,14 +32,14 @@ jobs:
           python -m pip install playwright==1.56.0
           python -m playwright install chromium
       - name: Install Japanese font for accurate visual inspection
-        timeout-minutes: 3
+        timeout-minutes: 5
         run: |
-          if ! fc-match -f '%{family}' 'Noto Sans CJK JP' | rg -q 'Noto Sans CJK'; then
+          if ! fc-match -f '%{family}' 'Noto Sans CJK JP' | grep -q 'Noto Sans CJK'; then
             sudo apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 update -qq
             sudo apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 install -y fonts-noto-cjk
             fc-cache -f
           fi
-          fc-match -f '%{family}' 'Noto Sans CJK JP' | rg 'Noto Sans CJK'
+          fc-match -f '%{family}' 'Noto Sans CJK JP' | grep 'Noto Sans CJK'
       - name: Check 15 widths and page controls
         run: python .github/scripts/qa_portfolio.py
       - name: Upload rendered evidence
