@@ -878,8 +878,8 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 
 /* DIY automatic equatorial mount — photographed hardware translated into site-native vector art. */
 .art-eqmount{
-  background:#e4e9e6;
-  color:#1e292c;
+  background:#1c252a;
+  color:#d9e2e1;
   aspect-ratio:620 / 430;
 }
 .art-eqmount::before{content:none}
@@ -1057,20 +1057,19 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 }
 #lock-preview-a,#lock-preview-b{scroll-margin-top:110px}
 
-/* Sorava uses neutral graphite for a night-observation interface;
-   the equatorial-mount schematic uses a pale paper ground.
-   Artwork is recolored per SVG role; no blanket filter or backdrop gradient. */
+/* Both astronomy pieces now use graphite backgrounds.
+   The equatorial-mount diagram retains its own lighter mechanical contours,
+   technical labels and a cyan signal accent. No blanket color filters. */
 
-/* A perceptible paper edge for the pale engineering diagram.
-   Uses an outline (no box-size change) and a restrained shadow on the list card.
-   The SVG geometry, animation, and concept-stage positions are unchanged. */
+/* A subtle defined edge against the paper-coloured portfolio layout;
+   the schematic geometry and animation timelines remain untouched. */
 .project-card[data-sheet-id="diy-equatorial-mount"] .project-media{
-  outline:1px solid #bec9c4;
+  outline:1px solid #46565c;
   outline-offset:-1px;
-  box-shadow:0 9px 22px rgba(25,39,39,.11);
+  box-shadow:0 9px 22px rgba(25,39,39,.16);
 }
 .project-sheet[data-theme="diy-equatorial-mount"] .sheet-visual .art-eqmount{
-  outline:1px solid #bec9c4;
+  outline:1px solid #46565c;
   outline-offset:-1px;
 }
 
