@@ -73,18 +73,22 @@
 
   function makeMesh() {
     const triangles = [];
-    const add = (a,b,c) => triangles.push(...a,...b,...c);
+    // Each triangle carries an exact front/back face tag so its fill never
+    // differs from the original black/white SVG. Only the extruded edges are shaded.
+    const add = (a,b,c,cap) => {
+      for (const vertex of [a,b,c]) triangles.push(...vertex,cap);
+    };
     for (const outline of readContours()) {
       const front = outline.map(([x,y]) => [x,y,depth/2]);
       const back = outline.map(([x,y]) => [x,y,-depth/2]);
       for (const [a,b,c] of triangulate(outline)) {
-        add(front[a],front[b],front[c]);
-        add(back[c],back[b],back[a]);
+        add(front[a],front[b],front[c],1);
+        add(back[c],back[b],back[a],1);
       }
       for (let i=0; i<outline.length; i++) {
         const j=(i+1)%outline.length;
-        add(front[i],back[i],front[j]);
-        add(front[j],back[i],back[j]);
+        add(front[i],back[i],front[j],0);
+        add(front[j],back[i],back[j],0);
       }
     }
     return new Float32Array(triangles);
@@ -105,8 +109,8 @@
   window.createRLogoSpin = (canvas,onFinish) => {
     const gl=canvas.getContext("webgl2",{alpha:true,antialias:true,depth:true});
     if (!gl) return null;
-    const vert='#version 300 es\nprecision highp float;\nin vec3 aPosition;\nuniform mat3 uRotation;\nuniform float uScale,uAspect;\nout vec3 vPosition;\nvoid main(){vec3 p=uRotation*aPosition;vPosition=p;gl_Position=vec4(p.x*uScale/uAspect,p.y*uScale,-p.z*0.20,1.0);}';
-    const frag='#version 300 es\nprecision highp float;\nin vec3 vPosition;\nuniform float uDark;\nout vec4 outputColor;\nvoid main(){vec3 n=normalize(cross(dFdx(vPosition),dFdy(vPosition)));if(!gl_FrontFacing)n=-n;float d=max(dot(n,normalize(vec3(-0.45,0.62,0.73))),0.0);float s=0.70+0.30*d;vec3 lightFace=vec3(0.88,0.91,0.94)*s+vec3(0.075);vec3 darkFace=vec3(0.035,0.045,0.055)+vec3(0.20)*(1.0-s);outputColor=vec4(mix(lightFace,darkFace,uDark),1.0);}';
+    const vert='#version 300 es\nprecision highp float;\nin vec3 aPosition;\nin float aCap;\nuniform mat3 uRotation;\nuniform float uScale,uAspect;\nout vec3 vPosition;\nflat out float vCap;\nvoid main(){vec3 p=uRotation*aPosition;vPosition=p;vCap=aCap;gl_Position=vec4(p.x*uScale/uAspect,p.y*uScale,-p.z*0.20,1.0);}';
+    const frag='#version 300 es\nprecision highp float;\nin vec3 vPosition;\nflat in float vCap;\nuniform float uDark;\nout vec4 outputColor;\nvoid main(){if(vCap>0.5){outputColor=vec4(vec3(1.0-uDark),1.0);return;}vec3 n=normalize(cross(dFdx(vPosition),dFdy(vPosition)));if(!gl_FrontFacing)n=-n;float d=max(dot(n,normalize(vec3(-0.45,0.62,0.73))),0.0);float shade=0.55+0.30*d;vec3 side=mix(vec3(shade),vec3(0.055+0.065*d),uDark);outputColor=vec4(side,1.0);}';
     const program=gl.createProgram(), vs=shader(gl,gl.VERTEX_SHADER,vert), fs=shader(gl,gl.FRAGMENT_SHADER,frag);
     gl.attachShader(program,vs);
     gl.attachShader(program,fs);
@@ -120,9 +124,13 @@
     const buffer=gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
     gl.bufferData(gl.ARRAY_BUFFER,mesh,gl.STATIC_DRAW);
+    const stride=4*Float32Array.BYTES_PER_ELEMENT;
     const loc=gl.getAttribLocation(program,"aPosition");
+    const capLoc=gl.getAttribLocation(program,"aCap");
     gl.enableVertexAttribArray(loc);
-    gl.vertexAttribPointer(loc,3,gl.FLOAT,false,0,0);
+    gl.vertexAttribPointer(loc,3,gl.FLOAT,false,stride,0);
+    gl.enableVertexAttribArray(capLoc);
+    gl.vertexAttribPointer(capLoc,1,gl.FLOAT,false,stride,3*Float32Array.BYTES_PER_ELEMENT);
     gl.bindVertexArray(null);
     const uniforms={
       rotation:gl.getUniformLocation(program,"uRotation"),
@@ -155,7 +163,7 @@
       gl.uniform1f(uniforms.scale,0.74*Math.min(1,width/height));
       gl.uniform1f(uniforms.aspect,width/height);
       gl.uniform1f(uniforms.dark,dark?1:0);
-      gl.drawArrays(gl.TRIANGLES,0,mesh.length/3);
+      gl.drawArrays(gl.TRIANGLES,0,mesh.length/4);
     }
     function stop() {
       active=false;
@@ -186,6 +194,6 @@
     }
     canvas.addEventListener("webglcontextlost",e=>{e.preventDefault();stop();onFinish?.();});
     document.addEventListener("visibilitychange",()=>{if(document.hidden&&active){stop();onFinish?.();}});
-    return {play,stop,get active(){return active;},get triangles(){return mesh.length/9;}};
+    return {play,stop,get active(){return active;},get triangles(){return mesh.length/12;}};
   };
 })();
