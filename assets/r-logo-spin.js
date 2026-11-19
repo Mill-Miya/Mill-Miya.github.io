@@ -137,7 +137,8 @@
       const height=Math.max(1,Math.round(canvas.clientHeight*ratio));
       if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}
       gl.viewport(0,0,width,height);
-      const smooth=progress*progress*(3-2*progress);
+      // Blend a small linear component into smoothstep for a quicker takeoff.
+      const smooth=0.8*progress*progress*(3-2*progress)+0.2*progress;
       const yaw=smooth*Math.PI*4;
       // Keep the camera level with the XY face: Y-axis spin only, no pitch.
       const cy=Math.cos(yaw),sy=Math.sin(yaw);
