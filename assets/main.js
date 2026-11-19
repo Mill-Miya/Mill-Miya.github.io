@@ -21,6 +21,17 @@
     if (physicalLabel) physicalLabel.hidden = !cards.some(card => card.classList.contains("is-physical") && !card.hidden);
     const lockedLabel = document.querySelector("#locked-group-label");
     if (lockedLabel) lockedLabel.hidden = !cards.some(card => card.classList.contains("is-locked") && !card.hidden);
+    // Section numbers identify the three chapters; project counts are separate
+    // and reflect the currently active filter.
+    const visibleGroupCount = predicate => cards.filter(card => !card.hidden && predicate(card)).length;
+    for (const [label, quantity] of [
+      [featuredLabel, visibleGroupCount(card => card.classList.contains("featured"))],
+      [archiveLabel, visibleGroupCount(card => !card.classList.contains("featured") && !card.classList.contains("is-physical"))],
+      [physicalLabel, visibleGroupCount(card => card.classList.contains("is-physical"))]
+    ]) {
+      const counter = label?.querySelector("[data-group-count]");
+      if (counter) counter.textContent = String(quantity).padStart(2, "0") + (quantity === 1 ? " PROJECT" : " PROJECTS");
+    }
     for (const button of buttons) {
       const active = button.dataset.filter === filter;
       button.classList.toggle("active", active);

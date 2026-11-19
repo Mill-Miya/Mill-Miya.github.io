@@ -70,6 +70,18 @@ with sync_playwright() as p:
         if metrics["hasJPOutside"]: fail("unwanted Japanese text outside work cards", width)
         if metrics["sourceLinks"]: fail("source-code link was reintroduced", width)
         if metrics["emptyAnchors"]: fail("broken internal anchors: "+repr(metrics["emptyAnchors"]), width)
+        # Chapter numbering is consecutive; counts are independent and filter-aware.
+        chapter_labels=[
+            ("featured-group-label", "01 / FEATURED WORK", "02 PROJECTS"),
+            ("archive-group-label", "02 / PROJECT ARCHIVE", "04 PROJECTS"),
+            ("physical-group-label", "03 / PHYSICAL WORK", "01 PROJECT")
+        ]
+        for section_id, heading, project_count in chapter_labels:
+            label=page.locator("#"+section_id)
+            if label.locator("span").first.inner_text()!=heading:
+                fail("Incorrect project chapter sequence: "+section_id, width)
+            if label.locator("[data-group-count]").inner_text()!=project_count:
+                fail("Incorrect initial project count: "+section_id, width)
         if len(metrics["cards"]) != 7 or len(metrics["visuals"]) != 7:
             fail("lost project card or concept artwork", width)
         visual_classes=set()
@@ -104,6 +116,8 @@ with sync_playwright() as p:
             page.locator('button[data-filter="ai"]').click()
             if page.locator('.project-card:visible').count()!=2:
                 fail("AI filter not preserving its two projects", width)
+            if page.locator('#archive-group-label [data-group-count]').inner_text()!="02 PROJECTS":
+                fail("Archive project count must update under AI filter", width)
             page.locator('button[data-filter="all"]').click()
             if page.locator('.project-card:visible').count()!=7:
                 fail("All filter does not restore all seven projects", width)
