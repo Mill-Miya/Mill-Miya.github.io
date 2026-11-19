@@ -23,7 +23,7 @@
     "Dv5uhvX81ofr2eSqE90horXfOJnR4TGQZeMPh3Hk233z5Jl07ORQa6LkmWU="
   ].join("");
   const depth = 0.21616895;
-  const duration = 2400;
+  const duration = 2150;
   const hold = 350;
 
   function readContours() {
@@ -137,9 +137,9 @@
       const height=Math.max(1,Math.round(canvas.clientHeight*ratio));
       if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}
       gl.viewport(0,0,width,height);
-      // Blend a small linear component into smoothstep for a quicker takeoff.
-      const smooth=0.8*progress*progress*(3-2*progress)+0.2*progress;
-      const yaw=smooth*Math.PI*4;
+      // An impulse at the tap: maximum speed at the first frame, then friction-like deceleration.
+      const smooth=1-Math.pow(1-progress,3);
+      const yaw=smooth*Math.PI*10; // five full turns, always finishing face-on
       // Keep the camera level with the XY face: Y-axis spin only, no pitch.
       const cy=Math.cos(yaw),sy=Math.sin(yaw);
       const rotation=new Float32Array([cy,0,-sy, 0,1,0, sy,0,cy]);
@@ -163,12 +163,11 @@
       frame=0;finishTimer=0;
     }
     function play(dark) {
-      stop();active=true;start=0;
+      stop();active=true;start=performance.now();
       const token=generation;
       render(0,dark);
       function tick(time) {
         if(!active||token!==generation)return;
-        if(!start)start=time;
         const progress=Math.min(1,(time-start)/duration);
         render(progress,dark);
         if(progress<1)frame=requestAnimationFrame(tick);
