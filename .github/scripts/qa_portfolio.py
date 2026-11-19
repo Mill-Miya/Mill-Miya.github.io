@@ -1666,7 +1666,17 @@ with sync_playwright() as p:
                 page.wait_for_function(
                     "() => document.querySelector('.hero-visual')?.classList.contains('is-logo-complete') === false"
                 )
-                if not construction.evaluate("() => window.getLogoStatus().speed === 1"):
+                # postMessage is asynchronous: confirm the iframe actually accepted
+                # REPLAY before asserting its playback speed.
+                normal_replay=construction.evaluate("""async () => {
+                    for (let i=0; i<60; i++) {
+                        const state=window.getLogoStatus();
+                        if (state.speed === 1 && state.running) return true;
+                        await new Promise(resolve => setTimeout(resolve, 50));
+                    }
+                    return false;
+                }""")
+                if not normal_replay:
                     fail("manual REPLAY must use the original construction speed", width)
                 construction.evaluate("() => window.setLogoTime(window.getLogoStatus().total)")
                 page.wait_for_function(
