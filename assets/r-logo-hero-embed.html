@@ -118,12 +118,14 @@ main{width:100%;height:100%;max-width:none;margin:0;padding:0;display:block}
   <line id="blade-leg" x1="627" y1="627" x2="627" y2="627" stroke="#d6b68c" stroke-width="2.4" visibility="hidden" />
   <circle id="debug-moving-b" r="6" fill="#f7f7f7" visibility="hidden" />
 </g></svg></div>
-<div class="controls"><button id="toggle" type="button">一時停止</button><button id="restart" type="button">最初から再生</button><input type="range" id="timeline" min="0" max="5.1734" step="0.005" value="0" aria-label="再生位置"><span class="clock" id="clock">0.00 / 5.17s</span></div>
+<div class="controls"><button id="toggle" type="button">一時停止</button><button id="restart" type="button">最初から再生</button><input type="range" id="timeline" min="0" max="6.2734" step="0.005" value="0" aria-label="再生位置"><span class="clock" id="clock">0.00 / 6.27s</span></div>
 <div class="subcontrols"><label><input type="checkbox" id="show-blade">3支点・移動するスクレーパー線を表示</label><label>速度 <select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label></div>
-<p class="description">ガイド線の実描画終了（2.30秒）の直後から、待ち時間・塗装前後の空回りなしで各工程を連続再生。外枠：反時計回り → 下側AND：時計回り → 上側OR：反時計回り → 脚 → 右先端。青が緑星方向（270°）に到達すると、緑星を支点に青星方向（90°）から反時計回りで引き継ぎます。脚の左側の尖端は先端から根元へ塗り、脚の下側の細い接続が塗られた時点から、折り返し面も重ねて開始。右先端は斜め上へ進む直線で、細い部分は早く、広い面はゆっくり塗ります。元SVGの曲線で塗装工程を分割し、白100%で連続表示します。</p>
+<p class="description">ガイド線の実描画終了（2.30秒）の直後から、待ち時間・塗装前後の空回りなしで各工程を連続再生。外枠：反時計回り → 下側AND：時計回り → 上側OR：反時計回り → 脚 → 右先端。青が緑星方向（270°）に到達すると、緑星を支点に青星方向（90°）から反時計回りで引き継ぎます。脚の左側の尖端は先端から根元へ塗り、脚の下側の細い接続が塗られた時点から、折り返し面も重ねて開始。右先端は斜め上へ進む直線で、細い部分は早く、広い面はゆっくり塗ります。元SVGの曲線で塗装工程を分割し、白100%で連続表示します。完成後は1.10秒かけてガイド線だけをフェードアウトします。</p>
 <script>
 (()=>{'use strict';
-const total=5.1734;
+const paintEnd=5.1734; // Last painted shape completes here.
+const guideFadeDuration=1.10; // Smoothly remove construction lines after painting.
+const total=paintEnd+guideFadeDuration;
 const schedule=[[0.0,0.57],[0.03,0.42],[0.24,0.37],[0.46,0.66],[0.53,0.66],[0.56,0.72],[0.65,0.66],[0.83,0.64],[0.92,0.66],[1.02,0.66],[0.17,0.43],[0.18,0.43],[0.19,0.43],[0.2,0.43],[1.37,0.58],[1.43,0.58],[1.48,0.61],[1.53,0.63],[1.58,0.62],[1.6,0.58],[1.64,0.58],[1.69,0.6],[1.75,0.53],[1.95,0.55],[2.0,0.57],[2.03,0.55],[2.07,0.5],[2.11,0.52],[2.14,0.41],[2.19,0.43],[2.24,0.39],[1.03,1.60],[1.93,0.62]].map(([start,duration])=>[start*0.8745247148288973,duration*0.8745247148288973]);
 const lines=[...document.querySelectorAll('#guide-paths > *')];
 const lengths=lines.map(el=>{const len=el.getTotalLength();if(!(len>0))throw new Error('Invalid guide length');el.style.visibility='hidden';return len;});
@@ -269,7 +271,23 @@ window.addEventListener('message',event=>{
  if(event.data.type==='status' && window.parent!==window)window.parent.postMessage({channel:'mill-miya-r-logo',type:t>=total?'completed':'started'},'*');
 });
 
-function paintAt(now){t=clamp(now,0,total);drawGuides(t);drawPaint(t);const completed=t>=total-0.000001;document.getElementById('guide-paths').style.display=completed?'none':'';document.getElementById('scraper-fill').style.display=completed?'none':'';cleanFinal.style.display=completed?'inline':'none';debug.style.display=completed?'none':'';input.value=t;clock.textContent=`${t.toFixed(2)} / ${total.toFixed(2)}s`;reportCompleted(completed);}
+function paintAt(now){
+ t=clamp(now,0,total);
+ drawGuides(t);
+ drawPaint(t);
+ const paintingFinished=t>=paintEnd-0.000001;
+ const fadeProgress=clamp((t-paintEnd)/guideFadeDuration,0,1);
+ const smoothFade=fadeProgress*fadeProgress*(3-2*fadeProgress);
+ const guides=document.getElementById('guide-paths');
+ guides.style.display=fadeProgress>=1?'none':'';
+ guides.style.opacity=String(1-smoothFade);
+ document.getElementById('scraper-fill').style.display=paintingFinished?'none':'';
+ cleanFinal.style.display=paintingFinished?'inline':'none';
+ debug.style.display=paintingFinished?'none':'';
+ input.value=t;
+ clock.textContent=`${t.toFixed(2)} / ${total.toFixed(2)}s`;
+ reportCompleted(t>=total-0.000001);
+}
 function stop(){running=false;prev=null;toggle.textContent='再生';if(frame!==null){cancelAnimationFrame(frame);frame=null}}
 function animate(ts){frame=null;if(!running)return;if(prev!==null)paintAt(t+(ts-prev)/1000*speed);prev=ts;if(t>=total){stop();return}frame=requestAnimationFrame(animate)}
 function play(){if(running&&frame!==null)return;if(t>=total)paintAt(0);running=true;prev=null;toggle.textContent='一時停止';frame=requestAnimationFrame(animate)}
@@ -279,7 +297,7 @@ input.addEventListener('input',()=>{stop();paintAt(Number(input.value))});
 showBlade.addEventListener('change',()=>drawPaint(t));
 document.getElementById('speed').addEventListener('change',e=>{speed=Number(e.target.value)});
 window.setLogoTime=(sec)=>{stop();paintAt(Number(sec))};
-window.getLogoStatus=()=>({time:t,total,running,speed,stage:t<2.3?'guides':t<3.0735?'red':t<3.3735?'blue':t<3.7643?'green':t<4.3934?'foot':t<4.4961?'foot+fold':t<5.1734?'tip':'complete',guideCount:lines.length,paintVisible:stages.map(s=>s.fill.getAttribute('visibility')==='visible'),debugVisible:debug.getAttribute('visibility')==='visible'});
+window.getLogoStatus=()=>({time:t,total,running,speed,stage:t<2.3?'guides':t<3.0735?'red':t<3.3735?'blue':t<3.7643?'green':t<4.3934?'foot':t<4.4961?'foot+fold':t<paintEnd?'tip':t<total?'guide-fade':'complete',guideCount:lines.length,paintVisible:stages.map(s=>s.fill.getAttribute('visibility')==='visible'),debugVisible:debug.getAttribute('visibility')==='visible'});
 paintAt(0);if(matchMedia('(prefers-reduced-motion: reduce)').matches){stop();paintAt(total)}else play();
 })();
 </script>
