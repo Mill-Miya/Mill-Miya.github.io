@@ -143,22 +143,20 @@ with sync_playwright() as p:
         )
         if not caption_z > max(logo_z,canvas_z):
             fail("design-study caption is hidden behind the logo renderer", width)
-        # A single uninterrupted stroke replaces the repeated center-up/restart-right
-        # construction guide; the same 560-unit L still covers the original geometry.
+        # The full-length construction centerline is already drawn by segment 1.
+        # Segment 2 must draw only the rightward part, without re-tracing the vertical.
         center_guide=page.frame_locator('#hero-logo-frame').locator('[data-segment="2"]')
-        uninterrupted=center_guide.evaluate("""el => {
+        no_duplicate_center=center_guide.evaluate("""el => {
           const d=el.getAttribute('d');
           const start=el.getPointAtLength(0);
-          const middle=el.getPointAtLength(280);
           const end=el.getPointAtLength(el.getTotalLength());
           return (d.match(/M/gi)||[]).length===1 &&
-            Math.abs(el.getTotalLength()-560)<0.05 &&
-            Math.abs(start.x-627)<0.05 && Math.abs(start.y-347)<0.05 &&
-            Math.abs(middle.x-627)<0.05 && Math.abs(middle.y-627)<0.05 &&
+            Math.abs(el.getTotalLength()-280)<0.05 &&
+            Math.abs(start.x-627)<0.05 && Math.abs(start.y-627)<0.05 &&
             Math.abs(end.x-907)<0.05 && Math.abs(end.y-627)<0.05;
         }""")
-        if not uninterrupted:
-            fail("central R logo guide reverses or jumps while drawing", width)
+        if not no_duplicate_center:
+            fail("central R logo guide duplicates the vertical centerline", width)
         if not page.locator("#hero-logo-replay").is_visible():
             fail("reduced-motion preference must retain explicit hero replay", width)
         if width in (390, 1440):
