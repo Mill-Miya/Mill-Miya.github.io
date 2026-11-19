@@ -1136,17 +1136,15 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .hero-visual{background:#0a121b}
 .hero-visual::before{display:none}
 .hero-logo-wrap .hero-logo-frame{position:relative;z-index:2;display:block;width:100%;height:100%;border:0;background:transparent;pointer-events:none}
-/* R logo completion replay */
+/* Footer replay control; replaces JAPAN and stays available throughout playback. */
+.hero-visual-bottom{z-index:4}
 .hero-logo-replay{
- position:absolute;right:20px;bottom:47px;z-index:5;
- display:inline-flex;align-items:center;gap:7px;padding:8px 10px;
- color:#d6e0e3;background:rgba(10,18,27,.85);
- border:1px solid rgba(181,198,205,.36);border-radius:5px;
- font:10px var(--font-mono);letter-spacing:.06em;
- cursor:pointer;transition:background .18s,border-color .18s;
+ display:inline-flex;position:static;align-items:center;justify-content:center;
+ gap:6px;min-height:30px;padding:5px 8px;margin:-7px -8px -7px 0;
+ color:#b0bdbd;background:transparent;border:1px solid transparent;
+ border-radius:3px;font:9px var(--font-mono);letter-spacing:.1em;
+ cursor:pointer;transition:color .18s,border-color .18s,background .18s;
 }
-.hero-logo-replay[hidden]{display:none!important}
-.hero-logo-replay:hover{background:#28343c;border-color:#b1c1c9}
-.hero-logo-replay:focus-visible{outline:2px solid #d4e8f6;outline-offset:3px}
-@media(max-width:640px){.hero-logo-replay{right:12px;bottom:36px;padding:7px 9px}}
-@media(prefers-reduced-motion:reduce){.hero-logo-replay{display:none!important}}
+.hero-logo-replay:hover{color:#f3f6f8;border-color:#52636c;background:#202b31}
+.hero-logo-replay:focus-visible{outline:2px solid #d4e8f6;outline-offset:2px}
+@media(max-width:640px){.hero-logo-replay{min-height:32px;padding:6px 7px;margin-right:-7px;font-size:8px}}
