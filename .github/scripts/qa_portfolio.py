@@ -129,6 +129,26 @@ with sync_playwright() as p:
                 fail("accent switch did not return to the original sky blue", width)
             if page.evaluate("() => localStorage.getItem('mill-miya.accent')") is not None:
                 fail("original accent should clear the persisted override", width)
+        # On one-column layouts (including 768/820px tablets and zoomed desktop)
+        # the logo must appear immediately after the heading, as on phones.
+        if width in (640, 768, 820):
+            order=page.evaluate("""() => {
+              const r=s=>document.querySelector(s).getBoundingClientRect();
+              return {
+                copy:getComputedStyle(document.querySelector('.hero-copy')).display,
+                headingBottom:r('#hero-heading').bottom,
+                logoTop:r('.hero-visual').top,
+                logoBottom:r('.hero-visual').bottom,
+                descriptionTop:r('.hero-description').top,
+                descriptionBottom:r('.hero-description').bottom,
+                projectsTop:r('.hero-links').top
+              };
+            }""")
+            if (order["copy"] != "contents" or
+                order["headingBottom"] > order["logoTop"]+2 or
+                order["logoBottom"] > order["descriptionTop"]+2 or
+                order["descriptionBottom"] > order["projectsTop"]+2):
+                fail("one-column hero does not use the phone's heading/logo/description/button order: "+repr(order), width)
         if metrics["scrollWidth"] > metrics["innerWidth"] + 1:
             fail("horizontal overflow: "+json.dumps(metrics["scrollWidth"]), width)
         if metrics["logoOverlap"]: fail("header branding overlaps navigation", width)
