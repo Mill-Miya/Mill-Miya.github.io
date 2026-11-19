@@ -673,6 +673,132 @@ with sync_playwright() as p:
                 fail("N.O.V.A. reduced-motion must remain static", width)
             page.locator("#sheet-close").click()
 
+        # University AI: actual Windows system-tray workflow demonstrated with
+        # invented sample rows; no fake always-open dashboard or live data.
+        university=page.locator('.project-card[data-sheet-id="university-ai"] .art-university')
+        if university.count()!=1:
+            fail("University AI portfolio visual missing", width)
+        for cls in (".up-tray-popup",".up-dialog",".up-view-today",
+                    ".up-view-tasks",".up-toast",".up-taskbar"):
+            if university.locator(cls).count()!=1:
+                fail("University AI desktop workflow element missing: "+cls, width)
+        for label in ("今日の予定","課題","試験","資料・設定"):
+            if label not in university.locator(".up-tray-popup").inner_text():
+                fail("University AI tray menu is not based on the real application: "+label, width)
+        if university.locator(".up-demo-note").inner_text()!="INTERFACE STUDY / SAMPLE DATA":
+            fail("University AI sample data must be labeled as illustrative, not live", width)
+        if (university.locator(".up-view-today .up-entry").count()!=2 or
+                university.locator(".up-view-tasks .up-entry").count()!=2):
+            fail("University AI sample schedule and task rows missing", width)
+        if "24時間前" not in university.locator(".up-toast").inner_text():
+            fail("University AI deadline notification should reflect its real reminder feature", width)
+        if "SQLite" not in university.locator(".up-dialog-foot").inner_text():
+            fail("University AI local storage architecture label missing", width)
+        rects=university.evaluate("""art=>{
+          const outer=art.getBoundingClientRect();
+          return ['.up-dialog','.up-toast','.up-taskbar'].map(sel=>{
+            const b=art.querySelector(sel).getBoundingClientRect();
+            return {sel,x:b.left-outer.left,right:outer.right-b.right,
+              y:b.top-outer.top,bottom:outer.bottom-b.bottom,width:b.width};
+          });
+        }""")
+        for rect in rects:
+            if min(rect["x"],rect["right"],rect["y"],rect["bottom"])< -2:
+                fail("University AI panel or notification is clipped: "+str(rects), width)
+        if university.locator(".up-view-today").evaluate(
+                "(el)=>getComputedStyle(el).opacity")!="0":
+            fail("Static University AI preview should show assignments, not both screens", width)
+        if university.locator(".up-view-tasks").evaluate(
+                "(el)=>getComputedStyle(el).opacity")!="1":
+            fail("Static University AI final task screen must be visible", width)
+        if width in (390,1440):
+            if width==390:
+                university.screenshot(path=str(OUT/"university_card_390.png"),animations="disabled")
+            page.emulate_media(reduced_motion="no-preference")
+            media=page.locator('.project-card[data-sheet-id="university-ai"] .project-media')
+            media.hover()
+            if "is-hovering" not in (university.get_attribute("class") or ""):
+                fail("University AI card hover must trigger one-shot preview", width)
+            preview=university.locator(".up-dialog").evaluate("""el=>({
+              name:getComputedStyle(el).animationName,
+              seconds:parseFloat(getComputedStyle(el).animationDuration),
+              count:getComputedStyle(el).animationIterationCount
+            })""")
+            if (preview["name"]!="up-window-open" or
+                    abs(preview["seconds"]-3.4375)>.025 or preview["count"]!="1"):
+                fail("University AI hover preview must run 1.6x and once: "+str(preview), width)
+            page.mouse.move(0,0)
+            page.locator('.project-card[data-sheet-id="university-ai"] .project-title-button').click()
+            art=page.locator("#sheet-visual .art-university")
+            page.wait_for_function("""()=>
+              document.querySelector('#sheet-visual .art-university')?.classList.contains('is-playing')
+            """, timeout=1500)
+            if not page.locator(".sheet-motion-play").is_visible() or \
+                    page.locator(".sheet-motion-play").inner_text().strip()!="REPLAY":
+                fail("University AI animation must offer single-cycle REPLAY", width)
+            stages=art.evaluate("""art=>{
+              const items=['.up-tray-popup','.up-dialog','.up-view-today',
+                           '.up-view-tasks','.up-toast'].map(sel=>art.querySelector(sel));
+              const names=['up-tray-open','up-window-open','up-today-show',
+                           'up-tasks-show','up-toast-appear'];
+              const anims=items.map((el,i)=>el.getAnimations().find(a=>
+                a.animationName===names[i]));
+              if(anims.some(a=>!a))return null;
+              const state=t=>{
+                anims.forEach(a=>a.currentTime=t);
+                return items.map(el=>parseFloat(getComputedStyle(el).opacity));
+              };
+              return {start:state(0),tray:state(650),today:state(1700),
+                tasks:state(2900),notification:state(4550),final:state(5500),
+                seconds:parseFloat(getComputedStyle(items[1]).animationDuration),
+                loops:getComputedStyle(items[1]).animationIterationCount};
+            }""")
+            if not stages or abs(stages["seconds"]-5.5)>.02 or stages["loops"]!="1":
+                fail("University AI full sheet must run 5.5 seconds once", width)
+            if max(stages["start"])>.05:
+                fail("University AI must begin with an empty desktop and taskbar: "+str(stages), width)
+            if (stages["tray"][0]<.95 or
+                    stages["tray"][1]>.05 or stages["tray"][4]>.05):
+                fail("Tray menu must be shown before the main window appears: "+str(stages), width)
+            if (stages["today"][0]>.05 or stages["today"][1]<.95 or
+                    stages["today"][2]<.95 or stages["today"][3]>.05):
+                fail("Today's courses must follow the tray menu: "+str(stages), width)
+            if (stages["tasks"][2]>.05 or stages["tasks"][3]<.95 or
+                    stages["tasks"][4]>.05):
+                fail("Assignments must follow today's courses without premature notification: "+str(stages), width)
+            if (stages["notification"][3]<.95 or
+                    stages["notification"][4]<.95):
+                fail("Assignment reminder must appear last: "+str(stages), width)
+            if (stages["final"][0]>.05 or stages["final"][1]<.95 or
+                    stages["final"][3]<.95 or stages["final"][4]<.95):
+                fail("University AI must stop on final tasks and reminder pose: "+str(stages), width)
+            if width==1440:
+                for t in (650,1700,2900,4550,5500):
+                    page.locator(".sheet-motion-play").click()
+                    art.evaluate("""(el,t)=>{
+                      for(const anim of el.getAnimations({subtree:true}))anim.currentTime=t;
+                    }""", t)
+                    art.screenshot(path=str(OUT/f"university_stage_{t}.png"),animations="allow")
+            page.locator(".sheet-motion-play").click()
+            art.locator(".up-toast").evaluate("""el=>
+              el.dispatchEvent(new AnimationEvent('animationend',{
+                bubbles:true,animationName:'up-toast-appear'}))
+            """)
+            if ("is-complete" not in (art.get_attribute("class") or "") or \
+                    "is-playing" in (art.get_attribute("class") or "")):
+                fail("University AI must freeze the final pose after single playback", width)
+            if width==1440:
+                art.screenshot(path=str(OUT/"university_complete_1440.png"),animations="disabled")
+            page.locator("#sheet-close").click()
+            page.emulate_media(reduced_motion="reduce")
+            page.locator('.project-card[data-sheet-id="university-ai"] .project-title-button').click()
+            if page.locator(".sheet-motion-play").is_visible():
+                fail("University AI must respect reduced motion preference", width)
+            if page.locator("#sheet-visual .up-toast").evaluate(
+                    "(el)=>getComputedStyle(el).animationName")!="none":
+                fail("Reduced-motion University AI preview must remain static", width)
+            page.locator("#sheet-close").click()
+
         # Corrected sparse four-stage SVG replaces the former dense mechanical poster.
         concept = page.locator('.project-card[data-project="07"] .eqmount-drawing')
         if concept.count()!=1:
