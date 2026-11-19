@@ -136,8 +136,9 @@ main{width:100%;height:100%;max-width:none;margin:0;padding:0;display:block}
 <script>
 (()=>{'use strict';
 const paintEnd=5.1734; // Last painted shape completes here.
-const guideFadeDuration=1.10; // Smoothly remove construction lines after painting.
-const total=paintEnd+guideFadeDuration;
+const normalGuideFadeDuration=1.10; // Normal REPLAY keeps the original gentle fade.
+let guideFadeDuration=window.parent!==window?0.55:normalGuideFadeDuration; // Opening only.
+let total=paintEnd+guideFadeDuration;
 const schedule=[
  [0,0.57], [0.03,0.42], [0.24,0.37], [0.46,0.66], [0.53,0.66], [0.56,0.72], [0.65,0.66], [0.17,0.43], [0.18,0.43], [0.19,0.43], [0.2,0.43], [1.37,0.58], [1.43,0.58], [1.48,0.61], [1.53,0.63], [1.58,0.62], [1.6,0.58], [1.64,0.58], [1.69,0.6], [1.75,0.53], [1.82,0.8], [1.87,0.64], [2.11,0.52], [2.24,0.39], [1.03,1.6], [1.93,0.62]
 ].map(([start,duration])=>[start*0.8745247148288973,duration*0.8745247148288973]);
@@ -154,6 +155,7 @@ const stages=[
 ];
 const R=1800;
 const input=document.getElementById('timeline'),clock=document.getElementById('clock'),toggle=document.getElementById('toggle');
+input.max=String(total);
 const showBlade=document.getElementById('show-blade'),debug=document.getElementById('radial-debug');
 const debugLines=Object.fromEntries(['red','blue','green','foot','tip'].map(n=>[n,document.getElementById(['foot','tip'].includes(n)?'blade-leg':'blade-'+n)]));
 const movingB=document.getElementById('debug-moving-b');
@@ -297,6 +299,11 @@ document.getElementById('guide-svg').appendChild(cleanFinal);
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
 let motionEnabled=!reducedMotion.matches;
 function showCompleted(){stop();paintAt(total)}
+function restoreNormalGuideFade(){
+ guideFadeDuration=normalGuideFadeDuration;
+ total=paintEnd+guideFadeDuration;
+ input.max=String(total);
+}
 function reportReady(){
  if(window.parent!==window)window.parent.postMessage({channel:'mill-miya-r-logo',type:'ready'},'*');
 }
@@ -312,9 +319,9 @@ window.addEventListener('message',event=>{
    const wasEnabled=motionEnabled;
    motionEnabled=event.data.allowed===true;
    if(!motionEnabled)showCompleted();
-   else if(!wasEnabled){speed=1;stop();paintAt(0);play();}
+   else if(!wasEnabled){restoreNormalGuideFade();speed=1;stop();paintAt(0);play();}
  }
- if(event.data.type==='replay' && motionEnabled){speed=1;stop();paintAt(0);play();}
+ if(event.data.type==='replay' && motionEnabled){restoreNormalGuideFade();speed=1;stop();paintAt(0);play();}
  if(event.data.type==='show-static')showCompleted();
  if(event.data.type==='theme' && ['light','dark'].includes(event.data.theme)){
    document.documentElement.dataset.logoTheme=event.data.theme;

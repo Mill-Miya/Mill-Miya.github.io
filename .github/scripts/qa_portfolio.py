@@ -1640,6 +1640,10 @@ with sync_playwright() as p:
             construction=page.frame_locator('#hero-logo-frame').locator('body')
             if not construction.evaluate("() => Math.abs(window.getLogoStatus().speed-1.35)<0.001"):
                 fail("first-load construction playback must be faster", width)
+            if not construction.evaluate(
+                "() => Math.abs(window.getLogoStatus().total-5.7234)<0.002"
+            ):
+                fail("opening guide fade was not shortened", width)
             if page.evaluate("() => !!document.createElement('canvas').getContext('webgl2')"):
                 try:
                     page.wait_for_function(
@@ -1678,6 +1682,10 @@ with sync_playwright() as p:
                 }""")
                 if not normal_replay:
                     fail("manual REPLAY must use the original construction speed", width)
+                if not construction.evaluate(
+                    "() => Math.abs(window.getLogoStatus().total-6.2734)<0.002"
+                ):
+                    fail("manual REPLAY did not restore original guide fade", width)
                 construction.evaluate("() => window.setLogoTime(window.getLogoStatus().total)")
                 page.wait_for_function(
                     "document.querySelector('.hero-visual').classList.contains('is-logo-complete')"
