@@ -139,9 +139,9 @@
       gl.viewport(0,0,width,height);
       const smooth=progress*progress*(3-2*progress);
       const yaw=smooth*Math.PI*4;
-      const pitch=-0.25*Math.sin(Math.PI*progress);
-      const cy=Math.cos(yaw),sy=Math.sin(yaw),cx=Math.cos(pitch),sx=Math.sin(pitch);
-      const rotation=new Float32Array([cy,sx*sy,-cx*sy, 0,cx,sx, sy,-sx*cy,cx*cy]);
+      // Keep the camera level with the XY face: Y-axis spin only, no pitch.
+      const cy=Math.cos(yaw),sy=Math.sin(yaw);
+      const rotation=new Float32Array([cy,0,-sy, 0,1,0, sy,0,cy]);
       gl.clearColor(0,0,0,0);
       gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
       gl.enable(gl.DEPTH_TEST);
