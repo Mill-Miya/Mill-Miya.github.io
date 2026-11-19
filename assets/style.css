@@ -12,7 +12,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 .project-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(27px,3vw,51px) clamp(19px,2.9vw,48px)}.project-card{min-width:0}.project-card[hidden]{display:none!important}.project-art{position:relative;aspect-ratio:1.25/1;overflow:hidden;border-radius:3px;isolation:isolate}.featured .project-art{aspect-ratio:1.27/1}.art-cap,.art-bottom{position:absolute;z-index:5;left:22px;right:22px;display:flex;justify-content:space-between;align-items:center;gap:8px;color:#e2f2f1aa;font-size:9px}.art-cap{top:20px}.art-bottom{bottom:18px}.art-bottom span:last-child{text-align:right}
 .art-sorava{--sorava-motion-duration:7.2s;background:#161c20;color:#e8efec}
 /* Listing previews run at 1.6×; full-size sheets retain the 7.2s storytelling pace. */
-.project-card .art-sorava.is-hovering{--sorava-motion-duration:4.5s}
+.project-card .art-sorava:is(.is-hovering,.is-playing){--sorava-motion-duration:4.5s}
 .art-sorava::after{content:none}
 .sorava-sharing-drawing{display:block;position:absolute;inset:0;width:100%;height:100%}
 .art-sorava .art-cap,.art-sorava .art-bottom{color:#a9bdc5;font:9px var(--font-mono);letter-spacing:.045em}
@@ -88,7 +88,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
    Static/reduced-motion content shows the final state; a hover or sheet replay
    ends after one 7.2-second cycle, holding the opened state. */
 .art-wallpipe{--wp-motion-duration:7.2s}
-.project-card .art-wallpipe.is-hovering{--wp-motion-duration:4.5s}
+.project-card .art-wallpipe:is(.is-hovering,.is-playing){--wp-motion-duration:4.5s}
 .art-wallpipe .pipe-drawing{display:block}
 /* WallPipe matches the equatorial-mount drawing: captions live inside the SVG. */
 .wp-scene{transform:none}
@@ -226,7 +226,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
    Static/reduced-motion presentation is the completed Full HUD. */
 .art-nova{--nova-motion-duration:6s;container-type:inline-size;
   background:radial-gradient(ellipse at 50% 45%,#09202b40,transparent 55%),#03080d;color:#b6dbe4}
-.project-card .art-nova.is-hovering{--nova-motion-duration:3.75s}
+.project-card .art-nova:is(.is-hovering,.is-playing){--nova-motion-duration:3.75s}
 .art-nova::before{background-image:linear-gradient(#86dced10 1px,transparent 1px),
   linear-gradient(90deg,#86dced10 1px,transparent 1px);
   background-size:48px 48px;opacity:.29;mask-image:linear-gradient(90deg,transparent,#000 25%,#000 75%,transparent)}
@@ -383,7 +383,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   --up-duration:5.5s;container-type:inline-size;
   background:#E4E9E6;
   color:#26353A}
-.project-card .art-university.is-hovering{--up-duration:3.4375s}
+.project-card .art-university:is(.is-hovering,.is-playing){--up-duration:3.4375s}
 .art-university::before{content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(90deg,transparent 49.8%,#00000000 50%,transparent 50.2%),
     linear-gradient(0deg,transparent 49.8%,#00000000 50%,transparent 50.2%);
@@ -723,7 +723,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 
 /* Project sheets / editorial overlay. Keeps the six original concept visuals. */
 .project-media{position:relative;overflow:hidden;border-radius:var(--control-radius)}
-.project-media-hit{position:absolute;inset:0;z-index:10;display:block;width:100%;height:100%;border:0;background:transparent;cursor:zoom-in}
+.project-media-hit{position:absolute;inset:0;z-index:10;display:block;width:100%;height:100%;border:0;background:transparent;cursor:pointer}
 .project-media-hit:focus-visible{outline:3px solid #fff;outline-offset:-6px;border-radius:2px;box-shadow:inset 0 0 0 5px var(--electric)}
 .project-links .sheet-link{min-height:var(--control-size);padding:8px 0;background:transparent;border:0;border-bottom:1px solid var(--line-strong);color:var(--ink);font-size:12px;font-weight:730;cursor:pointer;transition:color var(--ui-feedback),border-color var(--ui-feedback)}
 .project-links .sheet-link:hover,.project-links a:hover{color:var(--electric-strong);border-color:var(--electric-strong)}
@@ -879,7 +879,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
    Every motor turn ends at the original orientation (5:1 ratio). */
 .art-eqmount{--eq-motion-duration:6.4s}
 /* Hover previews are 1.6× normal speed; detail-sheet playback remains unchanged. */
-.project-card .art-eqmount.is-hovering{--eq-motion-duration:4s}
+.project-card .art-eqmount:is(.is-hovering,.is-playing){--eq-motion-duration:4s}
 .eq-small-rotor,.eq-belt-teeth{opacity:0}
 .sheet-motion-play{
   display:inline-flex;align-items:center;justify-content:center;
@@ -1324,3 +1324,10 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
   .hero-visual{aspect-ratio:1/1}
   .hero-logo-wrap{inset:5% 4% 9%}
 }
+
+
+/* Inline playback is available to touch, mouse and keyboard users. */
+.project-media-hit[hidden]{display:none}
+.project-preview-label{position:absolute;right:12px;bottom:12px;display:grid;place-items:center;min-width:76px;min-height:44px;padding:10px 12px;background:var(--paper);color:var(--ink);border:1px solid var(--line-strong);border-radius:var(--control-radius);font:12px var(--font-mono);letter-spacing:.06em}
+.project-title-button{display:inline-block;max-width:100%;min-height:44px;margin:0;padding:0;border:0;background:transparent;color:inherit;font:inherit;letter-spacing:inherit;line-height:inherit;text-align:left;cursor:pointer}
+.project-title-button:hover{text-decoration:underline;text-underline-offset:.15em;text-decoration-thickness:1px}

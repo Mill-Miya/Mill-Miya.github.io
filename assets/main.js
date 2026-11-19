@@ -254,23 +254,53 @@
       if (!motion.loop) motionTimer = window.setTimeout(() => finishSheetMotion(art), motion.duration + 250);
     }
     motionButton.addEventListener("click", playSheetMotion);
-    // On listing cards, hover starts a single cycle even with the transparent
-    // sheet-opening button above the image. In work sheets it autoplays instead.
-    const listingArts = [];
+    // Listing images play inline. Titles and detail buttons open the sheet.
+    const listingMotions = [];
+    function resetListingMotion(entry) {
+      window.clearTimeout(entry.timer);
+      entry.timer = null;
+      entry.tapped = false;
+      entry.art.classList.remove("is-playing", "is-hovering", "is-complete");
+    }
     for (const [id, motion] of Object.entries(motions)) {
       const media = document.querySelector(`.project-card[data-sheet-id="${id}"] .project-media`);
       const art = media?.querySelector(motion.selector);
-      if (!media || !art) continue;
-      listingArts.push(art);
+      const playButton = media?.querySelector("[data-play-card]");
+      if (!media || !art || !playButton) continue;
+      const entry = { art, playButton, timer: null, tapped: false };
+      const title = media.closest(".project-card").querySelector(".project-info h3").textContent.trim();
+      listingMotions.push(entry);
+      function finishListingMotion() {
+        if (!art.classList.contains("is-playing")) return;
+        window.clearTimeout(entry.timer);
+        entry.timer = null;
+        art.classList.add("is-complete");
+        art.classList.remove("is-playing");
+      }
+      playButton.addEventListener("click", () => {
+        if (!motionAllowed()) return;
+        for (const current of listingMotions) resetListingMotion(current);
+        void art.getBoundingClientRect().width;
+        entry.tapped = true;
+        art.classList.add("is-playing");
+        playButton.querySelector(".project-preview-label").textContent = "REPLAY";
+        playButton.setAttribute("aria-label", `${title} のアニメーションを再再生`);
+        // Listing playback uses the existing 1.6× preview speed.
+        entry.timer = window.setTimeout(finishListingMotion, motion.duration / 1.6 + 250);
+      });
+      art.addEventListener("animationend", event => {
+        if (event.animationName === motion.finishAnimation &&
+            event.target.classList.contains(motion.finishTarget)) finishListingMotion();
+      });
       media.addEventListener("pointerenter", event => {
-        if (event.pointerType === "mouse" && motionAllowed() &&
+        if (!entry.tapped && event.pointerType === "mouse" && motionAllowed() &&
             window.matchMedia("(hover:hover) and (pointer:fine)").matches) {
           art.classList.remove("is-complete");
           art.classList.add("is-hovering");
         }
       });
       media.addEventListener("pointerleave", () => {
-        art.classList.remove("is-hovering", "is-complete");
+        if (!entry.tapped) art.classList.remove("is-hovering", "is-complete");
       });
     }
     function syncMotionPreference() {
@@ -279,22 +309,22 @@
       if (!showReplay && document.activeElement === motionButton) closeButton.focus();
       motionButton.hidden = !showReplay;
       if (sheetVisualBrand) sheetVisualBrand.hidden = showReplay;
+      for (const entry of listingMotions) entry.playButton.hidden = !allowed;
       if (!allowed) {
         resetSheetMotion();
-        for (const art of listingArts) art.classList.remove("is-hovering", "is-complete");
+        for (const entry of listingMotions) resetListingMotion(entry);
       }
     }
     systemMotion.addEventListener("change", syncMotionPreference);
     motionChoice?.addEventListener("change", syncMotionPreference);
+    syncMotionPreference();
 
     const eligible = () => cards.filter(card => !card.hidden && card.querySelector("[data-open-sheet]"));
 
     function openSheet(card, trigger) {
       if (!card || !card.querySelector("[data-open-sheet]")) return;
       resetSheetMotion();
-      for (const listingArt of listingArts) {
-        listingArt.classList.remove("is-hovering", "is-complete");
-      }
+      for (const entry of listingMotions) resetListingMotion(entry);
       if (!dialog.open && trigger instanceof HTMLElement) lastOpener = trigger;
       const selection = eligible();
       const current = selection.indexOf(card);
@@ -410,3 +440,4 @@
   const year = document.querySelector("#footer-year");
   if (year) year.textContent = String(new Date().getFullYear());
 })();
+
