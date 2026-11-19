@@ -135,12 +135,21 @@ with sync_playwright() as p:
             theme = page.locator('#theme-choice')
             motion = page.locator('#motion-choice')
             theme.select_option('dark')
+            # Color-scheme and light-dark() can settle on the next rendering frame.
+            page.wait_for_function("getComputedStyle(document.body).backgroundColor === 'rgb(22, 28, 31)'", timeout=3000)
             if page.locator('body').evaluate("(el) => getComputedStyle(el).backgroundColor") != "rgb(22, 28, 31)":
                 fail("dark theme did not reach the page surface", width)
             if page.locator('.hero-logo-poster').evaluate("(el) => getComputedStyle(el).fill") != "rgb(0, 0, 0)":
                 fail("dark theme must use the black logo poster", width)
             logo_ground = page.frame_locator('#hero-logo-frame').locator('#guide-svg > rect')
-            if logo_ground.evaluate("(el) => getComputedStyle(el).fill") != "rgb(255, 255, 255)":
+            logo_ground_white = logo_ground.evaluate("""async el => {
+              for (let i = 0; i < 60; i++) {
+                if (getComputedStyle(el).fill === 'rgb(255, 255, 255)') return true;
+                await new Promise(resolve => setTimeout(resolve, 50));
+              }
+              return false;
+            }""")
+            if not logo_ground_white:
                 fail("dark theme must use a white animation background", width)
             first = page.locator('.project-card[data-project="01"]')
             card_accent = first.locator('.project-year').evaluate("(el) => getComputedStyle(el).color")
@@ -173,7 +182,16 @@ with sync_playwright() as p:
             page.locator('#hero-logo-replay').click()
             page.wait_for_function("document.documentElement.dataset.motionChoice === 'full'")
             logo = page.frame_locator('#hero-logo-frame').locator('body')
-            if not logo.evaluate("() => window.getLogoStatus().running"):
+            # postMessage reaches the sandboxed iframe asynchronously.
+            # Verify its actual playback status rather than assuming a single tick.
+            logo_running = logo.evaluate("""async () => {
+              for (let i = 0; i < 60; i++) {
+                if (window.getLogoStatus().running) return true;
+                await new Promise(resolve => setTimeout(resolve, 50));
+              }
+              return false;
+            }""")
+            if not logo_running:
                 fail("hero REPLAY did not enable iframe playback under OS reduce", width)
             if motion.input_value() != 'full' or page.evaluate("localStorage.getItem('mill-miya.motion')") != 'full':
                 fail("hero REPLAY did not persist full motion", width)
