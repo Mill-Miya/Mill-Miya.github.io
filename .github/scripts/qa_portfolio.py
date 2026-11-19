@@ -1625,6 +1625,36 @@ with sync_playwright() as p:
                     fail("Sorava ignores reduced-motion settings", width)
                 page.locator("#sheet-close").click()
             if errors: fail("JavaScript error after sheet controls: "+repr(errors), width)
+        if width == 390:
+            # Normal first visit: construction is accelerated, then one automatic spin.
+            # Explicit REPLAY must restore the original drawing speed and must not auto-spin.
+            page.emulate_media(reduced_motion="no-preference")
+            page.locator('#motion-choice').select_option('system')
+            page.reload(wait_until='load')
+            construction=page.frame_locator('#hero-logo-frame').locator('body')
+            if not construction.evaluate("() => Math.abs(window.getLogoStatus().speed-1.35)<0.001"):
+                fail("first-load construction playback must be faster", width)
+            if page.evaluate("() => !!document.createElement('canvas').getContext('webgl2')"):
+                page.wait_for_function(
+                    "document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
+                    timeout=11000
+                )
+                page.wait_for_function(
+                    "!document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
+                    timeout=7000
+                )
+                page.locator('#hero-logo-replay').click()
+                page.wait_for_function(
+                    "() => document.querySelector('.hero-visual')?.classList.contains('is-logo-complete') === false"
+                )
+                if not construction.evaluate("() => window.getLogoStatus().speed === 1"):
+                    fail("manual REPLAY must use the original construction speed", width)
+                construction.evaluate("() => window.setLogoTime(window.getLogoStatus().total)")
+                page.wait_for_function(
+                    "document.querySelector('.hero-visual').classList.contains('is-logo-complete')"
+                )
+                if page.locator('.hero-visual.is-logo-spinning').count():
+                    fail("manual REPLAY unexpectedly triggered the opening 3D spin", width)
         print("QA_PASS",width,"cards",len(boxes),"width",metrics["scrollWidth"],flush=True)
         page.close()
     browser.close()

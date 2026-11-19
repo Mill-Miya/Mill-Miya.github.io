@@ -122,6 +122,7 @@
     const spinTrigger = document.getElementById("hero-logo-spin");
     const spinCanvas = document.getElementById("hero-logo-spin-canvas");
     let spinner = null;
+    let openingSpinPending = motionAllowed();
     const finishSpin = () => {
       logoPanel.classList.remove("is-logo-spinning");
       if (spinTrigger) spinTrigger.disabled = false;
@@ -135,18 +136,48 @@
       if (spinTrigger) spinTrigger.hidden = !complete;
       if (!complete) cancelSpin();
     };
+    const playLogoSpin = (opening=false) => {
+      if (!spinCanvas || !spinTrigger || !logoPanel.classList.contains("is-logo-complete") ||
+          logoPanel.classList.contains("is-logo-spinning")) return;
+      try {
+        if (!spinner) spinner = window.createRLogoSpin?.(spinCanvas, finishSpin);
+        if (!spinner) {
+          spinTrigger.hidden = true; // WebGL2 unavailable: retain the original 2D mark.
+          return;
+        }
+        const choice = root.dataset.themeChoice || "system";
+        const dark = choice === "dark" || (choice === "system" && systemTheme.matches);
+        spinTrigger.disabled = true;
+        logoPanel.classList.add("is-logo-spinning");
+        spinner.play(dark, opening ? 2400 : undefined);
+      } catch (error) {
+        console.warn("R logo 3D view is unavailable", error);
+        finishSpin();
+        spinTrigger.hidden = true;
+      }
+    };
     const syncReplay = () => {
       const ready = logoPanel.classList.contains("is-logo-ready");
       logoReplay.hidden = !ready;
       logoFrame.contentWindow?.postMessage({ channel, type: "motion", allowed: motionAllowed() }, "*");
-      if (ready && !motionAllowed()) sendLogoMessage("show-static");
+      if (!motionAllowed()) {
+        openingSpinPending = false;
+        cancelSpin();
+        if (ready) sendLogoMessage("show-static");
+      }
     };
 
     window.addEventListener("message", event => {
       if (event.source !== logoFrame.contentWindow || event.data?.channel !== channel) return;
       if (event.data.type === "ready") syncTheme();
       if (event.data.type === "started") setLogoFinished(false);
-      if (event.data.type === "completed") setLogoFinished(true);
+      if (event.data.type === "completed") {
+        setLogoFinished(true);
+        if (openingSpinPending) {
+          openingSpinPending = false; // Never repeat the automatic 3D spin.
+          if (motionAllowed()) playLogoSpin(true);
+        }
+      }
       if (event.data.type === "theme-applied") {
         logoPanel.classList.add("is-logo-ready");
         syncReplay();
@@ -154,30 +185,12 @@
     });
     logoFrame.addEventListener("load", () => sendLogoMessage("status"));
     logoReplay.addEventListener("click", () => {
+      openingSpinPending = false;
       setLogoFinished(false);
       requestMotion();
       sendLogoMessage("replay");
     });
-    spinTrigger?.addEventListener("click", () => {
-      if (!spinCanvas || !logoPanel.classList.contains("is-logo-complete") ||
-          logoPanel.classList.contains("is-logo-spinning")) return;
-      try {
-        if (!spinner) spinner = window.createRLogoSpin?.(spinCanvas, finishSpin);
-        if (!spinner) {
-          spinTrigger.hidden = true; // WebGL2 unavailable: keep the original 2D logo.
-          return;
-        }
-        const choice = root.dataset.themeChoice || "system";
-        const dark = choice === "dark" || (choice === "system" && systemTheme.matches);
-        spinTrigger.disabled = true;
-        logoPanel.classList.add("is-logo-spinning");
-        spinner.play(dark);
-      } catch (error) {
-        console.warn("R logo 3D view is unavailable", error);
-        finishSpin();
-        spinTrigger.hidden = true;
-      }
-    });
+    spinTrigger?.addEventListener("click", () => playLogoSpin());
     systemMotion.addEventListener("change", syncReplay);
     motionChoice?.addEventListener("change", syncReplay);
     sendLogoMessage("status");

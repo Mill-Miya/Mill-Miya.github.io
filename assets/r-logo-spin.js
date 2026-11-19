@@ -172,13 +172,13 @@
       clearTimeout(finishTimer);
       frame=0;finishTimer=0;
     }
-    function play(dark) {
+    function play(dark, durationMs=duration) {
       stop();active=true;start=performance.now();
       const token=generation;
       render(0,dark);
       function tick(time) {
         if(!active||token!==generation)return;
-        const progress=Math.min(1,(time-start)/duration);
+        const progress=Math.min(1,(time-start)/durationMs);
         render(progress,dark);
         if(progress<1)frame=requestAnimationFrame(tick);
         else {

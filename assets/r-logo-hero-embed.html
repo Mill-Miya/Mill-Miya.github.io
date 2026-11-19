@@ -157,7 +157,8 @@ const input=document.getElementById('timeline'),clock=document.getElementById('c
 const showBlade=document.getElementById('show-blade'),debug=document.getElementById('radial-debug');
 const debugLines=Object.fromEntries(['red','blue','green','foot','tip'].map(n=>[n,document.getElementById(['foot','tip'].includes(n)?'blade-leg':'blade-'+n)]));
 const movingB=document.getElementById('debug-moving-b');
-let t=0,running=true,frame=null,prev=null,speed=1;
+// On the first embedded load only, shorten the construction sequence.
+let t=0,running=true,frame=null,prev=null,speed=window.parent!==window?1.35:1;
 const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
 const radians=deg=>deg*Math.PI/180;
 // A is fixed for each region. B is on a ray to the boundary. Only 100% white or unpainted is rendered.
@@ -311,9 +312,9 @@ window.addEventListener('message',event=>{
    const wasEnabled=motionEnabled;
    motionEnabled=event.data.allowed===true;
    if(!motionEnabled)showCompleted();
-   else if(!wasEnabled){stop();paintAt(0);play();}
+   else if(!wasEnabled){speed=1;stop();paintAt(0);play();}
  }
- if(event.data.type==='replay' && motionEnabled){stop();paintAt(0);play();}
+ if(event.data.type==='replay' && motionEnabled){speed=1;stop();paintAt(0);play();}
  if(event.data.type==='show-static')showCompleted();
  if(event.data.type==='theme' && ['light','dark'].includes(event.data.theme)){
    document.documentElement.dataset.logoTheme=event.data.theme;
