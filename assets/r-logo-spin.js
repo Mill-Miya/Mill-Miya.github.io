@@ -139,7 +139,7 @@
       gl.viewport(0,0,width,height);
       // An impulse at the tap: maximum speed at the first frame, then friction-like deceleration.
       const smooth=1-Math.pow(1-progress,3);
-      const yaw=smooth*Math.PI*10; // five full turns, always finishing face-on
+      const yaw=smooth*Math.PI*8; // four full turns, always finishing face-on
       // Keep the camera level with the XY face: Y-axis spin only, no pitch.
       const cy=Math.cos(yaw),sy=Math.sin(yaw);
       const rotation=new Float32Array([cy,0,-sy, 0,1,0, sy,0,cy]);
