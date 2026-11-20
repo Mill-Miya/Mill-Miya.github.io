@@ -165,7 +165,7 @@
     const next = accentOptions[(index + 1) % accentOptions.length];
     accentCycle?.setAttribute("aria-label",
       "Change accent color. Current: " + accentOptions[index].name + ". Next: " + next.name + ".");
-    if (accentCycle) accentCycle.title = "Accent: " + accentOptions[index].name + " — click to change";
+    if (accentCycle) accentCycle.title = "Change color";
   }
   accentCycle?.addEventListener("click", () => {
     const current = root.dataset.accentChoice || "blue";
