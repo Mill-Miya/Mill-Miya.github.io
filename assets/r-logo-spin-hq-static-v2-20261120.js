@@ -192,7 +192,7 @@
       // return to the original dark edge shading before the face-on stop.
       const edgeFade=Math.max(0,Math.min(1,progress/0.08,(1-progress)/0.10));
       const easedFade=edgeFade*edgeFade*(3-2*edgeFade);
-      gl.uniform1f(uniforms.sideLift,dark&&!still ? 0.095*easedFade : 0);
+      gl.uniform1f(uniforms.sideLift,dark&&!still ? 0.035*easedFade : 0);
       gl.drawArrays(gl.TRIANGLES,0,mesh.length/4);
     }
     function stop() {
