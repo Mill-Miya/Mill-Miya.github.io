@@ -160,9 +160,12 @@
     const spinCanvas = document.getElementById("hero-logo-spin-canvas");
     let spinner = null;
     let openingSpinPending = motionAllowed();
+    let returnSpinPending = false;
     const finishSpin = () => {
       logoPanel.classList.remove("is-logo-spinning");
       if (spinTrigger) spinTrigger.disabled = false;
+      // A return-to-top click during a spin queues one more spin on arrival.
+      if (returnSpinPending) requestAnimationFrame(maybePlayReturnSpin);
     };
     const cancelSpin = () => {
       spinner?.stop();
@@ -193,12 +196,43 @@
         spinTrigger.hidden = true;
       }
     };
+    const atPageTop = () => window.scrollY <= 12;
+    const maybePlayReturnSpin = () => {
+      if (!returnSpinPending || !atPageTop()) return;
+      if (!motionAllowed()) {
+        returnSpinPending = false;
+        return;
+      }
+      if (!logoPanel.classList.contains("is-logo-complete") ||
+          logoPanel.classList.contains("is-logo-spinning")) return;
+      returnSpinPending = false;
+      // Reuse the original four-turn, eased 3D rotation without replaying the engraving.
+      playLogoSpin();
+    };
+    // Native #top links retain their usual URL/history and smooth-scroll behavior.
+    // The spin starts only after scrolling actually reaches the top.
+    for (const link of document.querySelectorAll('a[href="#top"]')) {
+      link.addEventListener("click", () => {
+        if (!motionAllowed()) return;
+        returnSpinPending = true;
+        requestAnimationFrame(maybePlayReturnSpin); // Also handles clicks already at top.
+      });
+    }
+    window.addEventListener("scroll", () => {
+      if (returnSpinPending) maybePlayReturnSpin();
+    }, { passive: true });
+    window.addEventListener("scrollend", () => {
+      if (returnSpinPending && !atPageTop()) returnSpinPending = false;
+      else maybePlayReturnSpin();
+    }, { passive: true });
+
     const syncReplay = () => {
       const ready = logoPanel.classList.contains("is-logo-ready");
       logoReplay.hidden = !ready;
       logoFrame.contentWindow?.postMessage({ channel, type: "motion", allowed: motionAllowed() }, "*");
       if (!motionAllowed()) {
         openingSpinPending = false;
+        returnSpinPending = false;
         cancelSpin();
         if (ready) sendLogoMessage("show-static");
       }
@@ -212,8 +246,10 @@
         setLogoFinished(true);
         if (openingSpinPending) {
           openingSpinPending = false; // Never repeat the automatic 3D spin.
-          if (motionAllowed()) playLogoSpin(true);
+          // A newly requested return replaces the opening spin (not two spins).
+          if (!returnSpinPending && motionAllowed()) playLogoSpin(true);
         }
+        if (returnSpinPending) maybePlayReturnSpin();
       }
       if (event.data.type === "theme-applied") {
         logoPanel.classList.add("is-logo-ready");
@@ -231,6 +267,21 @@
     systemMotion.addEventListener("change", syncReplay);
     motionChoice?.addEventListener("change", syncReplay);
     sendLogoMessage("status");
+  }
+
+  // A persistent shortcut after the hero on narrow portrait screens, not
+  // an extra control competing with the logo on the opening screen.
+  const mobileBackTop = document.getElementById("mobile-back-top");
+  if (mobileBackTop) {
+    const portrait = window.matchMedia("(max-width: 820px) and (orientation: portrait)");
+    const syncBackTop = () => {
+      mobileBackTop.hidden = !portrait.matches ||
+        window.scrollY < Math.max(280, window.innerHeight * 0.75);
+    };
+    window.addEventListener("scroll", syncBackTop, { passive: true });
+    window.addEventListener("resize", syncBackTop, { passive: true });
+    portrait.addEventListener("change", syncBackTop);
+    syncBackTop();
   }
 
   // The orange index lands on the actual final punctuation in "N.O.V.A.".

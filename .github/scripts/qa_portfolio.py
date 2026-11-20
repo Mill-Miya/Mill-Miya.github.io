@@ -1838,6 +1838,81 @@ with sync_playwright() as p:
                 )
                 if page.locator('.hero-visual.is-logo-spinning').count():
                     fail("manual REPLAY unexpectedly triggered the opening 3D spin", width)
+        # Navigating home from the footer or header must invoke the
+        # existing eased 3D logo spin only when the top has been reached.
+        # On portrait phones the fixed shortcut must be accessible during
+        # long reads, but should not obscure the initial hero.
+        fixed_top=page.locator("#mobile-back-top")
+        if not fixed_top.count():
+            fail("missing portrait return-to-top shortcut", width)
+        if fixed_top.is_visible():
+            fail("portrait top shortcut must be hidden on the initial hero", width)
+        if width in (390, 1280):
+            page.locator("#motion-choice").select_option("full")
+            page.emulate_media(reduced_motion="no-preference")
+            page.locator(".hero").evaluate(
+                "el => el.scrollIntoView({block:'start',behavior:'instant'})"
+            )
+            frame=page.frame_locator("#hero-logo-frame").locator("body")
+            frame.evaluate("() => window.setLogoTime(window.getLogoStatus().total)")
+            page.wait_for_function(
+                "document.querySelector('.hero-visual').classList.contains('is-logo-complete')"
+            )
+            page.wait_for_function(
+                "!document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
+                timeout=7000
+            )
+            # CSS smooth scrolling is the production behavior for the TOP link.
+            page.locator(".site-footer").evaluate(
+                "el => el.scrollIntoView({block:'end',behavior:'instant'})"
+            )
+            page.wait_for_function("window.scrollY > innerHeight * .9")
+            if width == 390:
+                page.wait_for_function(
+                    "document.querySelector('#mobile-back-top')?.hidden === false"
+                )
+                fixed_top.click()
+            else:
+                if fixed_top.is_visible():
+                    fail("top shortcut displayed on desktop", width)
+                page.locator(".site-footer .back-top").click()
+            page.wait_for_function(
+                "window.scrollY < 15 && document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
+                timeout=8000
+            )
+            page.wait_for_function(
+                "!document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
+                timeout=7000
+            )
+            if fixed_top.is_visible():
+                fail("top shortcut remained visible after arriving at hero", width)
+            # Footer TOP should also trigger the same 3D spin, separately.
+            if width == 390:
+                page.locator(".site-footer").evaluate(
+                    "el => el.scrollIntoView({block:'end',behavior:'instant'})"
+                )
+                page.locator(".site-footer .back-top").click()
+                page.wait_for_function(
+                    "window.scrollY < 15 && document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
+                    timeout=8000
+                )
+                page.wait_for_function(
+                    "!document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
+                    timeout=7000
+                )
+            # Header wordmark: this should spin even when already at the top.
+            page.locator(".site-header .brand").click()
+            page.wait_for_function(
+                "document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
+                timeout=5000
+            )
+            page.wait_for_function(
+                "!document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
+                timeout=7000
+            )
+        # The existing footer link and native hash navigation remain intact.
+        if page.locator(".site-footer .back-top").get_attribute("href") != "#top":
+            fail("footer back-to-top link changed", width)
         print("QA_PASS",width,"cards",len(boxes),"width",metrics["scrollWidth"],flush=True)
         page.close()
     browser.close()
