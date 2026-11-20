@@ -121,7 +121,7 @@
     const gl=canvas.getContext("webgl2",{alpha:true,antialias:true,depth:true});
     if (!gl) return null;
     const vert='#version 300 es\nprecision highp float;\nin vec3 aPosition;\nin float aCap;\nuniform mat3 uRotation;\nuniform float uScale,uAspect;\nuniform vec2 uPoseOffset;\nout vec3 vPosition;\nflat out float vCap;\nvoid main(){vec3 p=uRotation*aPosition;vPosition=p;vCap=aCap;gl_Position=vec4((p.x+uPoseOffset.x)*uScale/uAspect,(p.y+uPoseOffset.y)*uScale,-p.z*0.20,1.0);}';
-    const frag='#version 300 es\nprecision highp float;\nin vec3 vPosition;\nflat in float vCap;\nuniform float uDark;\nout vec4 outputColor;\nvoid main(){if(vCap>0.5){outputColor=vec4(vec3(1.0-uDark),1.0);return;}vec3 n=normalize(cross(dFdx(vPosition),dFdy(vPosition)));if(!gl_FrontFacing)n=-n;float d=max(dot(n,normalize(vec3(-0.45,0.62,0.73))),0.0);float shade=0.55+0.30*d;vec3 side=mix(vec3(shade),vec3(0.055+0.065*d),uDark);outputColor=vec4(side,1.0);}';
+    const frag='#version 300 es\nprecision highp float;\nin vec3 vPosition;\nflat in float vCap;\nuniform float uDark,uSideLift;\nout vec4 outputColor;\nvoid main(){if(vCap>0.5){outputColor=vec4(vec3(1.0-uDark),1.0);return;}vec3 n=normalize(cross(dFdx(vPosition),dFdy(vPosition)));if(!gl_FrontFacing)n=-n;float d=max(dot(n,normalize(vec3(-0.45,0.62,0.73))),0.0);float shade=0.55+0.30*d;vec3 side=mix(vec3(shade),vec3(0.055+0.065*d+uSideLift),uDark);outputColor=vec4(side,1.0);}';
     const program=gl.createProgram(), vs=shader(gl,gl.VERTEX_SHADER,vert), fs=shader(gl,gl.FRAGMENT_SHADER,frag);
     gl.attachShader(program,vs);
     gl.attachShader(program,fs);
@@ -148,7 +148,8 @@
       scale:gl.getUniformLocation(program,"uScale"),
       aspect:gl.getUniformLocation(program,"uAspect"),
       poseOffset:gl.getUniformLocation(program,"uPoseOffset"),
-      dark:gl.getUniformLocation(program,"uDark")
+      dark:gl.getUniformLocation(program,"uDark"),
+      sideLift:gl.getUniformLocation(program,"uSideLift")
     };
     let frame=0,finishTimer=0,start=0,active=false,generation=0;
     function render(progress,dark,still=false) {
@@ -187,6 +188,11 @@
       gl.uniform1f(uniforms.aspect,width/height);
       gl.uniform2f(uniforms.poseOffset,svgPoseOffsetX,svgPoseOffsetY);
       gl.uniform1f(uniforms.dark,dark?1:0);
+      // Lift only the black logo's extruded edges while rotating. Smoothly
+      // return to the original dark edge shading before the face-on stop.
+      const edgeFade=Math.max(0,Math.min(1,progress/0.08,(1-progress)/0.10));
+      const easedFade=edgeFade*edgeFade*(3-2*edgeFade);
+      gl.uniform1f(uniforms.sideLift,dark&&!still ? 0.095*easedFade : 0);
       gl.drawArrays(gl.TRIANGLES,0,mesh.length/4);
     }
     function stop() {
