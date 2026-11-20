@@ -164,8 +164,6 @@
     const finishSpin = () => {
       logoPanel.classList.remove("is-logo-spinning");
       if (spinTrigger) spinTrigger.disabled = false;
-      // A return-to-top click during a spin queues one more spin on arrival.
-      if (returnSpinPending) requestAnimationFrame(maybePlayReturnSpin);
     };
     const cancelSpin = () => {
       spinner?.stop();
@@ -196,35 +194,20 @@
         spinTrigger.hidden = true;
       }
     };
-    const atPageTop = () => window.scrollY <= 12;
-    const maybePlayReturnSpin = () => {
-      if (!returnSpinPending || !atPageTop()) return;
-      if (!motionAllowed()) {
-        returnSpinPending = false;
-        return;
-      }
-      if (!logoPanel.classList.contains("is-logo-complete") ||
-          logoPanel.classList.contains("is-logo-spinning")) return;
-      returnSpinPending = false;
-      // Reuse the original four-turn, eased 3D rotation without replaying the engraving.
-      playLogoSpin();
-    };
-    // Native #top links retain their usual URL/history and smooth-scroll behavior.
-    // The spin starts only after scrolling actually reaches the top.
+    // Start rotating on the click itself, concurrently with the native smooth
+    // scroll. Do not wait for arrival at the hero (or change hash navigation).
+    // When the initial engraving is unfinished, start as soon as it completes.
     for (const link of document.querySelectorAll('a[href="#top"]')) {
       link.addEventListener("click", () => {
         if (!motionAllowed()) return;
-        returnSpinPending = true;
-        requestAnimationFrame(maybePlayReturnSpin); // Also handles clicks already at top.
+        openingSpinPending = false;
+        if (logoPanel.classList.contains("is-logo-complete")) {
+          if (!logoPanel.classList.contains("is-logo-spinning")) playLogoSpin();
+        } else {
+          returnSpinPending = true;
+        }
       });
     }
-    window.addEventListener("scroll", () => {
-      if (returnSpinPending) maybePlayReturnSpin();
-    }, { passive: true });
-    window.addEventListener("scrollend", () => {
-      if (returnSpinPending && !atPageTop()) returnSpinPending = false;
-      else maybePlayReturnSpin();
-    }, { passive: true });
 
     const syncReplay = () => {
       const ready = logoPanel.classList.contains("is-logo-ready");
@@ -249,7 +232,10 @@
           // A newly requested return replaces the opening spin (not two spins).
           if (!returnSpinPending && motionAllowed()) playLogoSpin(true);
         }
-        if (returnSpinPending) maybePlayReturnSpin();
+        if (returnSpinPending) {
+          returnSpinPending = false;
+          if (motionAllowed()) playLogoSpin();
+        }
       }
       if (event.data.type === "theme-applied") {
         logoPanel.classList.add("is-logo-ready");
@@ -274,8 +260,11 @@
   const mobileBackTop = document.getElementById("mobile-back-top");
   if (mobileBackTop) {
     const portrait = window.matchMedia("(max-width: 820px) and (orientation: portrait)");
+    const footer = document.querySelector(".site-footer");
     const syncBackTop = () => {
-      mobileBackTop.hidden = !portrait.matches ||
+      // The footer already has a TOP link. Avoid two simultaneous controls.
+      const footerInView = Boolean(footer && footer.getBoundingClientRect().top <= window.innerHeight);
+      mobileBackTop.hidden = !portrait.matches || footerInView ||
         window.scrollY < Math.max(280, window.innerHeight * 0.75);
     };
     window.addEventListener("scroll", syncBackTop, { passive: true });

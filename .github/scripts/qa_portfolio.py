@@ -1838,15 +1838,12 @@ with sync_playwright() as p:
                 )
                 if page.locator('.hero-visual.is-logo-spinning').count():
                     fail("manual REPLAY unexpectedly triggered the opening 3D spin", width)
-        # Navigating home from the footer or header must invoke the
-        # existing eased 3D logo spin only when the top has been reached.
-        # On portrait phones the fixed shortcut must be accessible during
-        # long reads, but should not obscure the initial hero.
+        # The return-to-top rotation must start on click, not after the
+        # smooth scroll arrives. Portrait shortcut hides near the footer,
+        # where the existing TOP link already offers the same action.
         fixed_top=page.locator("#mobile-back-top")
         if not fixed_top.count():
             fail("missing portrait return-to-top shortcut", width)
-        # Prior sheet/card tests leave the page scrolled down. Inspect the
-        # control's initial-fold state only after returning to the hero.
         page.locator(".hero").evaluate(
             "el => el.scrollIntoView({block:'start',behavior:'instant'})"
         )
@@ -1854,12 +1851,9 @@ with sync_playwright() as p:
         page.wait_for_function("document.querySelector('#mobile-back-top').hidden")
         if fixed_top.is_visible():
             fail("portrait top shortcut must be hidden on the initial hero", width)
-        if width in (390, 1280):
+        if width in (390,1280):
             page.locator("#motion-choice").select_option("full")
             page.emulate_media(reduced_motion="no-preference")
-            page.locator(".hero").evaluate(
-                "el => el.scrollIntoView({block:'start',behavior:'instant'})"
-            )
             frame=page.frame_locator("#hero-logo-frame").locator("body")
             frame.evaluate("() => window.setLogoTime(window.getLogoStatus().total)")
             page.wait_for_function(
@@ -1869,55 +1863,69 @@ with sync_playwright() as p:
                 "!document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
                 timeout=7000
             )
-            # CSS smooth scrolling is the production behavior for the TOP link.
-            page.locator(".site-footer").evaluate(
-                "el => el.scrollIntoView({block:'end',behavior:'instant'})"
-            )
-            page.wait_for_function("window.scrollY > innerHeight * .9")
+            # Record whether rotation starts before native scroll finishes.
+            def audit_click(selector):
+                page.evaluate("""selector => {
+                    window.__returnTopClick = null;
+                    const element=document.querySelector(selector);
+                    element.addEventListener('click', () => {
+                        queueMicrotask(() => {
+                            window.__returnTopClick={
+                                spinning:document.querySelector('.hero-visual').classList.contains('is-logo-spinning'),
+                                scrollY:window.scrollY
+                            };
+                        });
+                    }, {once:true});
+                }""", selector)
+                page.locator(selector).click()
+                page.wait_for_function("window.__returnTopClick !== null")
+                measurement=page.evaluate("window.__returnTopClick")
+                if not measurement["spinning"]:
+                    fail("R logo does not begin spinning on TOP click", width)
+                if measurement["scrollY"] < 20:
+                    fail("spin began only after scroll reached top", width)
+
             if width == 390:
+                page.locator("#works").evaluate(
+                    "el => el.scrollIntoView({block:'start',behavior:'instant'})"
+                )
+                page.wait_for_function("window.scrollY > innerHeight * 0.75")
                 page.wait_for_function(
-                    "document.querySelector('#mobile-back-top')?.hidden === false"
+                    "document.querySelector('#mobile-back-top').hidden === false"
                 )
-                fixed_top.click()
-            else:
-                if fixed_top.is_visible():
-                    fail("top shortcut displayed on desktop", width)
-                page.locator(".site-footer .back-top").click()
-            page.wait_for_function(
-                "window.scrollY < 15 && document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
-                timeout=8000
-            )
-            page.wait_for_function(
-                "!document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
-                timeout=7000
-            )
-            if fixed_top.is_visible():
-                fail("top shortcut remained visible after arriving at hero", width)
-            # Footer TOP should also trigger the same 3D spin, separately.
-            if width == 390:
-                page.locator(".site-footer").evaluate(
-                    "el => el.scrollIntoView({block:'end',behavior:'instant'})"
-                )
-                page.locator(".site-footer .back-top").click()
-                page.wait_for_function(
-                    "window.scrollY < 15 && document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
-                    timeout=8000
-                )
+                audit_click("#mobile-back-top")
+                page.wait_for_function("window.scrollY < 15", timeout=8000)
                 page.wait_for_function(
                     "!document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
                     timeout=7000
                 )
-            # Header wordmark: this should spin even when already at the top.
+
+            # Footer is the only bottom-of-page TOP action on portrait.
+            page.locator(".site-footer").evaluate(
+                "el => el.scrollIntoView({block:'end',behavior:'instant'})"
+            )
+            page.wait_for_function("window.scrollY > innerHeight * .9")
+            page.wait_for_function(
+                "document.querySelector('#mobile-back-top').hidden"
+            )
+            if fixed_top.is_visible():
+                fail("portrait shortcut overlaps the footer's TOP link", width)
+            audit_click(".site-footer .back-top")
+            page.wait_for_function("window.scrollY < 15", timeout=8000)
+            page.wait_for_function(
+                "!document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
+                timeout=7000
+            )
+            # The header wordmark should still respond even at the top.
             page.locator(".site-header .brand").click()
             page.wait_for_function(
                 "document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
-                timeout=5000
+                timeout=4000
             )
             page.wait_for_function(
                 "!document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
                 timeout=7000
             )
-        # The existing footer link and native hash navigation remain intact.
         if page.locator(".site-footer .back-top").get_attribute("href") != "#top":
             fail("footer back-to-top link changed", width)
         print("QA_PASS",width,"cards",len(boxes),"width",metrics["scrollWidth"],flush=True)
