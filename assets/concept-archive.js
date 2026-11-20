@@ -65,11 +65,26 @@
         ...history.state,
         millMiyaOverlay: {
           kind: view === "lightbox" ? "concept-lightbox" : "concept",
-          view, index: studyIndex ?? null, depth
+          view, index: studyIndex ?? null, figure, depth
         }
       }, "", window.location.href);
     } catch (error) {
       console.warn("Concept-sheet history is unavailable", error);
+    }
+  }
+  // Figure arrows change the active study view, not the navigation depth.
+  // Keep the figure index in the current history entry so Back from zoom
+  // and Forward reopen the same diagram instead of resetting to figure 1.
+  function rememberFigure() {
+    const entry = conceptHistory(history.state);
+    if (entry?.kind !== "concept" || entry.view !== "study") return;
+    try {
+      history.replaceState({
+        ...history.state,
+        millMiyaOverlay: { ...entry, figure }
+      }, "", window.location.href);
+    } catch (error) {
+      console.warn("Concept figure history is unavailable", error);
     }
   }
   const makeSvg = (key) => `<svg class="concept-sketch-svg" role="img" aria-label="Original concept sketch reinterpreted as a simplified schematic: ${key}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 490">${grid}${drawings[key]}</svg>`;
@@ -95,7 +110,6 @@
     headerLabel.textContent="CONCEPT ARCHIVE / 03 STUDIES";
     const target=studyButtons[active];
     (target || close).focus({preventScroll:true});
-    overview.scrollTop=0;
   };
   const openStudy=(i)=>{
     active=Math.max(0,Math.min(studies.length-1,i));
@@ -115,6 +129,7 @@
       back.hidden=true;
       headerLabel.textContent="CONCEPT ARCHIVE / 03 STUDIES";
       dialog.showModal();
+      overview.scrollTop=0; // reset only on a fresh open; Back preserves place
       pushConceptHistory("overview");
       close.focus();
     });
@@ -145,8 +160,8 @@
     }
   });
   dialog.addEventListener("click",(e)=>{if(e.target===dialog)dialog.close();});
-  stepPrev.addEventListener("click",()=>{if(figure>0){figure--;render();}});
-  stepNext.addEventListener("click",()=>{if(figure<studies[active].drawings.length-1){figure++;render();}});
+  stepPrev.addEventListener("click",()=>{if(figure>0){figure--;render();rememberFigure();}});
+  stepNext.addEventListener("click",()=>{if(figure<studies[active].drawings.length-1){figure++;render();rememberFigure();}});
   zoom.addEventListener("click",()=>{
     if(!lightbox||!lightboxArt)return;
     lightboxArt.innerHTML=diagram.innerHTML;
@@ -169,7 +184,13 @@
     if(!dialog.open) dialog.showModal();
     if(entry.kind!=="concept-lightbox" && lightbox?.open) lightbox.close();
     if(entry.view==="overview") showOverview();
-    else openStudy(Number.isInteger(entry.index) ? entry.index : 0);
+    else {
+      openStudy(Number.isInteger(entry.index) ? entry.index : 0);
+      if(Number.isInteger(entry.figure)) {
+        figure=Math.max(0,Math.min(studies[active].drawings.length-1,entry.figure));
+        render();
+      }
+    }
     if(entry.kind==="concept-lightbox" && lightbox && lightboxArt && !lightbox.open) {
       lightboxArt.innerHTML=diagram.innerHTML;
       lightbox.showModal();
