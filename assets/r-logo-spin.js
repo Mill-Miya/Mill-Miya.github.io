@@ -26,9 +26,11 @@
   const duration = 2800;
   const hold = 120;
   // 2D master: SVG viewBox 0 0 1254 1254, centered at (627,627).
-  // The source contour occupies x/y 176.69848..1077.30152 (half-extent 450.30152).
-  // The packed mesh normalizes that same contour to [-1,1]; scale accordingly.
-  const svgPoseScale = (2 * 450.30152) / 1254;
+  // The R outline reaches its true extrema at the four 42-unit round corners.
+  // Their arc extrema are 164.39696 and 1089.60304, NOT the path endpoints
+  // 176.69848 and 1077.30152. The packed 3D contour maps these full bounds
+  // to [-1,1]; using the endpoints made the model about 2.7% too small.
+  const svgPoseScale = (1089.60304 - 164.39696) / 1254;
 
   function readContours() {
     const bytes = Uint8Array.from(atob(encoded), c => c.charCodeAt(0));
