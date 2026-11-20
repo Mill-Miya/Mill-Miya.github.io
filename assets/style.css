@@ -614,7 +614,7 @@ a{color:inherit}button{font:inherit}img,svg{max-width:100%}h1,h2,h3,p{margin-top
 }
 /* Reading contrast, especially for secondary metadata on the paper surface. */
 .project-topline,.project-number,.section-side,.works-count,.work-footnote{color:#515d57}
-.project-info p,.section-lead,.hero-description{color:#495650}
+.project-info p,.section-lead,.hero-description{color:var(--muted)}
 .tag-row span{color:var(--muted);border-color:var(--line-strong)}
 @media(max-width:640px){.hero-flag{font-size:10px;line-height:1.5}}
 
