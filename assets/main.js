@@ -186,8 +186,10 @@
         const choice = root.dataset.themeChoice || "system";
         const dark = choice === "dark" || (choice === "system" && systemTheme.matches);
         spinTrigger.disabled = true;
-        logoPanel.classList.add("is-logo-spinning");
+        // Render the front-facing first 3D frame before hiding the SVG.
+        // This avoids a blank frame at the start of the crossfade cycle.
         spinner.play(dark, opening ? 2400 : undefined);
+        logoPanel.classList.add("is-logo-spinning");
       } catch (error) {
         console.warn("R logo 3D view is unavailable", error);
         finishSpin();
