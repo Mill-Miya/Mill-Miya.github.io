@@ -302,6 +302,8 @@ const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
 // Starting independently can report completion before the real drawing begins.
 const isEmbedded=window.parent!==window;
 let motionEnabled=!isEmbedded && !reducedMotion.matches;
+// Only the first parent decision uses the faster opening choreography.
+let awaitingInitialHostMotion=isEmbedded;
 function showCompleted(){stop();paintAt(total)}
 function restoreNormalGuideFade(){
  guideFadeDuration=normalGuideFadeDuration;
@@ -320,10 +322,17 @@ function reportCompleted(completed){
 window.addEventListener('message',event=>{
  if(event.source!==window.parent || !event.data || event.data.channel!=='mill-miya-r-logo')return;
  if(event.data.type==='motion'){
+   const firstHostMotion=awaitingInitialHostMotion;
+   awaitingInitialHostMotion=false;
    const wasEnabled=motionEnabled;
    motionEnabled=event.data.allowed===true;
    if(!motionEnabled)showCompleted();
-   else if(!wasEnabled){restoreNormalGuideFade();speed=1;stop();paintAt(0);play();}
+   else if(!wasEnabled){
+     // Initial page load: 1.35x drawing + 0.45s guide fade.
+     // Later re-enabling motion: normal replay pacing.
+     if(!firstHostMotion){restoreNormalGuideFade();speed=1;}
+     stop();paintAt(0);play();
+   }
  }
  if(event.data.type==='replay' && motionEnabled){restoreNormalGuideFade();speed=1;stop();paintAt(0);play();}
  if(event.data.type==='show-static')showCompleted();
