@@ -1845,6 +1845,12 @@ with sync_playwright() as p:
         fixed_top=page.locator("#mobile-back-top")
         if not fixed_top.count():
             fail("missing portrait return-to-top shortcut", width)
+        # Prior sheet/card tests leave the page scrolled down. Inspect the
+        # control's initial-fold state only after returning to the hero.
+        page.locator(".hero").evaluate(
+            "el => el.scrollIntoView({block:'start',behavior:'instant'})"
+        )
+        page.wait_for_function("window.scrollY < 15")
         if fixed_top.is_visible():
             fail("portrait top shortcut must be hidden on the initial hero", width)
         if width in (390, 1280):
