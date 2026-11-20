@@ -1851,6 +1851,7 @@ with sync_playwright() as p:
             "el => el.scrollIntoView({block:'start',behavior:'instant'})"
         )
         page.wait_for_function("window.scrollY < 15")
+        page.wait_for_function("document.querySelector('#mobile-back-top').hidden")
         if fixed_top.is_visible():
             fail("portrait top shortcut must be hidden on the initial hero", width)
         if width in (390, 1280):
