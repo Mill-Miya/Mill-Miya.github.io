@@ -161,11 +161,12 @@
       gl.useProgram(program);
       gl.bindVertexArray(vao);
       gl.uniformMatrix3fv(uniforms.rotation,false,rotation);
-      // Match the final SVG pose: measured from the supplied screen recording.
-      // Small constant alignment is applied after 3D rotation, so it does not orbit.
-      gl.uniform1f(uniforms.scale,0.7437*Math.min(1,width/height));
+      // Match the final SVG pose using a frame-by-frame comparison of the
+      // unblended WebGL frame and its adjacent SVG frame (2026-11-20).
+      // Translation is applied after rotation, avoiding an orbiting offset.
+      gl.uniform1f(uniforms.scale,0.7406*Math.min(1,width/height));
       gl.uniform1f(uniforms.aspect,width/height);
-      gl.uniform2f(uniforms.alignment,0.006,-0.010);
+      gl.uniform2f(uniforms.alignment,-0.007,0.004);
       gl.uniform1f(uniforms.dark,dark?1:0);
       gl.drawArrays(gl.TRIANGLES,0,mesh.length/4);
     }
