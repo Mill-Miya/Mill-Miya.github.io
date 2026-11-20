@@ -9,6 +9,28 @@
   const conceptEntry = document.querySelector("#concept-archive-entry");
   const category = (card, filter) => filter === "all" || (card.dataset.tags || "").split(/\s+/).includes(filter);
 
+  // Preserve the current work/filter and an on-screen anchor across a refresh.
+  // Do not interfere with the browser's Back/Forward scroll restoration.
+  const reloadKey = "mill-miya.reload-view.v1";
+  const locationKey = location.pathname + location.search + location.hash;
+  const navigationEntry = performance.getEntriesByType?.("navigation")?.[0];
+  const isReload = navigationEntry?.type === "reload" ||
+    (!navigationEntry && performance.navigation?.type === 1);
+  let reloadView = null;
+  if (isReload) {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(reloadKey) || "null");
+      if (saved?.path === locationKey && Number.isFinite(saved.y) &&
+          Date.now() - saved.savedAt < 600000) reloadView = saved;
+    } catch { /* Private browsing and disabled storage are supported. */ }
+  }
+  const originalScrollMode = history.scrollRestoration;
+  const originalInlineScrollBehavior = document.documentElement.style.scrollBehavior;
+  if (reloadView) {
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    document.documentElement.style.scrollBehavior = "auto";
+  }
+
   function applyFilter(filter) {
     let total = 0;
     for (const card of cards) {
@@ -49,7 +71,70 @@
   for (const button of buttons) {
     button.addEventListener("click", () => applyFilter(button.dataset.filter || "all"));
   }
-  applyFilter("all");
+  const savedFilter = reloadView?.filter;
+  applyFilter(buttons.some(button => button.dataset.filter === savedFilter)
+    ? savedFilter : "all");
+
+  function scrollAnchor() {
+    const probe = Math.min(140, Math.max(70, innerHeight * .25));
+    const containsProbe = element => {
+      const rect = element.getBoundingClientRect();
+      return rect.top <= probe && rect.bottom > probe;
+    };
+    const card = cards.find(element => !element.hidden && containsProbe(element));
+    if (card) {
+      return { kind: "card", id: card.dataset.project, top: card.getBoundingClientRect().top };
+    }
+    const section = [...document.querySelectorAll("main > section[id], footer.site-footer")]
+      .find(containsProbe);
+    if (section) {
+      return { kind: "section", id: section.id || "contact", top: section.getBoundingClientRect().top };
+    }
+    return null;
+  }
+  window.addEventListener("pagehide", () => {
+    try {
+      const filter = buttons.find(button => button.getAttribute("aria-pressed") === "true")?.dataset.filter || "all";
+      sessionStorage.setItem(reloadKey, JSON.stringify({
+        path: location.pathname + location.search + location.hash,
+        y: window.scrollY,
+        anchor: scrollAnchor(),
+        filter,
+        savedAt: Date.now()
+      }));
+    } catch { /* Let normal browser restoration work without storage. */ }
+  });
+  if (reloadView) {
+    const restorePosition = () => {
+      let y = reloadView.y;
+      const anchor = reloadView.anchor;
+      let target = null;
+      if (anchor?.kind === "card") {
+        target = cards.find(card => card.dataset.project === anchor.id && !card.hidden);
+      } else if (anchor?.kind === "section") {
+        target = document.getElementById(anchor.id);
+      }
+      if (target && Number.isFinite(anchor.top)) {
+        y = window.scrollY + target.getBoundingClientRect().top - anchor.top;
+      }
+      window.scrollTo({ top: Math.max(0, y), left: 0, behavior: "instant" });
+    };
+    // Restore early, then repeat after asynchronous font / image layout settles.
+    restorePosition();
+    window.addEventListener("load", () => {
+      restorePosition();
+      Promise.resolve(document.fonts?.ready).catch(() => {}).then(() => {
+        requestAnimationFrame(() => {
+          restorePosition();
+          requestAnimationFrame(() => {
+            restorePosition();
+            document.documentElement.style.scrollBehavior = originalInlineScrollBehavior;
+            if ("scrollRestoration" in history) history.scrollRestoration = originalScrollMode;
+          });
+        });
+      });
+    }, { once: true });
+  }
 
   const logoFrame = document.getElementById("hero-logo-frame");
   const logoReplay = document.getElementById("hero-logo-replay");
