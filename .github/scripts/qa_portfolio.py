@@ -1916,7 +1916,7 @@ with sync_playwright() as p:
                     timeout=7000
                 )
                 page.wait_for_function(
-                    "getComputedStyle(document.querySelector('#mobile-back-top')).visibility==='hidden'"
+                    "(() => { const s=getComputedStyle(document.querySelector('#mobile-back-top')); return s.display==='none' || s.visibility==='hidden'; })()"
                 )
             page.locator(".site-footer").evaluate(
                 "el => el.scrollIntoView({block:'end',behavior:'instant'})"
@@ -1926,7 +1926,7 @@ with sync_playwright() as p:
                 "!document.querySelector('#mobile-back-top').classList.contains('is-visible')"
             )
             page.wait_for_function(
-                "getComputedStyle(document.querySelector('#mobile-back-top')).visibility==='hidden'"
+                "(() => { const s=getComputedStyle(document.querySelector('#mobile-back-top')); return s.display==='none' || s.visibility==='hidden'; })()"
             )
             audit_click(".site-footer .back-top")
             page.wait_for_function("window.scrollY < 15", timeout=8000)
