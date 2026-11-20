@@ -164,6 +164,19 @@ with sync_playwright() as p:
                 fail("Concept Archive heading must open an independent-work folder", width)
             if overview.locator("[data-concept-open]").count() != 3:
                 fail("Concept Archive must contain three separate selectable works", width)
+            # Each independent study has its own compact line icon, without
+            # creating an image card or overlapping the work title.
+            for button in overview.locator("[data-concept-open]").all():
+                icon=button.locator(".concept-work-icon svg")
+                if icon.count()!=1 or not icon.is_visible() or icon.get_attribute("viewBox")!="0 0 56 56":
+                    fail("independent concepts need small, distinct SVG symbols", width)
+                geometry=button.evaluate("""el => {
+                    const icon=el.querySelector('.concept-work-icon').getBoundingClientRect();
+                    const title=el.querySelector('.concept-work-label').getBoundingClientRect();
+                    return {iconRight:icon.right,titleLeft:title.left,iconWidth:icon.width};
+                }""")
+                if geometry["iconRight"]>geometry["titleLeft"]+1 or geometry["iconWidth"]>56:
+                    fail("Concept symbols collide with descriptions on narrow screens", width)
             concept.locator("#concept-sheet-close").click()
             page.locator("#concept-archive-open").click()
             if not overview.is_visible():

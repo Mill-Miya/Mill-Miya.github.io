@@ -91,7 +91,10 @@
 .concept-sheet .concept-overview-heading h2{font-size:clamp(42px,5.2vw,75px);line-height:1.05;letter-spacing:-.073em;font-weight:730;margin:0 0 20px}
 .concept-sheet .concept-overview-heading>p:last-child{max-width:57ch;color:var(--muted);font-size:14px;line-height:1.85;margin:0}
 .concept-work-list{border-top:1px solid var(--line-strong)}
-.concept-work-open{display:grid;grid-template-columns:90px minmax(0,1fr) 28px;gap:clamp(12px,2.8vw,34px);align-items:center;width:100%;min-height:112px;border:0;border-bottom:1px solid var(--line);padding:20px 0;background:transparent;color:var(--ink);text-align:left;cursor:pointer}
+.concept-work-open{display:grid;grid-template-columns:72px 56px minmax(0,1fr) 28px;gap:clamp(12px,2vw,26px);align-items:center;width:100%;min-height:112px;border:0;border-bottom:1px solid var(--line);padding:20px 0;background:transparent;color:var(--ink);text-align:left;cursor:pointer}
+.concept-work-icon{display:grid;place-items:center;width:56px;height:56px;color:var(--muted);transition:color .16s ease}
+.concept-work-icon svg{display:block;width:56px;height:56px;overflow:visible}
+.concept-work-open:hover .concept-work-icon,.concept-work-open:focus-visible .concept-work-icon{color:var(--electric-strong)}
 .concept-work-open:hover .concept-work-arrow,.concept-work-open:focus-visible .concept-work-arrow{color:var(--electric-strong);transform:translate(3px,-3px)}
 .concept-work-open:focus-visible{outline:2px solid var(--electric-strong);outline-offset:-1px}
 .concept-work-index{align-self:start;padding-top:6px;color:var(--muted);font:11px var(--font-mono)}
@@ -108,14 +111,18 @@
   .concept-sheet .concept-overview-heading{margin-bottom:25px}
   .concept-sheet .concept-overview-heading h2{font-size:clamp(40px,10vw,55px)}
   .concept-sheet .concept-overview-heading>p:last-child{font-size:13px}
-  .concept-work-open{grid-template-columns:50px minmax(0,1fr) 20px;gap:12px;min-height:100px;padding:18px 0}
+  .concept-work-open{grid-template-columns:45px 44px minmax(0,1fr) 20px;gap:10px;min-height:100px;padding:18px 0}
+  .concept-work-icon,.concept-work-icon svg{width:44px;height:44px}
   .concept-work-label strong{font-size:19px}
   .concept-work-label small{font-size:11px}
   .concept-header-left{gap:7px}
   .concept-header-left>span{font-size:9px}
 }
 @media(max-width:380px){
-  .concept-work-open{grid-template-columns:40px minmax(0,1fr) 15px;gap:8px}
+  .concept-work-open{grid-template-columns:35px 36px minmax(0,1fr) 15px;gap:7px}
+  .concept-work-icon,.concept-work-icon svg{width:36px;height:36px}
   .concept-work-label strong{font-size:17px}
   .concept-work-arrow{font-size:18px}
 }
+
+@media(prefers-reduced-motion:reduce){.concept-work-icon{transition:none}}
