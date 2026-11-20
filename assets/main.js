@@ -278,6 +278,9 @@
       new ResizeObserver(redrawRestingLogo).observe(spinCanvas);
     }
     window.addEventListener("resize", redrawRestingLogo, { passive: true });
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) redrawRestingLogo();
+    });
     systemMotion.addEventListener("change", syncReplay);
     motionChoice?.addEventListener("change", syncReplay);
     sendLogoMessage("status");
