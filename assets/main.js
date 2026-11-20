@@ -552,9 +552,26 @@
     syncMotionPreference();
 
     const eligible = () => cards.filter(card => !card.hidden && card.querySelector("[data-open-sheet]"));
+    // Browser Back/Forward mirrors the work-sheet stack without reloading the page.
+    // Entries deliberately retain the current URL and hash (the reader's position).
+    const sheetHistory = state => state?.millMiyaOverlay;
+    function pushSheetHistory(card) {
+      const previous = sheetHistory(history.state);
+      const depth = previous?.kind === "project" ? previous.depth + 1 : 1;
+      try {
+        history.pushState({
+          ...history.state,
+          millMiyaOverlay: { kind: "project", id: card.dataset.sheetId, depth }
+        }, "", window.location.href);
+      } catch (error) {
+        console.warn("Work-sheet history is unavailable", error);
+      }
+    }
 
-    function openSheet(card, trigger) {
+    function openSheet(card, trigger, fromHistory = false) {
       if (!card || !card.querySelector("[data-open-sheet]")) return;
+      // A forward-history entry can refer to a work hidden by a later filter.
+      if (fromHistory && card.hidden) applyFilter("all");
       resetSheetMotion();
       for (const entry of listingMotions) resetListingMotion(entry);
       centeredMotions.clear();
@@ -626,6 +643,7 @@
       prevButton.disabled = selection.length < 2;
       nextButton.disabled = selection.length < 2;
       if (!dialog.open) dialog.showModal();
+      if (!fromHistory) pushSheetHistory(card);
       observeNova(art);
       closeButton.focus();
       // Play exactly once when an animated sheet opens, including navigation
@@ -650,6 +668,16 @@
         trigger.addEventListener("click", () => openSheet(card, trigger));
       }
     }
+    window.addEventListener("popstate", event => {
+      const entry = sheetHistory(event.state);
+      if (entry?.kind === "project") {
+        const card = cards.find(item => item.dataset.sheetId === entry.id);
+        if (card) openSheet(card, null, true);
+        else if (dialog.open) dialog.close();
+      } else if (dialog.open) {
+        dialog.close();
+      }
+    });
     closeButton.addEventListener("click", () => dialog.close());
     prevButton.addEventListener("click", () => moveSheet(-1));
     nextButton.addEventListener("click", () => moveSheet(1));
@@ -660,9 +688,23 @@
       resetSheetMotion();
       activeCard = null;
       scheduleCenteredMotion();
-      if (lastOpener?.isConnected && !lastOpener.closest("[hidden]")) lastOpener.focus();
+      if (lastOpener?.isConnected && !lastOpener.closest("[hidden]")) {
+        lastOpener.focus({ preventScroll: true });
+      }
       lastOpener = null;
+      // Closing by X, backdrop or Escape must discard the sheet entries.
+      // A popstate-driven close already has a non-project current state.
+      const entry = sheetHistory(history.state);
+      if (entry?.kind === "project") {
+        history.go(-Math.max(1, Number(entry.depth) || 1));
+      }
     });
+    // Restore an open sheet after a same-tab refresh, and on Forward.
+    const initialSheet = sheetHistory(history.state);
+    if (initialSheet?.kind === "project") {
+      const card = cards.find(item => item.dataset.sheetId === initialSheet.id);
+      if (card) openSheet(card, null, true);
+    }
     document.addEventListener("keydown", event => {
       if (!dialog.open || event.altKey || event.ctrlKey || event.metaKey) return;
       if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
