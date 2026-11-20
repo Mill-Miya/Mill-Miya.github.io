@@ -25,6 +25,10 @@
   const depth = 0.21616895;
   const duration = 2800;
   const hold = 120;
+  // 2D master: SVG viewBox 0 0 1254 1254, centered at (627,627).
+  // The source contour occupies x/y 176.69848..1077.30152 (half-extent 450.30152).
+  // The packed mesh normalizes that same contour to [-1,1]; scale accordingly.
+  const svgPoseScale = (2 * 450.30152) / 1254;
 
   function readContours() {
     const bytes = Uint8Array.from(atob(encoded), c => c.charCodeAt(0));
@@ -109,7 +113,7 @@
   window.createRLogoSpin = (canvas,onFinish) => {
     const gl=canvas.getContext("webgl2",{alpha:true,antialias:true,depth:true});
     if (!gl) return null;
-    const vert='#version 300 es\nprecision highp float;\nin vec3 aPosition;\nin float aCap;\nuniform mat3 uRotation;\nuniform float uScale,uAspect;\nuniform vec2 uAlignment;\nout vec3 vPosition;\nflat out float vCap;\nvoid main(){vec3 p=uRotation*aPosition;vPosition=p;vCap=aCap;gl_Position=vec4(p.x*uScale/uAspect+uAlignment.x,p.y*uScale+uAlignment.y,-p.z*0.20,1.0);}';
+    const vert='#version 300 es\nprecision highp float;\nin vec3 aPosition;\nin float aCap;\nuniform mat3 uRotation;\nuniform float uScale,uAspect;\nout vec3 vPosition;\nflat out float vCap;\nvoid main(){vec3 p=uRotation*aPosition;vPosition=p;vCap=aCap;gl_Position=vec4(p.x*uScale/uAspect,p.y*uScale,-p.z*0.20,1.0);}';
     const frag='#version 300 es\nprecision highp float;\nin vec3 vPosition;\nflat in float vCap;\nuniform float uDark;\nout vec4 outputColor;\nvoid main(){if(vCap>0.5){outputColor=vec4(vec3(1.0-uDark),1.0);return;}vec3 n=normalize(cross(dFdx(vPosition),dFdy(vPosition)));if(!gl_FrontFacing)n=-n;float d=max(dot(n,normalize(vec3(-0.45,0.62,0.73))),0.0);float shade=0.55+0.30*d;vec3 side=mix(vec3(shade),vec3(0.055+0.065*d),uDark);outputColor=vec4(side,1.0);}';
     const program=gl.createProgram(), vs=shader(gl,gl.VERTEX_SHADER,vert), fs=shader(gl,gl.FRAGMENT_SHADER,frag);
     gl.attachShader(program,vs);
@@ -136,7 +140,6 @@
       rotation:gl.getUniformLocation(program,"uRotation"),
       scale:gl.getUniformLocation(program,"uScale"),
       aspect:gl.getUniformLocation(program,"uAspect"),
-      alignment:gl.getUniformLocation(program,"uAlignment"),
       dark:gl.getUniformLocation(program,"uDark")
     };
     let frame=0,finishTimer=0,start=0,active=false,generation=0;
@@ -161,12 +164,11 @@
       gl.useProgram(program);
       gl.bindVertexArray(vao);
       gl.uniformMatrix3fv(uniforms.rotation,false,rotation);
-      // Match the final SVG pose using a frame-by-frame comparison of the
-      // unblended WebGL frame and its adjacent SVG frame (2026-11-20).
-      // Translation is applied after rotation, avoiding an orbiting offset.
-      gl.uniform1f(uniforms.scale,0.7406*Math.min(1,width/height));
+      // Use the master SVG's actual viewBox and contour bounds. Both layers now
+      // share a centered square viewport regardless of canvas aspect ratio.
+      // Do not add hand-tuned translations: they cause jumps on both transitions.
+      gl.uniform1f(uniforms.scale,svgPoseScale*Math.min(1,width/height));
       gl.uniform1f(uniforms.aspect,width/height);
-      gl.uniform2f(uniforms.alignment,-0.007,0.004);
       gl.uniform1f(uniforms.dark,dark?1:0);
       gl.drawArrays(gl.TRIANGLES,0,mesh.length/4);
     }
