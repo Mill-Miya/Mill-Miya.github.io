@@ -30,10 +30,10 @@
     } catch {}
   </script>
   <link rel="stylesheet" href="assets/style.css?v=93">
-  <link rel="stylesheet" href="assets/concept-archive.css?v=1">
+  <link rel="stylesheet" href="assets/concept-archive.css?v=2">
   <script src="assets/r-logo-spin.js?v=8" defer></script>
   <script src="assets/main.js?v=32" defer></script>
-  <script src="assets/concept-archive.js?v=1" defer></script>
+  <script src="assets/concept-archive.js?v=2" defer></script>
   <title>Mill-Miya — Selected Works</title>
 </head>
 <body>
@@ -368,7 +368,7 @@
             <span class="concept-entry-mark" aria-hidden="true">↳</span>
             <div>
               <span class="concept-entry-kicker">IDEA RECORD / UNBUILT</span>
-              <h3>Concept Archive</h3>
+              <h3><button type="button" id="concept-archive-title" class="concept-entry-title-button" aria-haspopup="dialog" aria-controls="concept-sheet">Concept Archive</button></h3>
               <p>Three ideas for experiencing the universe.</p>
             </div>
           </div>
@@ -561,47 +561,72 @@
     </div>
   </dialog>
 
-  <!-- Small archive, independent from the seven work cards and their counter. -->
-  <dialog id="concept-sheet" class="project-sheet concept-sheet" aria-labelledby="concept-sheet-title" aria-modal="true">
+  <!-- The archive is only a container. Each idea has its own work view. -->
+  <dialog id="concept-sheet" class="project-sheet concept-sheet" aria-label="Concept Archive" aria-modal="true">
     <div class="sheet-shell">
       <div class="sheet-header">
-        <span>CONCEPT STUDY / UNBUILT</span>
+        <div class="concept-header-left">
+          <button type="button" id="concept-back" class="concept-back" hidden aria-label="構想一覧へ戻る">← ARCHIVE</button>
+          <span id="concept-header-label">CONCEPT ARCHIVE / 03 STUDIES</span>
+        </div>
         <button type="button" id="concept-sheet-close" class="sheet-close" aria-label="Close concept archive">CLOSE <span aria-hidden="true">×</span></button>
       </div>
-      <div class="sheet-body">
-        <div class="sheet-visual-side">
-          <div class="sheet-visual-top"><span>SCHEMATIC REDRAW</span><span id="concept-figure-index">01 / 01</span></div>
-          <div id="concept-diagram" class="concept-figure" aria-live="polite"></div>
-          <p id="concept-diagram-caption" class="concept-diagram-caption">P1 / 全体構成</p>
-          <div class="concept-figure-controls">
-            <button type="button" id="concept-figure-prev" aria-label="前の構想図">←</button>
-            <button type="button" id="concept-figure-zoom" class="concept-zoom" aria-label="構想図を拡大">EXPAND ↗</button>
-            <button type="button" id="concept-figure-next" aria-label="次の構想図">→</button>
-          </div>
-          <div class="sheet-visual-bottom"><span>BASED ON HAND-DRAWN NOTES</span><span>NOT BUILT</span></div>
+      <section id="concept-archive-overview" class="concept-overview" aria-labelledby="concept-overview-heading">
+        <div class="concept-overview-heading">
+          <p class="sheet-eyebrow">UNBUILT IDEAS / ASTRONOMY</p>
+          <h2 id="concept-overview-heading">Concept Archive<span class="punct">.</span></h2>
+          <p>宇宙現象を展示として体験できないか考えた、3つの独立した構想。いずれも手描きの構想図までで、試作・実証・展示は行っていません。</p>
         </div>
-        <div class="sheet-copy-side concept-sheet-copy">
-          <p class="sheet-eyebrow">ASTRONOMY / CONCEPT EXPLORATION</p>
-          <h2 id="concept-sheet-title">Experiencing the Universe.</h2>
-          <div class="sheet-rule"></div>
-          <p class="concept-intro">宇宙現象を、見たり触れたりできる展示として構想した3案。元の手描き図面を参考にした簡略図を掲載しています。試作・実証・展示は行っていません。</p>
-          <div class="concept-tabs" role="tablist" aria-label="展示アイデアを選択">
-            <button type="button" role="tab" id="concept-tab-p1" data-concept="p1" aria-selected="true" aria-controls="concept-detail">01 / P1</button>
-            <button type="button" role="tab" id="concept-tab-p2" data-concept="p2" aria-selected="false" aria-controls="concept-detail">02 / P2</button>
-            <button type="button" role="tab" id="concept-tab-p3" data-concept="p3" aria-selected="false" aria-controls="concept-detail">03 / P3</button>
-          </div>
-          <section id="concept-detail" class="concept-detail" role="tabpanel" aria-label="構想の説明" tabindex="0">
-            <h3 id="concept-detail-title"></h3>
-            <p id="concept-detail-description"></p>
-            <div class="concept-limitations">
-              <strong>TECHNICAL NOTE / UNVERIFIED</strong>
-              <p id="concept-detail-caution"></p>
+        <div class="concept-work-list" aria-label="独立した3つの構想">
+          <button type="button" class="concept-work-open" data-concept-open="p1" aria-controls="concept-study-view">
+            <span class="concept-work-index">01 / P1</span>
+            <span class="concept-work-label"><strong>Space Debris / Mist Globe</strong><small>霧を利用した地球・スペースデブリの可視化</small></span>
+            <span class="concept-work-arrow" aria-hidden="true">↗</span>
+          </button>
+          <button type="button" class="concept-work-open" data-concept-open="p2" aria-controls="concept-study-view">
+            <span class="concept-work-index">02 / P2</span>
+            <span class="concept-work-label"><strong>Dark Matter / Dark Energy</strong><small>磁石と指輪型デバイスによる力覚・振動体験</small></span>
+            <span class="concept-work-arrow" aria-hidden="true">↗</span>
+          </button>
+          <button type="button" class="concept-work-open" data-concept-open="p3" aria-controls="concept-study-view">
+            <span class="concept-work-index">03 / P3</span>
+            <span class="concept-work-label"><strong>Cosmic Expansion / Redshift</strong><small>LEDの色と明るさで表現する宇宙膨張</small></span>
+            <span class="concept-work-arrow" aria-hidden="true">↗</span>
+          </button>
+        </div>
+        <p class="concept-overview-note">CONCEPT STUDIES ONLY · NOT PHYSICAL PROTOTYPES</p>
+      </section>
+      <div id="concept-study-view" class="concept-study-view" hidden>
+        <div class="sheet-body">
+          <div class="sheet-visual-side">
+            <div class="sheet-visual-top"><span>SCHEMATIC REDRAW</span><span id="concept-figure-index">01 / 01</span></div>
+            <div id="concept-diagram" class="concept-figure" aria-live="polite"></div>
+            <p id="concept-diagram-caption" class="concept-diagram-caption">P1 / 全体構成</p>
+            <div class="concept-figure-controls">
+              <button type="button" id="concept-figure-prev" aria-label="前の構想図">←</button>
+              <button type="button" id="concept-figure-zoom" class="concept-zoom" aria-label="構想図を拡大">EXPAND ↗</button>
+              <button type="button" id="concept-figure-next" aria-label="次の構想図">→</button>
             </div>
-          </section>
-          <p class="concept-sheet-context">これらのアイデアは観望会スタッフの交流の場で博物館関係者とも非公式に共有しました。正式な展示企画・展示実績ではありません。</p>
+            <div class="sheet-visual-bottom"><span>BASED ON HAND-DRAWN NOTES</span><span>NOT BUILT</span></div>
+          </div>
+          <div class="sheet-copy-side concept-sheet-copy">
+            <p class="sheet-eyebrow" id="concept-study-eyebrow">CONCEPT STUDY / P1</p>
+            <h2 id="concept-sheet-title">Space Debris / Mist Globe</h2>
+            <div class="sheet-rule"></div>
+            <p class="concept-intro">手描きの構想図を参考にした簡略図を掲載しています。試作・実証・展示は行っていません。</p>
+            <section class="concept-detail" aria-labelledby="concept-detail-title">
+              <h3 id="concept-detail-title"></h3>
+              <p id="concept-detail-description"></p>
+              <div class="concept-limitations">
+                <strong>TECHNICAL NOTE / UNVERIFIED</strong>
+                <p id="concept-detail-caution"></p>
+              </div>
+            </section>
+            <p class="concept-sheet-context">観望会スタッフの交流の場で博物館関係者とも非公式に共有した構想の一つです。正式な展示企画・展示実績ではありません。</p>
+          </div>
         </div>
+        <div class="sheet-footer"><span id="concept-study-position">CONCEPT 01 / 03</span><span>UNBUILT / DESIGN STUDY ONLY</span></div>
       </div>
-      <div class="sheet-footer"><span>NO PROTOTYPE / DESIGN STUDY ONLY</span><span>03 CONCEPTS · 04 DRAWINGS</span></div>
     </div>
   </dialog>
   <dialog id="concept-lightbox" aria-label="構想図の拡大表示">

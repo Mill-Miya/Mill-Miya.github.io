@@ -3,11 +3,18 @@
    NOT photographs or fabricated prototypes. */
 (() => {
   "use strict";
-  const opener = document.querySelector("#concept-archive-open");
+  const openers = [...document.querySelectorAll("#concept-archive-open, #concept-archive-title")];
   const dialog = document.querySelector("#concept-sheet");
-  if (!opener || !dialog || typeof dialog.showModal !== "function") return;
+  if (!openers.length || !dialog || typeof dialog.showModal !== "function") return;
   const close = dialog.querySelector("#concept-sheet-close");
-  const tabs = [...dialog.querySelectorAll("[data-concept]")];
+  const back = dialog.querySelector("#concept-back");
+  const headerLabel = dialog.querySelector("#concept-header-label");
+  const overview = dialog.querySelector("#concept-archive-overview");
+  const detailView = dialog.querySelector("#concept-study-view");
+  const studyButtons = [...dialog.querySelectorAll("[data-concept-open]")];
+  const studyTitle = dialog.querySelector("#concept-sheet-title");
+  const studyEyebrow = dialog.querySelector("#concept-study-eyebrow");
+  const studyPosition = dialog.querySelector("#concept-study-position");
   const title = dialog.querySelector("#concept-detail-title");
   const caption = dialog.querySelector("#concept-diagram-caption");
   const description = dialog.querySelector("#concept-detail-description");
@@ -59,31 +66,52 @@
     index.textContent=`${String(figure+1).padStart(2,"0")} / ${String(study.drawings.length).padStart(2,"0")}`;
     stepPrev.disabled=figure===0;
     stepNext.disabled=figure>=study.drawings.length-1;
-    for(const [i,tab] of tabs.entries()){
-      tab.setAttribute("aria-selected",String(i===active));
-      tab.tabIndex=i===active?0:-1;
-    }
+    studyTitle.textContent=study.title;
+    studyEyebrow.textContent="CONCEPT STUDY / "+study.id.toUpperCase();
+    studyPosition.textContent="CONCEPT "+String(active+1).padStart(2,"0")+" / "+String(studies.length).padStart(2,"0");
     dialog.querySelector(".concept-sheet-copy").scrollTop=0;
   }
-  const setStudy=(i)=>{active=Math.max(0,Math.min(studies.length-1,i));figure=0;render();};
-  opener.addEventListener("click",()=>{
-    lastFocus=document.activeElement;
-    setStudy(0);
-    dialog.showModal();
-    close.focus();
-  });
+  const showOverview=()=>{
+    detailView.hidden=true;
+    overview.hidden=false;
+    back.hidden=true;
+    headerLabel.textContent="CONCEPT ARCHIVE / 03 STUDIES";
+    const target=studyButtons[active];
+    (target || close).focus();
+    overview.scrollTop=0;
+  };
+  const openStudy=(i)=>{
+    active=Math.max(0,Math.min(studies.length-1,i));
+    figure=0;
+    render();
+    overview.hidden=true;
+    detailView.hidden=false;
+    back.hidden=false;
+    headerLabel.textContent="CONCEPT STUDY / "+String(active+1).padStart(2,"0")+" OF 03";
+    back.focus();
+  };
+  for(const opener of openers){
+    opener.addEventListener("click",()=>{
+      lastFocus=opener;
+      detailView.hidden=true;
+      overview.hidden=false;
+      back.hidden=true;
+      headerLabel.textContent="CONCEPT ARCHIVE / 03 STUDIES";
+      dialog.showModal();
+      close.focus();
+    });
+  }
+  back.addEventListener("click",showOverview);
+  studyButtons.forEach((button,i)=>button.addEventListener("click",()=>openStudy(i)));
   close.addEventListener("click",()=>dialog.close());
   dialog.addEventListener("close",()=>lastFocus?.focus?.());
-  dialog.addEventListener("click",(e)=>{if(e.target===dialog)dialog.close();});
-  tabs.forEach((tab,i)=>{
-    tab.addEventListener("click",()=>setStudy(i));
-    tab.addEventListener("keydown",(e)=>{
-      if(!["ArrowLeft","ArrowRight","Home","End"].includes(e.key))return;
-      e.preventDefault();
-      const next=e.key==="Home"?0:e.key==="End"?tabs.length-1:(i+(e.key==="ArrowRight"?1:-1)+tabs.length)%tabs.length;
-      setStudy(next);tabs[next].focus();
-    });
+  dialog.addEventListener("cancel",(event)=>{
+    if(!detailView.hidden){
+      event.preventDefault();
+      showOverview();
+    }
   });
+  dialog.addEventListener("click",(e)=>{if(e.target===dialog)dialog.close();});
   stepPrev.addEventListener("click",()=>{if(figure>0){figure--;render();}});
   stepNext.addEventListener("click",()=>{if(figure<studies[active].drawings.length-1){figure++;render();}});
   zoom.addEventListener("click",()=>{

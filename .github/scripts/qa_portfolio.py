@@ -149,40 +149,57 @@ with sync_playwright() as p:
                 order["logoBottom"] > order["descriptionTop"]+2 or
                 order["descriptionBottom"] > order["projectsTop"]+2):
                 fail("one-column hero does not use the phone's heading/logo/description/button order: "+repr(order), width)
-        # A small unbuilt-idea appendix must stay distinct from the seven work cards.
+        # The archive itself is a small appendix, not an eighth work.
         archive=page.locator("#concept-archive-entry")
-        if not archive.is_visible() or not page.locator("#concept-archive-open").is_visible():
-            fail("Concept Archive appendix is missing", width)
+        title_trigger=page.locator("#concept-archive-title")
+        if not archive.is_visible() or not page.locator("#concept-archive-open").is_visible() or not title_trigger.is_visible():
+            fail("Concept Archive entry/title trigger is missing", width)
         if width in (390,1280):
-            page.locator("#concept-archive-open").click()
+            # Both the heading and Explore open the folder, never the first work.
+            title_trigger.click()
             concept=page.locator("#concept-sheet")
-            if not concept.is_visible():
-                fail("Concept Archive sheet did not open", width)
-            if "Experiencing the Universe" not in concept.locator("#concept-sheet-title").inner_text():
-                fail("Concept Archive title missing", width)
-            if "Space Debris" not in concept.locator("#concept-detail-title").inner_text():
-                fail("P1 did not open as initial concept", width)
-            concept.locator('[data-concept="p2"]').click()
-            if "Dark Matter" not in concept.locator("#concept-detail-title").inner_text():
-                fail("P2 concept tab does not work", width)
-            if concept.locator("#concept-figure-index").inner_text() != "01 / 02":
-                fail("P2 must have two figures", width)
-            concept.locator("#concept-figure-next").click()
-            if concept.locator("#concept-figure-index").inner_text() != "02 / 02":
-                fail("P2 next drawing does not work", width)
-            concept.locator("#concept-figure-zoom").click()
+            overview=concept.locator("#concept-archive-overview")
+            detail=concept.locator("#concept-study-view")
+            if not concept.is_visible() or not overview.is_visible() or detail.is_visible():
+                fail("Concept Archive heading must open an independent-work folder", width)
+            if overview.locator("[data-concept-open]").count() != 3:
+                fail("Concept Archive must contain three separate selectable works", width)
+            concept.locator("#concept-sheet-close").click()
+            page.locator("#concept-archive-open").click()
+            if not overview.is_visible():
+                fail("Explore button must open the archive folder", width)
+            overview.locator('[data-concept-open="p1"]').click()
+            if not detail.is_visible() or "Space Debris" not in detail.locator("#concept-sheet-title").inner_text():
+                fail("P1 independent work detail did not open", width)
+            concept.locator("#concept-back").click()
+            if not overview.is_visible() or detail.is_visible():
+                fail("Back must return to the three-work archive", width)
+            overview.locator('[data-concept-open="p2"]').click()
+            if "Dark Matter" not in detail.locator("#concept-sheet-title").inner_text():
+                fail("P2 independent work title missing", width)
+            if detail.locator("#concept-figure-index").inner_text() != "01 / 02":
+                fail("P2 must have two drawings", width)
+            detail.locator("#concept-figure-next").click()
+            if detail.locator("#concept-figure-index").inner_text() != "02 / 02":
+                fail("P2 figure navigation broken", width)
+            detail.locator("#concept-figure-zoom").click()
             if not page.locator("#concept-lightbox").is_visible():
-                fail("Concept drawing expand action does not work", width)
+                fail("Concept drawing expand action broken", width)
             page.locator("#concept-lightbox-close").click()
-            concept.locator('[data-concept="p3"]').click()
-            if "Cosmic Expansion" not in concept.locator("#concept-detail-title").inner_text():
-                fail("P3 concept tab does not work", width)
+            # Escape from an individual study returns to the folder, not the site.
+            concept.press("Escape")
+            if not overview.is_visible() or not concept.is_visible():
+                fail("Escape must return from work to archive overview", width)
+            overview.locator('[data-concept-open="p3"]').click()
+            if "Cosmic Expansion" not in detail.locator("#concept-sheet-title").inner_text():
+                fail("P3 independent work title missing", width)
+            concept.locator("#concept-back").click()
             concept.locator("#concept-sheet-close").click()
             if concept.is_visible():
                 fail("Concept Archive dialog did not close", width)
             page.locator('.filter[data-filter="ai"]').click()
             if archive.is_visible():
-                fail("Concept appendix must be hidden while filtering completed work", width)
+                fail("Concept appendix must hide during work filter", width)
             page.locator('.filter[data-filter="all"]').click()
             if not archive.is_visible():
                 fail("Concept appendix did not return after filter reset", width)
