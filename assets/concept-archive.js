@@ -55,6 +55,23 @@
     }
   ];
   let active=0,figure=0,lastFocus=null;
+  const conceptHistory = state => state?.millMiyaOverlay;
+  function pushConceptHistory(view, studyIndex) {
+    const previous = conceptHistory(history.state);
+    const isConcept = previous?.kind === "concept" || previous?.kind === "concept-lightbox";
+    const depth = isConcept ? previous.depth + 1 : 1;
+    try {
+      history.pushState({
+        ...history.state,
+        millMiyaOverlay: {
+          kind: view === "lightbox" ? "concept-lightbox" : "concept",
+          view, index: studyIndex ?? null, depth
+        }
+      }, "", window.location.href);
+    } catch (error) {
+      console.warn("Concept-sheet history is unavailable", error);
+    }
+  }
   const makeSvg = (key) => `<svg class="concept-sketch-svg" role="img" aria-label="Original concept sketch reinterpreted as a simplified schematic: ${key}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 490">${grid}${drawings[key]}</svg>`;
   function render() {
     const study=studies[active], current=study.drawings[figure];
@@ -77,7 +94,7 @@
     back.hidden=true;
     headerLabel.textContent="CONCEPT ARCHIVE / 03 STUDIES";
     const target=studyButtons[active];
-    (target || close).focus();
+    (target || close).focus({preventScroll:true});
     overview.scrollTop=0;
   };
   const openStudy=(i)=>{
@@ -88,7 +105,7 @@
     detailView.hidden=false;
     back.hidden=false;
     headerLabel.textContent="CONCEPT STUDY / "+String(active+1).padStart(2,"0")+" OF 03";
-    back.focus();
+    back.focus({preventScroll:true});
   };
   for(const opener of openers){
     opener.addEventListener("click",()=>{
@@ -98,17 +115,33 @@
       back.hidden=true;
       headerLabel.textContent="CONCEPT ARCHIVE / 03 STUDIES";
       dialog.showModal();
+      pushConceptHistory("overview");
       close.focus();
     });
   }
-  back.addEventListener("click",showOverview);
-  studyButtons.forEach((button,i)=>button.addEventListener("click",()=>openStudy(i)));
+  back.addEventListener("click",()=>{
+    const entry=conceptHistory(history.state);
+    if(entry?.kind==="concept" && entry.depth>1) history.back();
+    else showOverview();
+  });
+  studyButtons.forEach((button,i)=>button.addEventListener("click",()=>{
+    openStudy(i);
+    pushConceptHistory("study",i);
+  }));
   close.addEventListener("click",()=>dialog.close());
-  dialog.addEventListener("close",()=>lastFocus?.focus?.());
+  dialog.addEventListener("close",()=>{
+    lastFocus?.focus?.({preventScroll:true});
+    const entry=conceptHistory(history.state);
+    if(entry?.kind==="concept" || entry?.kind==="concept-lightbox") {
+      history.go(-Math.max(1,Number(entry.depth)||1));
+    }
+  });
   dialog.addEventListener("cancel",(event)=>{
     if(!detailView.hidden){
       event.preventDefault();
-      showOverview();
+      const entry=conceptHistory(history.state);
+      if(entry?.kind==="concept" && entry.depth>1) history.back();
+      else showOverview();
     }
   });
   dialog.addEventListener("click",(e)=>{if(e.target===dialog)dialog.close();});
@@ -118,8 +151,35 @@
     if(!lightbox||!lightboxArt)return;
     lightboxArt.innerHTML=diagram.innerHTML;
     lightbox.showModal();
+    pushConceptHistory("lightbox",active);
     lightboxClose?.focus();
   });
   lightboxClose?.addEventListener("click",()=>lightbox.close());
   lightbox?.addEventListener("click",(e)=>{if(e.target===lightbox)lightbox.close();});
+  lightbox?.addEventListener("close",()=>{
+    if(conceptHistory(history.state)?.kind==="concept-lightbox") history.back();
+  });
+  // Back/Forward traverses Archive -> Study -> Zoom in normal browser order.
+  const syncConceptHistory = entry => {
+    if(entry?.kind!=="concept" && entry?.kind!=="concept-lightbox") {
+      if(lightbox?.open) lightbox.close();
+      if(dialog.open) dialog.close();
+      return;
+    }
+    if(!dialog.open) dialog.showModal();
+    if(entry.kind!=="concept-lightbox" && lightbox?.open) lightbox.close();
+    if(entry.view==="overview") showOverview();
+    else openStudy(Number.isInteger(entry.index) ? entry.index : 0);
+    if(entry.kind==="concept-lightbox" && lightbox && lightboxArt && !lightbox.open) {
+      lightboxArt.innerHTML=diagram.innerHTML;
+      lightbox.showModal();
+      lightboxClose?.focus();
+    }
+  };
+  window.addEventListener("popstate",event=>syncConceptHistory(event.state?.millMiyaOverlay));
+  // Restore modal state after refreshing a page while an Archive view is open.
+  const initialConcept=conceptHistory(history.state);
+  if(initialConcept?.kind==="concept" || initialConcept?.kind==="concept-lightbox") {
+    syncConceptHistory(initialConcept);
+  }
 })();
