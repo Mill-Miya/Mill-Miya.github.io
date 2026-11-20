@@ -1838,19 +1838,22 @@ with sync_playwright() as p:
                 )
                 if page.locator('.hero-visual.is-logo-spinning').count():
                     fail("manual REPLAY unexpectedly triggered the opening 3D spin", width)
-        # The return-to-top rotation must start on click, not after the
-        # smooth scroll arrives. Portrait shortcut hides near the footer,
-        # where the existing TOP link already offers the same action.
+        # A portrait-only floating TOP link fades in while reading, but fades
+        # out as soon as any TOP navigation starts. It must not reappear
+        # while smooth scrolling upwards and must remain hidden near footer.
         fixed_top=page.locator("#mobile-back-top")
-        if not fixed_top.count():
+        if fixed_top.count()!=1:
             fail("missing portrait return-to-top shortcut", width)
         page.locator(".hero").evaluate(
             "el => el.scrollIntoView({block:'start',behavior:'instant'})"
         )
         page.wait_for_function("window.scrollY < 15")
-        page.wait_for_function("document.querySelector('#mobile-back-top').hidden")
-        if fixed_top.is_visible():
-            fail("portrait top shortcut must be hidden on the initial hero", width)
+        page.wait_for_function(
+            "el => getComputedStyle(el).visibility === 'hidden'",
+            arg=page.locator("#mobile-back-top").element_handle()
+        )
+        if fixed_top.get_attribute("aria-hidden") != "true" or fixed_top.get_attribute("tabindex") != "-1":
+            fail("invisible TOP shortcut must not receive keyboard focus", width)
         if width in (390,1280):
             page.locator("#motion-choice").select_option("full")
             page.emulate_media(reduced_motion="no-preference")
@@ -1863,16 +1866,18 @@ with sync_playwright() as p:
                 "!document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
                 timeout=7000
             )
-            # Record whether rotation starts before native scroll finishes.
             def audit_click(selector):
                 page.evaluate("""selector => {
-                    window.__returnTopClick = null;
+                    window.__returnTopClick=null;
                     const element=document.querySelector(selector);
                     element.addEventListener('click', () => {
                         queueMicrotask(() => {
+                            const top=document.querySelector('#mobile-back-top');
                             window.__returnTopClick={
                                 spinning:document.querySelector('.hero-visual').classList.contains('is-logo-spinning'),
-                                scrollY:window.scrollY
+                                scrollY:window.scrollY,
+                                shortcutVisible:top.classList.contains('is-visible'),
+                                shortcutFocusable:top.tabIndex===0
                             };
                         });
                     }, {once:true});
@@ -1883,40 +1888,52 @@ with sync_playwright() as p:
                 if not measurement["spinning"]:
                     fail("R logo does not begin spinning on TOP click", width)
                 if measurement["scrollY"] < 20:
-                    fail("spin began only after scroll reached top", width)
-
+                    fail("R logo waited until the scroll reached top", width)
+                if measurement["shortcutVisible"] or measurement["shortcutFocusable"]:
+                    fail("fixed shortcut must fade out immediately on TOP click", width)
             if width == 390:
                 page.locator("#works").evaluate(
                     "el => el.scrollIntoView({block:'start',behavior:'instant'})"
                 )
                 page.wait_for_function("window.scrollY > innerHeight * 0.75")
                 page.wait_for_function(
-                    "document.querySelector('#mobile-back-top').hidden === false"
+                    "document.querySelector('#mobile-back-top').classList.contains('is-visible')"
                 )
+                fade=page.locator("#mobile-back-top").evaluate("""el => {
+                    const c=getComputedStyle(el);
+                    return {
+                        duration:c.transitionDuration,
+                        opacity:c.opacity,
+                        visibility:c.visibility
+                    };
+                }""")
+                if fade["visibility"]!="visible" or "0.22s" not in fade["duration"]:
+                    fail("portrait shortcut must have a real opacity transition", width)
                 audit_click("#mobile-back-top")
                 page.wait_for_function("window.scrollY < 15", timeout=8000)
                 page.wait_for_function(
                     "!document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
                     timeout=7000
                 )
-
-            # Footer is the only bottom-of-page TOP action on portrait.
+                page.wait_for_function(
+                    "getComputedStyle(document.querySelector('#mobile-back-top')).visibility==='hidden'"
+                )
             page.locator(".site-footer").evaluate(
                 "el => el.scrollIntoView({block:'end',behavior:'instant'})"
             )
             page.wait_for_function("window.scrollY > innerHeight * .9")
             page.wait_for_function(
-                "document.querySelector('#mobile-back-top').hidden"
+                "!document.querySelector('#mobile-back-top').classList.contains('is-visible')"
             )
-            if fixed_top.is_visible():
-                fail("portrait shortcut overlaps the footer's TOP link", width)
+            page.wait_for_function(
+                "getComputedStyle(document.querySelector('#mobile-back-top')).visibility==='hidden'"
+            )
             audit_click(".site-footer .back-top")
             page.wait_for_function("window.scrollY < 15", timeout=8000)
             page.wait_for_function(
                 "!document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",
                 timeout=7000
             )
-            # The header wordmark should still respond even at the top.
             page.locator(".site-header .brand").click()
             page.wait_for_function(
                 "document.querySelector('.hero-visual').classList.contains('is-logo-spinning')",

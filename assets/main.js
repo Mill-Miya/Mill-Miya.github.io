@@ -255,19 +255,38 @@
     sendLogoMessage("status");
   }
 
-  // A persistent shortcut after the hero on narrow portrait screens, not
-  // an extra control competing with the logo on the opening screen.
+  // Show a discreet portrait shortcut only during regular reading.
+  // Its opacity/visibility are transitioned in CSS; the link is not removed
+  // from the DOM, so both fade-in and fade-out remain smooth.
   const mobileBackTop = document.getElementById("mobile-back-top");
   if (mobileBackTop) {
     const portrait = window.matchMedia("(max-width: 820px) and (orientation: portrait)");
     const footer = document.querySelector(".site-footer");
+    let returningToTop = false;
     const syncBackTop = () => {
-      // The footer already has a TOP link. Avoid two simultaneous controls.
+      if (window.scrollY <= 12) returningToTop = false;
+      // The footer's own TOP action replaces this shortcut at page end.
       const footerInView = Boolean(footer && footer.getBoundingClientRect().top <= window.innerHeight);
-      mobileBackTop.hidden = !portrait.matches || footerInView ||
-        window.scrollY < Math.max(280, window.innerHeight * 0.75);
+      const visible = portrait.matches && !footerInView && !returningToTop &&
+        window.scrollY >= Math.max(280, window.innerHeight * 0.75);
+      mobileBackTop.classList.toggle("is-visible", visible);
+      mobileBackTop.setAttribute("aria-hidden", String(!visible));
+      mobileBackTop.tabIndex = visible ? 0 : -1;
     };
+    // All top links (including the floating button) immediately fade it out,
+    // before native smooth scrolling begins. It must not reappear en route.
+    for (const link of document.querySelectorAll('a[href="#top"]')) {
+      link.addEventListener("click", () => {
+        returningToTop = true;
+        syncBackTop();
+      });
+    }
     window.addEventListener("scroll", syncBackTop, { passive: true });
+    window.addEventListener("scrollend", () => {
+      // Also recover if a return scroll is interrupted before reaching top.
+      returningToTop = false;
+      syncBackTop();
+    }, { passive: true });
     window.addEventListener("resize", syncBackTop, { passive: true });
     portrait.addEventListener("change", syncBackTop);
     syncBackTop();
