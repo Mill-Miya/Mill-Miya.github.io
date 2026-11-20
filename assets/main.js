@@ -6,6 +6,7 @@
   const count = document.querySelector("#visible-count");
   const countUnit = document.querySelector("#project-count-unit");
   const grid = document.querySelector("#project-grid");
+  const conceptEntry = document.querySelector("#concept-archive-entry");
   const category = (card, filter) => filter === "all" || (card.dataset.tags || "").split(/\s+/).includes(filter);
 
   function applyFilter(filter) {
@@ -15,6 +16,8 @@
       card.hidden = !visible;
       if (visible) total += 1;
     }
+    // The concept archive is an optional appendix, not a work card.
+    if (conceptEntry) conceptEntry.hidden = filter !== "all";
     const featuredLabel = document.querySelector("#featured-group-label");
     const archiveLabel = document.querySelector("#archive-group-label");
     if (featuredLabel) featuredLabel.hidden = !cards.some(card => card.classList.contains("featured") && !card.hidden);

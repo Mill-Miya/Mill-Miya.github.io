@@ -64,7 +64,7 @@ with sync_playwright() as p:
           const navigation=document.querySelector('.site-header .site-nav');
           const head=document.querySelector('.hero h1');
           const clone=document.body.cloneNode(true);
-          clone.querySelectorAll('.project-card').forEach(n=>n.remove());
+          clone.querySelectorAll('.project-card,#concept-sheet,#concept-lightbox').forEach(n=>n.remove());
           const outside=clone.textContent || '';
           return {
             scrollWidth: document.documentElement.scrollWidth,
@@ -149,6 +149,43 @@ with sync_playwright() as p:
                 order["logoBottom"] > order["descriptionTop"]+2 or
                 order["descriptionBottom"] > order["projectsTop"]+2):
                 fail("one-column hero does not use the phone's heading/logo/description/button order: "+repr(order), width)
+        # A small unbuilt-idea appendix must stay distinct from the seven work cards.
+        archive=page.locator("#concept-archive-entry")
+        if not archive.is_visible() or not page.locator("#concept-archive-open").is_visible():
+            fail("Concept Archive appendix is missing", width)
+        if width in (390,1280):
+            page.locator("#concept-archive-open").click()
+            concept=page.locator("#concept-sheet")
+            if not concept.is_visible():
+                fail("Concept Archive sheet did not open", width)
+            if "Experiencing the Universe" not in concept.locator("#concept-sheet-title").inner_text():
+                fail("Concept Archive title missing", width)
+            if "Space Debris" not in concept.locator("#concept-detail-title").inner_text():
+                fail("P1 did not open as initial concept", width)
+            concept.locator('[data-concept="p2"]').click()
+            if "Dark Matter" not in concept.locator("#concept-detail-title").inner_text():
+                fail("P2 concept tab does not work", width)
+            if concept.locator("#concept-figure-index").inner_text() != "01 / 02":
+                fail("P2 must have two figures", width)
+            concept.locator("#concept-figure-next").click()
+            if concept.locator("#concept-figure-index").inner_text() != "02 / 02":
+                fail("P2 next drawing does not work", width)
+            concept.locator("#concept-figure-zoom").click()
+            if not page.locator("#concept-lightbox").is_visible():
+                fail("Concept drawing expand action does not work", width)
+            page.locator("#concept-lightbox-close").click()
+            concept.locator('[data-concept="p3"]').click()
+            if "Cosmic Expansion" not in concept.locator("#concept-detail-title").inner_text():
+                fail("P3 concept tab does not work", width)
+            concept.locator("#concept-sheet-close").click()
+            if concept.is_visible():
+                fail("Concept Archive dialog did not close", width)
+            page.locator('.filter[data-filter="ai"]').click()
+            if archive.is_visible():
+                fail("Concept appendix must be hidden while filtering completed work", width)
+            page.locator('.filter[data-filter="all"]').click()
+            if not archive.is_visible():
+                fail("Concept appendix did not return after filter reset", width)
         if metrics["scrollWidth"] > metrics["innerWidth"] + 1:
             fail("horizontal overflow: "+json.dumps(metrics["scrollWidth"]), width)
         if metrics["logoOverlap"]: fail("header branding overlaps navigation", width)
