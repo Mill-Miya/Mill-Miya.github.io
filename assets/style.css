@@ -1376,8 +1376,12 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .hero-logo-spin-trigger[hidden]{display:none}
 .hero-logo-spin-trigger:disabled{cursor:default}
 .hero-logo-spin-trigger:focus-visible{outline:2px solid var(--logo-label,#b0bdbd);outline-offset:-5px}
-.is-logo-spinning .hero-logo-frame{visibility:hidden}
-.is-logo-spinning .hero-logo-spin-canvas{opacity:1}
+/* Keep the final face-on 3D frame visible when rotation stops.
+   This removes the subpixel jump caused by returning to the SVG renderer. */
+.is-logo-spinning .hero-logo-frame,
+.is-logo-3d-resting .hero-logo-frame{visibility:hidden}
+.is-logo-spinning .hero-logo-spin-canvas,
+.is-logo-3d-resting .hero-logo-spin-canvas{opacity:1}
 @media(prefers-reduced-motion:reduce){.hero-logo-spin-canvas{transition:none!important}}
 
 /* Keep the R / DESIGN STUDY caption above the animation iframe and 3D canvas at all times. */
