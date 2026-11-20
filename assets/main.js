@@ -161,9 +161,27 @@
     let spinner = null;
     let openingSpinPending = motionAllowed();
     let returnSpinPending = false;
-    const finishSpin = () => {
+    const currentLogoDark = () => {
+      const choice = root.dataset.themeChoice || "system";
+      return choice === "dark" || (choice === "system" && systemTheme.matches);
+    };
+    const redrawRestingLogo = () => {
+      if (logoPanel.classList.contains("is-logo-3d-resting")) {
+        spinner?.redrawResting?.(currentLogoDark());
+      }
+    };
+    const finishSpin = (reason = "interrupted") => {
+      // The still-visible face-on WebGL frame is the last animation frame.
+      // Do not swap it for a separately rasterized SVG when motion ends.
+      const retain3D = reason === "completed" &&
+        logoPanel.classList.contains("is-logo-complete");
+      logoPanel.classList.toggle("is-logo-3d-resting", retain3D);
       logoPanel.classList.remove("is-logo-spinning");
-      if (spinTrigger) spinTrigger.disabled = false;
+      if (spinTrigger) {
+        spinTrigger.disabled = false;
+        if (reason === "contextlost") spinTrigger.hidden = true;
+      }
+      if (retain3D) redrawRestingLogo();
     };
     const cancelSpin = () => {
       spinner?.stop();
@@ -183,8 +201,7 @@
           spinTrigger.hidden = true; // WebGL2 unavailable: retain the original 2D mark.
           return;
         }
-        const choice = root.dataset.themeChoice || "system";
-        const dark = choice === "dark" || (choice === "system" && systemTheme.matches);
+        const dark = currentLogoDark();
         spinTrigger.disabled = true;
         // Render the front-facing first 3D frame before hiding the SVG.
         // This avoids a blank frame at the start of the crossfade cycle.
@@ -252,6 +269,15 @@
       sendLogoMessage("replay");
     });
     spinTrigger?.addEventListener("click", () => playLogoSpin());
+    // The resting canvas remains responsive to dark mode and viewport changes.
+    systemTheme.addEventListener("change", redrawRestingLogo);
+    new MutationObserver(redrawRestingLogo).observe(root, {
+      attributes: true, attributeFilter: ["data-theme-choice"]
+    });
+    if (typeof ResizeObserver !== "undefined") {
+      new ResizeObserver(redrawRestingLogo).observe(spinCanvas);
+    }
+    window.addEventListener("resize", redrawRestingLogo, { passive: true });
     systemMotion.addEventListener("change", syncReplay);
     motionChoice?.addEventListener("change", syncReplay);
     sendLogoMessage("status");
