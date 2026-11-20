@@ -1849,7 +1849,7 @@ with sync_playwright() as p:
         )
         page.wait_for_function("window.scrollY < 15")
         page.wait_for_function(
-            "el => getComputedStyle(el).visibility === 'hidden'",
+            "el => { const style = getComputedStyle(el); return style.display === 'none' || style.visibility === 'hidden'; }",
             arg=page.locator("#mobile-back-top").element_handle()
         )
         if fixed_top.get_attribute("aria-hidden") != "true" or fixed_top.get_attribute("tabindex") != "-1":
