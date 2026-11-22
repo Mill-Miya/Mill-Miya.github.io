@@ -90,10 +90,10 @@
   // Preserve the actual photographed sheets. The file names are intentionally
   // stable so the photos can be added without touching this controller again.
   const originals = {
-    earth: {src:"assets/concept-original-p1.jpg", alt:"手描き構想図 P1：地球模型と霧による宇宙空間表現"},
-    field: {src:"assets/concept-original-p2-1.jpg", alt:"手描き構想図 P2-1：銀河を模した板と磁石の配置"},
-    ring: {src:"assets/concept-original-p2-2.jpg", alt:"手描き構想図 P2-2：ホールセンサと磁石を使う指輪型装置"},
-    lights: {src:"assets/concept-original-p3.jpg", alt:"手描き構想図 P3：RGB LEDを備えた展示箱"}
+    earth: {src:"assets/Concept_Archive_Original_4_Images/concept-original-p1.jpg", alt:"手描き構想図 P1：地球模型と霧による宇宙空間表現"},
+    field: {src:"assets/Concept_Archive_Original_4_Images/concept-original-p2-1.jpg", alt:"手描き構想図 P2-1：銀河を模した板と磁石の配置"},
+    ring: {src:"assets/Concept_Archive_Original_4_Images/concept-original-p2-2.jpg", alt:"手描き構想図 P2-2：ホールセンサと磁石を使う指輪型装置"},
+    lights: {src:"assets/Concept_Archive_Original_4_Images/concept-original-p3.jpg", alt:"手描き構想図 P3：RGB LEDを備えた展示箱"}
   };
   const originalLabel = dialog.querySelector(".sheet-visual-top span");
   const originalIntro = dialog.querySelector(".concept-intro");
