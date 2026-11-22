@@ -23,6 +23,7 @@
 .concept-sheet .sheet-visual-side{justify-content:flex-start}
 .concept-sheet .concept-figure{flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .concept-sheet .concept-sketch-svg{display:block;width:100%;height:auto;max-height:100%;border:1px solid var(--line);background:#f0f2ef}
+.concept-sheet .concept-original-photo{display:block;width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain;border:1px solid var(--line);background:#f0f2ef}
 .concept-sheet .concept-figure-controls{display:flex;align-items:center;justify-content:center;gap:15px}
 .concept-sheet .concept-figure-controls button{min-height:44px;min-width:44px;border:1px solid var(--line-strong);color:var(--ink);background:transparent;cursor:pointer;border-radius:2px}
 .concept-sheet .concept-figure-controls button:disabled{opacity:.28;cursor:default}
@@ -51,6 +52,7 @@
 .concept-lightbox-header{display:flex;align-items:center;justify-content:space-between;gap:16px;font:11px var(--font-mono);padding-bottom:12px}
 .concept-lightbox-header button{background:transparent;border:1px solid var(--line-strong);color:inherit;min-height:44px;padding:8px 15px;cursor:pointer}
 #concept-lightbox-art .concept-sketch-svg{width:100%;height:auto;max-height:calc(94dvh - 110px);display:block}
+#concept-lightbox-art .concept-original-photo{display:block;width:auto;height:auto;max-width:100%;max-height:calc(94dvh - 110px);margin:auto;object-fit:contain;border:1px solid var(--line)}
 @media(max-width:760px){
   .concept-archive-entry{gap:12px;padding:20px 0;align-items:flex-start}
   .concept-entry-copy{gap:10px}
@@ -61,6 +63,7 @@
   .concept-sheet .sheet-visual-side{overflow:visible}
   .concept-sheet .concept-figure{flex:none;height:auto;min-height:0}
   .concept-sheet .concept-sketch-svg{width:100%;height:auto;max-height:unset}
+  .concept-sheet .concept-original-photo{width:100%;height:auto;max-height:unset}
   .concept-sheet .sheet-copy-side{padding-top:24px}
   .concept-sheet .sheet-copy-side h2{font-size:clamp(32px,8vw,43px)}
   .concept-sheet .concept-tabs{margin-bottom:22px}
