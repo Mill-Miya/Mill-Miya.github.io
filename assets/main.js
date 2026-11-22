@@ -142,6 +142,19 @@
   const systemMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const motionAllowed = () => root.dataset.motionChoice === "full" ||
     (!systemMotion.matches && root.dataset.motionChoice !== "reduce");
+  // Keep top navigation and R-logo spin, but do not leave #top in the URL.
+  // Use the existing anchor as a no-JavaScript fallback.
+  for (const link of document.querySelectorAll('a[href="#top"]')) {
+    link.addEventListener("click", event => {
+      if (event.defaultPrevented || event.button !== 0 ||
+          event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      if (window.location.hash) {
+        history.replaceState(history.state, "", location.pathname + location.search);
+      }
+      window.scrollTo({ top: 0, left: 0, behavior: motionAllowed() ? "smooth" : "instant" });
+    });
+  }
   const themeChoice = document.getElementById("theme-choice");
   const motionChoice = document.getElementById("motion-choice");
   const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
