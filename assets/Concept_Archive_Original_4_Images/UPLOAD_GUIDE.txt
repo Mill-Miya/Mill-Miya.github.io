@@ -1,0 +1,14 @@
+Concept Archive hand-drawn originals (source files unchanged)
+
+Files: 
+concept-original-p1.jpg -> P1 / globe + mist
+concept-original-p2-1.jpg -> P2-1 / magnetic galaxy panel
+concept-original-p2-2.jpg -> P2-2 / ring controller
+concept-original-p3.jpg -> P3 / LED light-box
+
+Upload the FOUR jpg files directly to the assets/ folder of
+https://github.com/Mill-Miya/Mill-Miya.github.io (branch main).
+The site's updated Concept Archive automatically swaps from SVG to photos
+after the files exist at those paths. Do not upload the zip itself.
+
+All images are the user's original photographed handwritten sheets.
