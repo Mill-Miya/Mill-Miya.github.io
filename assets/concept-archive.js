@@ -1,6 +1,5 @@
-/* Concept Archive: deliberately separate from the seven completed / in-progress projects.
-   Original hand sketches are the source; these SVGs are schematic redrawings,
-   NOT photographs or fabricated prototypes. */
+/* Concept Archive: three independent unbuilt studies with four original hand-drawn
+   sheets. Keep the prior schematic SVGs as fallbacks until their photos are available. */
 (() => {
   "use strict";
   const openers = [...document.querySelectorAll("#concept-archive-open, #concept-archive-title")];
@@ -87,14 +86,65 @@
       console.warn("Concept figure history is unavailable", error);
     }
   }
-  const makeSvg = (key) => `<svg class="concept-sketch-svg" role="img" aria-label="Original concept sketch reinterpreted as a simplified schematic: ${key}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 490">${grid}${drawings[key]}</svg>`;
+  const makeSvg = (key) => `<svg class="concept-sketch-svg" role="img" aria-label="手描き構想図を参考にした簡略図: ${key}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 490">${grid}${drawings[key]}</svg>`;
+  // Preserve the actual photographed sheets. The file names are intentionally
+  // stable so the photos can be added without touching this controller again.
+  const originals = {
+    earth: {src:"assets/concept-original-p1.jpg", alt:"手描き構想図 P1：地球模型と霧による宇宙空間表現"},
+    field: {src:"assets/concept-original-p2-1.jpg", alt:"手描き構想図 P2-1：銀河を模した板と磁石の配置"},
+    ring: {src:"assets/concept-original-p2-2.jpg", alt:"手描き構想図 P2-2：ホールセンサと磁石を使う指輪型装置"},
+    lights: {src:"assets/concept-original-p3.jpg", alt:"手描き構想図 P3：RGB LEDを備えた展示箱"}
+  };
+  const originalLabel = dialog.querySelector(".sheet-visual-top span");
+  const originalIntro = dialog.querySelector(".concept-intro");
+  const originalFootnote = dialog.querySelector(".sheet-visual-bottom span");
+  const zoomLabel = lightbox?.querySelector(".concept-lightbox-header span");
+  const fallbackIntro = originalIntro?.textContent ?? "";
+  function renderFigure(host,key) {
+    const drawing=originals[key];
+    const setView=(isOriginal)=>{
+      if(host===diagram) {
+        if(originalLabel) originalLabel.textContent=isOriginal?"ORIGINAL HAND-DRAWN SHEET":"SCHEMATIC REDRAW";
+        if(originalIntro) originalIntro.textContent=isOriginal
+          ?"当時描いた構想図の原本写真を掲載しています。試作・実証・展示は行っていません。"
+          :fallbackIntro;
+        if(originalFootnote) originalFootnote.textContent=isOriginal?"ORIGINAL SKETCH / PHOTO":"BASED ON HAND-DRAWN NOTES";
+      } else if(host===lightboxArt && zoomLabel) {
+        zoomLabel.textContent=isOriginal
+          ?"ORIGINAL HAND-DRAWN SHEET / NOT A PROTOTYPE"
+          :"SCHEMATIC REDRAW / NOT A PROTOTYPE";
+      }
+    };
+    if(!drawing) {
+      host.innerHTML=makeSvg(key);
+      setView(false);
+      return;
+    }
+    const img=document.createElement("img");
+    img.className="concept-original-photo";
+    img.alt=drawing.alt;
+    img.decoding="async";
+    img.loading="eager";
+    img.addEventListener("load",()=>{
+      if(img.isConnected) setView(true);
+    });
+    img.addEventListener("error",()=>{
+      if(!img.isConnected)return;
+      host.innerHTML=makeSvg(key);
+      setView(false);
+    });
+    host.replaceChildren(img);
+    // Keep the existing SVG available while the new image has not been
+    // uploaded yet. A failed image load automatically restores that SVG.
+    img.src=drawing.src;
+  }
   function render() {
     const study=studies[active], current=study.drawings[figure];
     title.textContent=study.title;
     description.textContent=study.desc;
     caution.textContent=study.caution;
     caption.textContent=current[1];
-    diagram.innerHTML=makeSvg(current[0]);
+    renderFigure(diagram,current[0]);
     index.textContent=`${String(figure+1).padStart(2,"0")} / ${String(study.drawings.length).padStart(2,"0")}`;
     stepPrev.disabled=figure===0;
     stepNext.disabled=figure>=study.drawings.length-1;
@@ -164,7 +214,7 @@
   stepNext.addEventListener("click",()=>{if(figure<studies[active].drawings.length-1){figure++;render();rememberFigure();}});
   zoom.addEventListener("click",()=>{
     if(!lightbox||!lightboxArt)return;
-    lightboxArt.innerHTML=diagram.innerHTML;
+    renderFigure(lightboxArt,studies[active].drawings[figure][0]);
     lightbox.showModal();
     pushConceptHistory("lightbox",active);
     lightboxClose?.focus();
@@ -192,7 +242,7 @@
       }
     }
     if(entry.kind==="concept-lightbox" && lightbox && lightboxArt && !lightbox.open) {
-      lightboxArt.innerHTML=diagram.innerHTML;
+      renderFigure(lightboxArt,studies[active].drawings[figure][0]);
       lightbox.showModal();
       lightboxClose?.focus();
     }
